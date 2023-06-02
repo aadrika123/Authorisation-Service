@@ -29,7 +29,7 @@ class ApiGatewayController extends Controller
 
             $url = $baseURLs[$service];
             $method = $req->method();
-            $req = $req->merge(['auth' => authUser()]);
+            $req = $req->merge(['auth' => authUser(), 'token' => $req->bearerToken()]);
             $response = Http::$method($url . $req->getRequestUri(), $req->all());
             return $response;
         } catch (Exception $e) {
