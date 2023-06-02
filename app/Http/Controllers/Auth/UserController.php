@@ -7,7 +7,6 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -43,8 +42,9 @@ class UserController extends Controller
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
             if (Hash::check($req->password, $user->password)) {
-                $token = $user->createToken('my-app-token')->plainTextToken;
-                return responseMsgs(true, "You have Logged In Successfully", $token, 010101, "1.0", responseTime(), "POST", $req->deviceId);
+                $data['token'] = $user->createToken('my-app-token')->plainTextToken;
+                $data['userDetails'] = $user;
+                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }
 
             throw new Exception("Password Not Matched");

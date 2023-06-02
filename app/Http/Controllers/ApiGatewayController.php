@@ -13,12 +13,13 @@ class ApiGatewayController extends Controller
     {
         try {
             $baseURLs = [
-                'property' => 'http://127.0.0.1:8001',
-                'water' => 'http://127.0.0.1:8001',
-                'trade' => 'http://127.0.0.1:8001',
-                'advert' => 'http://127.0.0.1:8001',
+                'property'  => 'http://127.0.0.1:8000',
+                'water'     => 'http://127.0.0.1:8000',
+                'trade'     => 'http://127.0.0.1:8000',
+                'menu'      => 'http://127.0.0.1:8000',
+                'advert'    => 'http://192.168.0.21:8000',
+                'market'    => 'http://192.168.0.21:8000',
                 'water-tanker' => 'http://192.168.0.21:8001',
-                'menu' => 'http://192.168.0.104:8000'
                 // Add more microservices here
             ];
             $segments = explode('/', $req->path());
