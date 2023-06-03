@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApiGatewayController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
+use App\Http\Controllers\UlbController;
 use App\Http\Controllers\WcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,13 +41,31 @@ Route::controller(CitizenController::class)->group(function () {
     Route::post('citizen-logout', 'citizenLogout')->middleware('auth:sanctum');
 });
 
+/**
+ * | 
+ */
+Route::controller(UlbController::class)->group(function () {
+    Route::get('get-all-ulb', 'getAllUlb');
+    Route::post('city/state/ulb-id', 'getCityStateByUlb');
+});
+
 
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
+
     /**
      * | Created On-02-06-2023
      * | Created By-Mrinal Kumar
+     */
+
+    Route::controller(UlbController::class)->group(function () {
+        Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
+        Route::post('list-ulb-by-district', 'districtWiseUlb');
+        Route::post('list-district', 'districtList');
+    });
+
+    /**
      * | Workflow Traits
      */
     Route::controller(WcController::class)->group(function () {
