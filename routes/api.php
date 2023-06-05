@@ -78,6 +78,29 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('finisher', 'finisherId');
     });
 
+    /**
+     * | 
+     */
+    Route::controller(UserController::class)->group(function () {
+        Route::post('authorised-register', 'authorizeStore');               // authorised user adding user // 
+        Route::post('change-password', 'changePass');                       // Change password with login
+        Route::post('otp/change-password', 'changePasswordByOtp');           // Change Password With OTP   
+
+        // User Profile APIs
+        Route::get('my-profile-details', 'myProfileDetails');   // For get My profile Details
+        Route::post('edit-my-profile', 'editMyProfile');        // For Edit My profile Details ---->>edited by mrinal method changed from put to post
+
+        Route::post('edit-user', 'update');
+        Route::post('delete-user', 'deleteUser');
+        Route::get('get-user/{id}', 'getUser');
+        Route::get('get-all-users', 'getAllUsers');
+        Route::post('list-employees', 'employeeList');
+        Route::post('get-user-notifications', 'userNotification');
+        Route::post('add-user-notification', 'addNotification');
+        Route::post('delete-user-notification', 'deactivateNotification');
+        Route::post('hash-password', 'hashPassword');
+    });
+
     // Api Gateway Routes
     Route::controller(ApiGatewayController::class)->group(function () {
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');

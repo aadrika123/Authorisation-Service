@@ -51,4 +51,24 @@ class User extends Authenticatable
         return User::where('email', $email)
             ->first();
     }
+
+    public function getUserById($userId)
+    {
+        return User::select('users.*', 'ulb_masters.ulb_name')
+            ->where('users.id', $userId)
+            ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->first();
+    }
+
+    /**
+     * | getUserRoleDtls
+     */
+    public function getUserRoleDtls()
+    {
+        return User::select()
+            ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', 'users.id')
+            ->join('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
+            ->where('suspended', false)
+            ->where('wf_roleusermaps.is_suspended', false);
+    }
 }

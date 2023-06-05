@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\MicroServices\DocUpload;
 use App\Models\Auth\ActiveCitizen;
 use Carbon\Carbon;
 use Exception;
@@ -50,6 +51,63 @@ class CitizenController extends Controller
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
             DB::rollBack();
+        }
+    }
+
+    /**
+     * | Doc upload
+     */
+    public function docUpload($request, $id)
+    {
+        $docUpload = new DocUpload;
+        $imageRelativePath = 'Uploads/Citizen/' . $id;
+        ActiveCitizen::where('id', $id)
+            ->update([
+                'relative_path' => $imageRelativePath . '/',
+            ]);
+
+        if ($request->photo) {
+            $filename = 'photo';
+            $document = $request->photo;
+            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+
+            ActiveCitizen::where('id', $id)
+                ->update([
+                    'profile_photo' => $imageName,
+                ]);
+        }
+
+        if ($request->aadharDoc) {
+            $filename = 'aadharDoc';
+            $document = $request->aadharDoc;
+            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+
+            ActiveCitizen::where('id', $id)
+                ->update([
+                    'aadhar_doc' => $imageName,
+                ]);
+        }
+
+        if ($request->speciallyAbledDoc) {
+            $filename = 'speciallyAbled';
+            $document = $request->speciallyAbledDoc;
+            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+
+            ActiveCitizen::where('id', $id)
+                ->update([
+                    'specially_abled_doc' => $imageName,
+                ]);
+        }
+
+        if ($request->armedForceDoc) {
+            $filename = 'armedForce';
+            $document = $request->armedForceDoc;
+            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+
+            ActiveCitizen::where('id', $id)
+                ->update([
+                    'armed_force_doc' => $imageName,
+                ]);
         }
     }
 
@@ -103,5 +161,24 @@ class CitizenController extends Controller
         catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
+    }
+
+    /**
+     * | Citizen Logout 
+     */
+    public function citizenLogout(Request $req)
+    {
+        // token();
+        $id =  auth()->user()->id;
+
+        $user = ActiveCitizen::where('id', $id)->first();
+        $user->remember_token = null;
+        $user->save();
+
+        $user->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Successfully logged out',
+        ]);
     }
 }
