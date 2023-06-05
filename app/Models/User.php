@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -65,9 +66,9 @@ class User extends Authenticatable
      */
     public function getUserRoleDtls()
     {
-        return User::select()
-            ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', 'users.id')
-            ->join('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
+        return  User::select('users.*', 'wf_role_id', 'role_name')
+            ->leftjoin('wf_roleusermaps', 'wf_roleusermaps.user_id', 'users.id')
+            ->leftjoin('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
             ->where('suspended', false)
             ->where('wf_roleusermaps.is_suspended', false);
     }

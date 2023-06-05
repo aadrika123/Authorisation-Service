@@ -7,13 +7,18 @@ use App\Http\Requests\Auth\AuthorizeRequestUser;
 use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
+use App\Models\Notification\MirrorUserNotification;
+use App\Models\Notification\UserNotification;
 use App\Models\User;
 use App\Traits\Auth;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
+use function PHPUnit\Framework\throwException;
 
 class UserController extends Controller
 {
@@ -149,7 +154,6 @@ class UserController extends Controller
     /**
      * | For Showing Logged In User Details 
      * | #user_id= Get the id of current user 
-     * | #redis= Find the details On Redis Server
      * | if $redis available then get the value from redis key
      * | if $redis not available then get the value from sql database
      */
@@ -244,16 +248,164 @@ class UserController extends Controller
     /**
      * | Get Users Details by Id
      */
-    public function getUser(Request $request)
+    public function getUser(Request $request, $id)
     {
         try {
             $mUser = new User();
-            return $mUser->getUserRoleDtls()
-                ->where('users.id', $request->id)
+            $data = $mUser->getUserRoleDtls()
+                ->where('users.id', $id)
                 ->first();
-            return responseMsgs(true, "Successfully Updated", "", "", "01", ".ms", "POST", "");
+            if (!$data)
+                throw new Exception('No Role For the User');
+
+            return responseMsgs(true, "User Details", $data, "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
         }
+    }
+
+    /**
+     * | Get All User Details
+     */
+    public function getAllUsers(Request $request)
+    {
+        try {
+            $mUser = new User();
+            $ulbId = authUser()->ulb_id;
+            $data = $mUser->getUserRoleDtls()
+                ->where('users.ulb_id', $ulbId)
+                ->get();
+            if ($data->isEmpty())
+                throw new Exception('No User Found');
+
+            return responseMsgs(true, "User Details", $data, "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
+    /**
+     * |Employee Lis
+     */
+    public function employeeList()
+    {
+        try {
+            $ulbId = authUser()->ulb_id;
+            $data = User::select('name as user_name', 'id')
+                ->where('user_type', 'Employee')
+                ->where('ulb_id', $ulbId)
+                ->orderBy('id')
+                ->get();
+
+            return responseMsgs(true, "List Employee", $data, "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
+    /**
+     * | Get user Notification
+     */
+    public function userNotification()
+    {
+        $user = authUser();
+        $userId = $user->id;
+        $ulbId = $user->ulb_id;
+        $userType = $user->user_type;
+        $mMirrorUserNotification = new MirrorUserNotification();
+        if ($userType == 'Citizen') {
+            $data = $mMirrorUserNotification->notificationByUserId()
+                ->where('citizen_id', $userId)
+                ->get();
+            $notification = collect($data)->groupBy('category');
+        } else
+            $notification =  $mMirrorUserNotification->notificationByUserId($userId)
+                ->where('user_id', $userId)
+                ->where('ulb_id', $ulbId)
+                ->get();
+
+        if (collect($notification)->isEmpty())
+            return responseMsgs(true, "No Current Notification", '', "010108", "1.0", "", "POST", "");
+
+        return responseMsgs(true, "Your Notificationn", remove_null($notification), "010108", "1.0", "", "POST", "");
+    }
+
+    /**
+     * | Add Notification
+     */
+    public function addNotification($req)
+    {
+        $user = authUser();
+        $userId = $user->id;
+        $ulbId = $user->ulb_id;
+        $muserNotification = new UserNotification();
+
+        $mreq = new Request([
+            "user_id" => $req->userId,
+            "citizen_id" => $req->citizenId,
+            "notification" => $req->notification,
+            "send_by" => $req->sender,
+            "category" => $req->category,
+            "sender_id" => $userId,
+            "ulb_id" => $ulbId,
+            "module_id" => $req->moduleId,
+            "event_id" => $req->eventId,
+            "generation_time" => Carbon::now(),
+            "ephameral" => $req->ephameral,
+            "require_acknowledgment" => $req->requireAcknowledgment,
+            "expected_delivery_time" => null,
+            "created_at" => Carbon::now(),
+        ]);
+        $id = $muserNotification->addNotification($mreq);
+
+        if ($req->citizenId) {
+            $data = $muserNotification->notificationByUserId($userId)
+                ->where('citizen_id', $req->citizenId)
+                ->get();
+        } else
+            $data = $muserNotification->notificationByUserId($userId)
+                ->where('user_id', $req->userId)
+                ->take(10);
+
+        $this->addMirrorNotification($mreq, $id, $user);
+
+        return responseMsgs(true, "Notificationn Addedd", '', "010108", "1.0", "", "POST", "");
+    }
+
+    /**
+     * | Add Mirror Notification
+     */
+    public function addMirrorNotification($req, $id, $user)
+    {
+        $mMirrorUserNotification = new MirrorUserNotification();
+        $mreq = new Request([
+            "user_id" => $req->user_id,
+            "citizen_id" => $req->citizen_id,
+            "notification" => $req->notification,
+            "send_by" => $req->send_by,
+            "category" => $req->category,
+            "sender_id" => $user->id,
+            "ulb_id" => $user->ulb_id,
+            "module_id" => $req->module_id,
+            "event_id" => $req->event_id,
+            "generation_time" => Carbon::now(),
+            "ephameral" => $req->ephameral,
+            "require_acknowledgment" => $req->require_acknowledgment,
+            "expected_delivery_time" => $req->expected_delivery_time,
+            "created_at" => Carbon::now(),
+            "notification_id" => $id,
+        ]);
+        $mMirrorUserNotification->addNotification($mreq);
+    }
+
+    /**
+     * | Get user Notification
+     */
+    public function deactivateNotification($req)
+    {
+        $muserNotification = new UserNotification();
+        $muserNotification->deactivateNotification($req);
+
+        return responseMsgs(true, "Notificationn Deactivated", '', "010108", "1.0", "", "POST", "");
     }
 }

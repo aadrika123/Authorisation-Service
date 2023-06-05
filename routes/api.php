@@ -3,6 +3,7 @@
 use App\Http\Controllers\ApiGatewayController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
+use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\UlbController;
 use App\Http\Controllers\WcController;
 use Illuminate\Http\Request;
@@ -54,11 +55,15 @@ Route::controller(UlbController::class)->group(function () {
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::controller(MenuController::class)->group(function () {
+        Route::post('menu/by-module', 'getMenuByModuleId');                  // Get menu by role 
+
+    });
+
     /**
      * | Created On-02-06-2023
      * | Created By-Mrinal Kumar
      */
-
     Route::controller(UlbController::class)->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
         Route::post('list-ulb-by-district', 'districtWiseUlb');
