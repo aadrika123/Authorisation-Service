@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePassRequest;
+use App\Http\Requests\Auth\OtpChangePass;
 use App\MicroServices\DocUpload;
 use App\Models\Auth\ActiveCitizen;
 use Carbon\Carbon;
@@ -10,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class CitizenController extends Controller
 {
@@ -180,5 +183,125 @@ class CitizenController extends Controller
         return response()->json([
             'message' => 'Successfully logged out',
         ]);
+    }
+
+    /**
+     * | Get Citizen Details
+     */
+    public function getCitizenByID(Request $request, $id)
+    {
+        try {
+            $citizen = ActiveCitizen::find($id);
+
+            return responseMsgs(true, "Citizen Details", $citizen, "", "", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    /**
+     * | Get Citizen Details
+     */
+    public function getAllCitizens(Request $request)
+    {
+        try {
+            $citizen = ActiveCitizen::get();
+
+            return responseMsgs(true, "Citizen Details", $citizen, "", "", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    /**
+     * |
+     */
+    public function citizenEditProfile(Request $request)
+    {
+        $validator = Validator::make(request()->all(), [
+            'id'     => 'required'
+        ]);
+
+        if ($validator->fails())
+            return validationError($validator);
+
+        try {
+            $citizen = ActiveCitizen::find($request->id);
+            $citizen->user_name = $request->name;
+            $citizen->email = $request->email;
+            $citizen->mobile = $request->mobile;
+            $citizen->gender = $request->gender;
+            $citizen->dob    = $request->dob;
+            $citizen->aadhar = $request->aadhar;
+            $citizen->is_specially_abled = $request->isSpeciallyAbled;
+            $citizen->is_armed_force = $request->isArmedForce;
+            $citizen->save();
+
+            $this->docUpload($request, $citizen->id);
+
+            return responseMsg(true, 'Successful Updated', "");
+        } catch (Exception $e) {
+            return response()->json('Something Went Wrong', 400);
+        }
+    }
+
+    /**
+     * | Citizen Change Password
+     */
+    public function changeCitizenPass(ChangePassRequest $request)
+    {
+        try {
+            $id = auth()->user()->id;
+            $citizen = ActiveCitizen::where('id', $id)->firstOrFail();
+            $validPassword = Hash::check($request->password, $citizen->password);
+            if ($validPassword) {
+
+                $citizen->password = Hash::make($request->newPassword);
+                $citizen->save();
+
+                return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", ".ms", "POST", $request->deviceId);
+            }
+            throw new Exception("Old Password dosen't Match!");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", ".ms", "POST", $request->deviceId);
+        }
+    }
+
+    /**
+     * |
+     */
+    public function changeCitizenPassByOtp(OtpChangePass $request)
+    {
+        try {
+            $id = auth()->user()->id;
+            $citizen = ActiveCitizen::where('id', $id)->firstOrFail();
+            $citizen->password = Hash::make($request->password);
+            $citizen->save();
+
+            return responseMsgs(true, "Password changed!", "", "", "01", ".ms", "POST", $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", $request->deviceId);
+        }
+    }
+
+    /** 
+     * 
+     */
+    public function profileDetails(Request $request)
+    {
+        try {
+            $citizenId = auth()->user()->id;
+            $details = ActiveCitizen::find($citizenId);
+
+            $details->name = $details->user_name;
+            $details->aadhar_doc = ($details->relative_path . $details->aadhar_doc);
+            $details->specially_abled_doc = ($details->relative_path . $details->specially_abled_doc);
+            $details->armed_force_doc = ($details->relative_path . $details->armed_force_doc);
+            $details->profile_photo = ($details->relative_path . $details->profile_photo);
+
+            return responseMsgs(true, "Citizen Details", $details, "", "01", ".ms", "POST", $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", $request->deviceId);
+        }
     }
 }

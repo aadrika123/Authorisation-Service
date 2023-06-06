@@ -145,7 +145,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
 
-            return response()->json(['Status' => 'True', 'Message' => 'Successfully Changed the Password'], 200);
+            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", ".ms", "POST", $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", $request->deviceId);
         }
