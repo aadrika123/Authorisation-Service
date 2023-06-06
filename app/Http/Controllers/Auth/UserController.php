@@ -7,9 +7,9 @@ use App\Http\Requests\Auth\AuthorizeRequestUser;
 use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
+use App\Models\Auth\User;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
-use App\Models\User;
 use App\Traits\Auth;
 use Carbon\Carbon;
 use Exception;
@@ -407,5 +407,27 @@ class UserController extends Controller
         $muserNotification->deactivateNotification($req);
 
         return responseMsgs(true, "Notificationn Deactivated", '', "010108", "1.0", "", "POST", "");
+    }
+
+    /**
+     * | For Hashing Password
+     */
+    public function hashPassword()
+    {
+        $datas =  User::select('id', 'password', "old_password")
+            ->where('password', '121')
+            ->orderby('id')
+            ->get();
+
+        foreach ($datas as $data) {
+            $user = User::find($data->id);
+            if (!$user || $user->password != '121') {
+                continue;
+            }
+            DB::beginTransaction();
+            $user->password = Hash::make($data->old_password);
+            $user->update();
+            DB::commit();
+        }
     }
 }

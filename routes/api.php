@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\UlbController;
 use App\Http\Controllers\WcController;
+use App\Http\Controllers\WorkflowMaster\WorkflowMap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -104,6 +105,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('add-user-notification', 'addNotification');
         Route::post('delete-user-notification', 'deactivateNotification');
         Route::post('hash-password', 'hashPassword');
+    });
+
+    // Citizen Register
+    Route::controller(CitizenController::class)->group(function () {
+        Route::get('get-citizen-by-id/{id}', 'getCitizenByID');                                                // Get Citizen By ID
+        Route::get('get-all-citizens', 'getAllCitizens');                                                      // Get All Citizens
+        Route::post('edit-citizen-profile', 'citizenEditProfile');                                             // Approve Or Reject Citizen by Id
+        Route::match(['get', 'post'], 'citizens/applied-applications', 'getAllAppliedApplications');           // Get Applied Applications
+        Route::post('citizens/independent-comment', 'commentIndependent');                                     // Independent Comment for the Citizen to be Tracked
+        Route::get('citizens/get-transactions', 'getTransactionHistory');                                      // Get User Transaction History
+        Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
+        Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
+        Route::post('citizen-profile-details', 'profileDetails');
+    });
+
+    /**
+     * Workflow Mapping CRUD operation
+     */
+
+    Route::controller(WorkflowMap::class)->group(function () {
+        Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
 
     // Api Gateway Routes
