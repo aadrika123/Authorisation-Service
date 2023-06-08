@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 class ApiGatewayController extends Controller
@@ -11,22 +12,16 @@ class ApiGatewayController extends Controller
     public function apiGatewayService(Request $req)
     {
         try {
-            $baseURLs = [
-                'property'  => 'http://127.0.0.1:8000',
-                'water'     => 'http://127.0.0.1:8000',
-                'trade'     => 'http://127.0.0.1:8000',
-                'menu'      => 'http://127.0.0.1:8000',
-                'advert'    => 'http://192.168.0.21:8000',
-                'market'    => 'http://192.168.0.21:8000',
-                'water-tanker' => 'http://192.168.0.21:8001',
-                // Add more microservices here
-            ];
+            // Converting environmental variables to Services
+            $baseURLs = Config::get('constants.MICROSERVICES_APIS');
+            $services = json_decode($baseURLs, true);
+            // Sending to Microservices
             $segments = explode('/', $req->path());
             $service = $segments[1];
-            if (!array_key_exists($service, $baseURLs))
+            if (!array_key_exists($service, $services))
                 throw new Exception("Service Not Available");
 
-            $url = $baseURLs[$service];
+            $url = $services[$service];
             $method = $req->method();
             $req = $req->merge([
                 'auth' => authUser(),
