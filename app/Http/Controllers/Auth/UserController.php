@@ -42,19 +42,15 @@ class UserController extends Controller
                 'type' => "nullable|in:mobile"
             ]
         );
-        if ($validated->fails()) {
-            return response()->json([
-                'status'  => false,
-                'message' => 'validation error',
-                'errors'  => $validated->errors()
-            ]);
-        }
+        if ($validated->fails())
+            return validationError($validated);
         try {
             $user = $this->_mUser->getUserByEmail($req->email);
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
             if (Hash::check($req->password, $user->password)) {
-                $data['token'] = $user->createToken('my-app-token')->plainTextToken;
+                $token = $user->createToken('my-app-token')->plainTextToken;
+                $data['token'] = $token;
                 $data['userDetails'] = $user;
                 return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }

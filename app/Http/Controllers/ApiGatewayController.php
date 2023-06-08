@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -29,8 +28,20 @@ class ApiGatewayController extends Controller
 
             $url = $baseURLs[$service];
             $method = $req->method();
-            $req = $req->merge(['auth' => authUser(), 'token' => $req->bearerToken()]);
-            $response = Http::$method($url . $req->getRequestUri(), $req->all());
+            $req = $req->merge([
+                'auth' => authUser(),
+                'token' => $req->bearerToken(),
+                'currentAccessToken' => $req->user()->currentAccessToken(),
+                'apiToken' => $req->user()->currentAccessToken()->token
+            ]);
+            $response = Http::withHeaders([
+                'API-KEY' => collect($req->headers)->toArray()['api-key']
+            ])
+                ->$method(
+                    $url . $req->getRequestUri(),
+                    $req->all()
+                );
+
             return $response;
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
