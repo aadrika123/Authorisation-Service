@@ -14,8 +14,13 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Trait for Workflows
+<<<<<<< HEAD
+ * Created By-Tannu Verma
+ * Created On-13-06-2023 
+=======
  * Created By-Anshu Kumar
  * Created On-06-07-2022 
+>>>>>>> 48190415502fbd67495aee83a5a8504ada899f71
  * --------------------------------------------------------------------------------------
  */
 
@@ -36,12 +41,21 @@ trait Workflow
     /**
      * Check workflow Candidate already existing
      */
+<<<<<<< HEAD
+    // public function checkExisting($request)
+    // {
+    //     return  WorkflowCandidate::where('ulb_workflow_id', '=', $request->UlbWorkflowID)
+    //         ->where('user_id', '=', $request->UserID)
+    //         ->first();
+    // }
+=======
     public function checkExisting($request)
     {
         return  WorkflowCandidate::where('ulb_workflow_id', '=', $request->UlbWorkflowID)
             ->where('user_id', '=', $request->UserID)
             ->first();
     }
+>>>>>>> 48190415502fbd67495aee83a5a8504ada899f71
 
     /**
      * Function for Saving and Editing Workflow Candidates
@@ -266,4 +280,8 @@ trait Workflow
             ->where('is_suspended', false)
             ->first();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 48190415502fbd67495aee83a5a8504ada899f71
