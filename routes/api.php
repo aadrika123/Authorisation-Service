@@ -14,6 +14,7 @@ use App\Http\Controllers\WorkflowMaster\WorkflowRoleUserMapController;
 use App\Http\Controllers\UlbController;
 use App\Http\Controllers\WcController;
 use App\Http\Controllers\WorkflowMaster\WorkflowMap;
+use App\Http\Controllers\WorkflowMaster\WorkflowMapController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,39 @@ Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
 });
+
+/**
+     * Workflow Mapping CRUD operation
+     */
+
+     Route::controller(WorkflowMapController::class)->group(function () {
+
+        //Mapping
+        Route::post('getroledetails', 'getRoleDetails');
+        Route::post('getUserById', 'getUserById');
+        Route::post('getWorkflowNameByUlb', 'getWorkflowNameByUlb');
+        Route::post('getRoleByUlb', 'getRoleByUlb');
+        Route::post('getWardByUlb', 'getWardByUlb');
+        Route::post('getUserByRole', 'getUserByRole');
+
+        //mapping
+        Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
+        Route::post('getUserByWorkflow', 'getUserByWorkflow');
+        Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
+        Route::post('getUlbInWorkflow', 'getUlbInWorkflow'); 
+        Route::post('getWorkflowByRole', 'getWorkflowByRole');
+        Route::post('getUserByRoleId', 'getUserByRoleId');
+        Route::post('getWardByRole', 'getWardByRole');
+        Route::post('getUlbByRole', 'getUlbByRole');
+        Route::post('getUserInUlb', 'getUserInUlb');
+        Route::post('getRoleInUlb', 'getRoleInUlb');
+        Route::post('getWorkflowInUlb', 'getWorkflowInUlb');
+
+        Route::post('getRoleByUserUlbId', 'getRoleByUserUlbId');
+        Route::post('getRoleByWardUlbId', 'getRoleByWardUlbId');
+
+        Route::post('get-ulb-workflow', 'getWorkflow');
+    });
 
 
 
@@ -211,7 +245,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Workflow Mapping CRUD operation
      */
 
-     Route::controller(WorkflowMa::class)->group(function () {
+     Route::controller(WorkflowMapController::class)->group(function () {
 
         //Mapping
         Route::post('getroledetails', 'getRoleDetails');

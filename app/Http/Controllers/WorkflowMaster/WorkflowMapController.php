@@ -37,5 +37,11 @@ class WorkflowMapController extends Controller
         return $this->wfMap->getRoleByUlb($request);
     }
 
+    public function getWardByUlb(Request $request)
+    {
+        return $this->wfMap->getWardByUlb($request);
+    }
+
+
 
 }
