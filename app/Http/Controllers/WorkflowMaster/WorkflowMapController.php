@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\WorkflowMaster;
 
 use App\Http\Controllers\Controller;
+use App\Models\Workflows\WfWorkflowrolemap;
 use App\Repository\WorkflowMaster\Interface\iWorkflowMapRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WorkflowMapController extends Controller
 {
@@ -16,10 +18,22 @@ class WorkflowMapController extends Controller
     }
 
     //Mapping 
-    public function getRoleDetails(Request $req)
-    {
-        return $this->wfMap->getRoleDetails($req);
-    }
+    public function getRoleDetails(Request $request)
+    {   
+        
+        $ulbId = auth()->user()->ulb_id;
+        $request->validate([
+            'workflowId' => 'required|int',
+            'wfRoleId' => 'required|int'
+
+        ]);
+
+        $roledetails = new WfWorkflowrolemap();
+        $get = $roledetails->getRoleDetails($request);
+        return responseMsg(true, 'All Role Deatils' , $get);
+    }    
+
+
 
     public function getUserById(Request $request)
     {
@@ -28,7 +42,6 @@ class WorkflowMapController extends Controller
 
     public function getWorkflowNameByUlb(Request $request)
     {
-        // return 'Hii';
         return $this->wfMap->getWorkflowNameByUlb($request);
     }
 
@@ -41,6 +54,27 @@ class WorkflowMapController extends Controller
     {
         return $this->wfMap->getWardByUlb($request);
     }
+
+    public function getUserByRole(Request $request)
+    {
+        return $this->wfMap->getUserByRole($request);
+    }
+
+    //by model
+    public function getRoleByWorkflow(Request $request)
+    {
+        $ulbId = authUser()->ulb_id;
+        $request->validate([
+            'workflowId' => 'required|int'
+        ]);
+
+        $roledetails = new WfWorkflowrolemap();
+        $get = $roledetails->getRoleByWorkflow($request, $ulbId);
+        return responseMsg(true, 'All Role Deatils' , $get);
+       
+    }
+
+    
 
 
 

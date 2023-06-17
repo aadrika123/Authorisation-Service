@@ -22,58 +22,58 @@ use Exception;
 
     class WorkflowMap implements iWorkflowMapRepository
 {
-    //role in a workflow
-    public function getRoleByWorkflow(Request $request)
-    {
-        $ulbId = authUser()->ulb_id;
-        $request->validate([
-            'workflowId' => 'required|int'
-        ]);
-        $roles = WfWorkflowrolemap::select('wf_roles.id as role_id', 'wf_roles.role_name')
-            ->join('wf_roles', 'wf_roles.id', '=', 'wf_workflowrolemaps.wf_role_id')
-            ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
-            ->where('wf_workflows.ulb_id', $ulbId)
-            ->where('workflow_id', $request->workflowId)
-            ->where(function ($where) {
-                $where->orWhereNotNull("wf_workflowrolemaps.forward_role_id")
-                    ->orWhereNotNull("wf_workflowrolemaps.backward_role_id")
-                    ->orWhereNotNull("wf_workflowrolemaps.serial_no");
-            })
-            ->orderBy('serial_no')
-            ->get();
+    // //role in a workflow
+    // public function getRoleByWorkflow(Request $request)
+    // {
+    //     $ulbId = authUser()->ulb_id;
+    //     $request->validate([
+    //         'workflowId' => 'required|int'
+    //     ]);
+    //     $roles = WfWorkflowrolemap::select('wf_roles.id as role_id', 'wf_roles.role_name')
+    //         ->join('wf_roles', 'wf_roles.id', '=', 'wf_workflowrolemaps.wf_role_id')
+    //         ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
+    //         ->where('wf_workflows.ulb_id', $ulbId)
+    //         ->where('workflow_id', $request->workflowId)
+    //         ->where(function ($where) {
+    //             $where->orWhereNotNull("wf_workflowrolemaps.forward_role_id")
+    //                 ->orWhereNotNull("wf_workflowrolemaps.backward_role_id")
+    //                 ->orWhereNotNull("wf_workflowrolemaps.serial_no");
+    //         })
+    //         ->orderBy('serial_no')
+    //         ->get();
 
-        return responseMsg(true, "Data Retrived", $roles);
-    }
+    //     return responseMsg(true, "Data Retrived", $roles);
+    // }
 
     
     //get role details by 
-    public function getRoleDetails(Request $request)
-    {
-        $ulbId = auth()->user()->ulb_id;
-        $request->validate([
-            'workflowId' => 'required|int',
-            'wfRoleId' => 'required|int'
+    // public function getRoleDetails(Request $request)
+    // {
+    //     $ulbId = auth()->user()->ulb_id;
+    //     $request->validate([
+    //         'workflowId' => 'required|int',
+    //         'wfRoleId' => 'required|int'
 
-        ]);
-        $roleDetails = DB::table('wf_workflowrolemaps')
-            ->select(
-                'wf_workflowrolemaps.id',
-                'wf_workflowrolemaps.workflow_id',
-                'wf_workflowrolemaps.wf_role_id',
-                'wf_workflowrolemaps.forward_role_id',
-                'wf_workflowrolemaps.backward_role_id',
-                'wf_workflowrolemaps.is_initiator',
-                'wf_workflowrolemaps.is_finisher',
-                'r.role_name as forward_role_name',
-                'rr.role_name as backward_role_name'
-            )
-            ->leftJoin('wf_roles as r', 'wf_workflowrolemaps.forward_role_id', '=', 'r.id')
-            ->leftJoin('wf_roles as rr', 'wf_workflowrolemaps.backward_role_id', '=', 'rr.id')
-            ->where('workflow_id', $request->workflowId)
-            ->where('wf_role_id', $request->wfRoleId)
-            ->first();
-        return responseMsg(true, "Data Retrived", remove_null($roleDetails));
-    }
+    //     ]);
+    //     $roleDetails = DB::table('wf_workflowrolemaps')
+    //         ->select(
+    //             'wf_workflowrolemaps.id',
+    //             'wf_workflowrolemaps.workflow_id',
+    //             'wf_workflowrolemaps.wf_role_id',
+    //             'wf_workflowrolemaps.forward_role_id',
+    //             'wf_workflowrolemaps.backward_role_id',
+    //             'wf_workflowrolemaps.is_initiator',
+    //             'wf_workflowrolemaps.is_finisher',
+    //             'r.role_name as forward_role_name',
+    //             'rr.role_name as backward_role_name'
+    //         )
+    //         ->leftJoin('wf_roles as r', 'wf_workflowrolemaps.forward_role_id', '=', 'r.id')
+    //         ->leftJoin('wf_roles as rr', 'wf_workflowrolemaps.backward_role_id', '=', 'rr.id')
+    //         ->where('workflow_id', $request->workflowId)
+    //         ->where('wf_role_id', $request->wfRoleId)
+    //         ->first();
+    //     return responseMsg(true, "Data Retrived", remove_null($roleDetails));
+    // }
 
 
 
@@ -134,6 +134,40 @@ use Exception;
             return $e;
         }
     }
+
+    //working
+    //table = ulb_ward_master
+    //ulbId->WardName
+    //wards in ulb
+    public function getWardByUlb(Request $request)
+    {
+        //validating
+        $request->validate([
+            'ulbId' => 'nullable'
+        ]);
+        $ulbId = $request->ulbId ?? authUser()->ulb_id;
+        $wards = collect();
+        $workkFlow = UlbWardMaster::select(
+            'id',
+            'ulb_id',
+            'ward_name',
+            'old_ward_name'
+        )
+            ->where('ulb_id', $ulbId)
+            ->where('status', 1)
+            ->orderby('id')
+            ->get();
+
+        $groupByWards = $workkFlow->groupBy('ward_name');
+        foreach ($groupByWards as $ward) {
+            $wards->push(collect($ward)->first());
+        }
+        $wards->sortBy('ward_name')->values();
+        return responseMsg(true, "Data Retrived", remove_null($wards));
+    }
+
+    
+
 
 
 }  

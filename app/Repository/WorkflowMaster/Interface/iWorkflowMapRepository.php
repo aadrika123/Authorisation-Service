@@ -15,10 +15,13 @@ use Illuminate\Http\Request;
 
 interface iWorkflowMapRepository
 {
-    public function getRoleByWorkflow(Request $request);
+    //public function getRoleByWorkflow(Request $request);
     //for mapping
-    public function getRoleDetails(Request $req);
+    //public function getRoleDetails(Request $req);
     public function getUserById(Request $request);
     public function getWorkflowNameByUlb(Request $request);
     public function getRoleByUlb(Request $request);
+    public function getWardByUlb(Request $request);
+    public function getUserByRole(Request $request);
+    
 }
