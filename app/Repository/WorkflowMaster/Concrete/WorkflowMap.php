@@ -165,7 +165,8 @@ use Exception;
         $wards->sortBy('ward_name')->values();
         return responseMsg(true, "Data Retrived", remove_null($wards));
     }
-
+    
+    
     
 
 
