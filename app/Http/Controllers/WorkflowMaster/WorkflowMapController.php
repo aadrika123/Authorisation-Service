@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\WorkflowMaster;
 
 use App\Http\Controllers\Controller;
+use App\Models\Workflows\WfRole;
+use App\Models\Workflows\WfRoleusermap;
+use App\Models\Workflows\WfWorkflow;
 use App\Models\Workflows\WfWorkflowrolemap;
 use App\Repository\WorkflowMaster\Interface\iWorkflowMapRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -60,7 +64,10 @@ class WorkflowMapController extends Controller
         return $this->wfMap->getUserByRole($request);
     }
 
-    //by model
+
+    //----------------------------------------------------------------------
+                 //By Model 
+    //----------------------------------------------------------------------
     public function getRoleByWorkflow(Request $request)
     {
         $ulbId = authUser()->ulb_id;
@@ -70,9 +77,74 @@ class WorkflowMapController extends Controller
 
         $roledetails = new WfWorkflowrolemap();
         $get = $roledetails->getRoleByWorkflow($request, $ulbId);
-        return responseMsg(true, 'All Role Deatils' , $get);
+        return responseMsg(true, 'All Role Details' , $get);
        
     }
+
+    public function getUserByWorkflow(Request $request)
+    {
+        $request->validate([
+            'workflowId' => 'required|int'
+        ]);
+        
+        $users = new WfWorkflowrolemap();
+        $getusers = $users->getUserByWorkflow($request);
+        return responseMsg(true, 'All user Details', $getusers);
+
+    }
+
+
+    public function getWardsInWorkflow(Request $request)
+    {
+        try{
+            $wards = new WfWorkflowrolemap();
+            $getwards = $wards->getWardsInWorkflow($request);
+            return responseMsg(true, 'All wards in Workflow', $getwards);
+        }
+        catch(Exception $e){
+            return response()->json(false, $e->getmessage());
+
+        }
+    }
+
+
+    public function getUlbInWorkflow(Request $request)
+    {
+        try{
+            $ulb = new WfWorkflow();
+            $getulb = $ulb->getUlbInWorkflow($request);
+            return responseMsg(true, 'All Ulb in Workflow', $getulb);
+        }
+        catch(Exception $e){
+            return response()->json(false, $e->getmessage());
+        }
+    }
+
+
+    public function getWorkflowByRole(Request $request)
+    {
+        try{
+            $workflow = new WfWorkflowrolemap();
+            $getworkflow = $workflow->getWorkflowByRole($request);
+            return responseMsg(true, 'Workflow By Role', $getworkflow);
+        }
+        catch(Exception $e){
+            return response()->json(false, $e->getmessage());
+        }
+    }
+
+    public function getUserByRoleId(Request $request)
+    {
+        try{
+            $workflow = new WfRole();
+            $getworkflow = $workflow->getUserByRoleId($request);
+            return responseMsg(true, 'User By Role', $getworkflow);
+        }
+        catch(Exception $e){
+            return response()->json(false, $e->getmessage());
+        }
+    }
+
 
     
 

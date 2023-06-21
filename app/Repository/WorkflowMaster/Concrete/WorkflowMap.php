@@ -165,8 +165,20 @@ use Exception;
         $wards->sortBy('ward_name')->values();
         return responseMsg(true, "Data Retrived", remove_null($wards));
     }
+
+    // table = 6 & 7
+    //role_id -> users
+    //users in a role
+    public function getUserByRole(Request $request)
+    {
+        $workkFlow = WfRoleusermap::where('wf_role_id', $request->roleId)
+            ->select('user_name', 'mobile', 'email', 'user_type')
+            ->join('users', 'users.id', '=', 'wf_roleusermaps.user_id')
+            ->get('users.user_name');
+        return responseMsg(true, "Data Retrived", $workkFlow);
+    }
     
-    
+
     
 
 
