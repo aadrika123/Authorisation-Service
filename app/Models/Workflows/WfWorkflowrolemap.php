@@ -95,4 +95,12 @@ class WfWorkflowrolemap extends Model
         return $users;
     }
 
+    public function getUlbByRole($request){
+    $users = WfWorkflowrolemap::where('wf_role_id', $request->roleId)
+            ->join('wf_workflows', 'wf_workflows.id', '=', 'wf_workflowrolemaps.workflow_id')
+            ->join('ulb_masters', 'ulb_masters.id', '=', 'wf_workflows.ulb_id')
+            ->get('ulb_masters.*');
+        return $users;
+    }    
+
 }

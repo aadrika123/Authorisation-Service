@@ -133,17 +133,50 @@ class WorkflowMapController extends Controller
         }
     }
 
+
     public function getUserByRoleId(Request $request)
     {
         try{
-            $workflow = new WfRole();
+            $workflow = new WfRoleusermap();
             $getworkflow = $workflow->getUserByRoleId($request);
             return responseMsg(true, 'User By Role', $getworkflow);
         }
         catch(Exception $e){
-            return response()->json(false, $e->getmessage());
+            return responseMsg(false,$e->getmessage(),'');
         }
     }
+    
+    //workking
+    //table = ulb_ward_master
+    //ulbId->WardName
+    //wards in ulb
+    public function getWardByRole(Request $request)
+    {
+        
+        try{
+            $ward = new WfRoleusermap();
+            $getward = $ward->getWardByRole($request);
+            return responseMsg(true, 'Ward  By Role', $getward);
+        }
+        catch (Exception $e){
+            return responseMsg(false, $e->getmessage(),'');
+        }
+    }
+
+
+    public function getUlbByRole(Request $request)
+    {
+         try{
+            $ulb = new WfWorkflowrolemap();
+            $getulb = $ulb->getUlbyRole($request);
+            return responseMsg(true, 'Ulb By Role', $getulb);
+         }
+         catch (Exception $e){
+            return responseMsg(false, $e->getmessage(),'');
+         }
+    }
+
+    
 
 
     

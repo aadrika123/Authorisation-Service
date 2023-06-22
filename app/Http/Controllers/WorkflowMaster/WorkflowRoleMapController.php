@@ -50,7 +50,8 @@ class WorkflowRoleMapController extends Controller
  
              return responseMsg(true, "Successfully Updated", $list);
          } catch (Exception $e) {
-             return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), '');
+            //  return response()->json(false, $e->getMessage());
          }
      }
 

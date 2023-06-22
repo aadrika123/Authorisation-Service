@@ -24,4 +24,27 @@ class WfRoleusermap extends Model
             ->orderByDesc('wf_roles.id')
             ->get();
     }
+
+    
+    public function getUserByRoleId($request)
+    {
+        $users = WfRoleusermap::where('wf_role_id', $request->roleId)
+            ->select('user_name', 'mobile', 'email', 'user_type')
+            ->join('users', 'users.id', '=', 'wf_roleusermaps.user_id')
+            ->get();
+        return $users;
+    }
+    
+    public function getWardByRole($request)
+    {
+    $users = WfRoleusermap::where('wf_role_id', $request->roleId)
+                ->select('ulb_masters.*')
+                ->join('wf_ward_users', 'wf_ward_users.user_id', '=', 'wf_roleusermaps.user_id')
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'wf_ward_users.ward_id')
+                ->get();
+            return $users;
+    }
+
+
+    
 }

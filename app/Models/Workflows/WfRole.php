@@ -10,9 +10,9 @@ class WfRole extends Model
 {
     use HasFactory;
 
-    public function getRoleByUserUlbId($request)
+    public function getUserByRoleId($request)
     {
-        try {
+       
             $users = WfRole::select('wf_roles.*')
                 ->where('ulb_ward_masters.ulb_id', $request->ulbId)
                 ->where('wf_roleusermaps.user_id', $request->userId)
@@ -24,8 +24,7 @@ class WfRole extends Model
                 return $users;
             }
             return responseMsg(false, "No Data Available", "");
-        } catch (Exception $e) {
-            return $e;
+       
         }
-    }
+    
 }
