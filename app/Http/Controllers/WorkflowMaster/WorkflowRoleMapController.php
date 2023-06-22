@@ -12,11 +12,11 @@ use Illuminate\Http\Request;
 
 class WorkflowRoleMapController extends Controller
 {
-    
-/**
- * Created On-13-06-2022 
- * Created By-Tannu Verma
- */
+
+    /**
+     * Created On-13-06-2022 
+     * Created By-Tannu Verma
+     */
 
 
 
@@ -41,21 +41,21 @@ class WorkflowRoleMapController extends Controller
         }
     }
 
-     //update master
-     public function updateRoleMap(Request $req)
-     {
-         try {
-             $update = new WfWorkflowrolemap();
-             $list  = $update->updateRoleMap($req);
- 
-             return responseMsg(true, "Successfully Updated", $list);
-         } catch (Exception $e) {
+    //update master
+    public function updateRoleMap(Request $req)
+    {
+        try {
+            $update = new WfWorkflowrolemap();
+            $list  = $update->updateRoleMap($req);
+
+            return responseMsg(true, "Successfully Updated", $list);
+        } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), '');
             //  return response()->json(false, $e->getMessage());
-         }
-     }
+        }
+    }
 
-     //master list by id
+    //master list by id
     public function roleMapbyId(Request $req)
     {
         try {
@@ -105,10 +105,7 @@ class WorkflowRoleMapController extends Controller
             $mWfWorkflows = new WfWorkflow();
             $mWfWorkflowrolemap = new WfWorkflowrolemap();
             $ulbId = authUser()->ulb_id;
-            // $wfMasterId = $req->workflowId;                  // wfMasterId from frontend in the key of wokflowId
-            $workflowId = $req->workflowId;                  // wfMasterId from frontend in the key of wokflowId
-            // $ulbWorkflow = $mWfWorkflows->getulbWorkflowId($wfMasterId, $ulbId);
-            // $workflowId  =  $ulbWorkflow->id;
+            $workflowId = $req->workflowId;
 
             $mreqs = new Request(["workflowId" => $workflowId]);
             $role = $mWorkflowMap->getRoleByWorkflow($mreqs);
@@ -132,6 +129,4 @@ class WorkflowRoleMapController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
-
-
 }

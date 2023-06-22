@@ -25,7 +25,7 @@ class WorkflowController extends Controller
 
             return responseMsg(true, "Workflow Saved", "");
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -38,7 +38,7 @@ class WorkflowController extends Controller
 
             return responseMsg(true, "Successfully Updated", $list);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -52,7 +52,7 @@ class WorkflowController extends Controller
 
             return responseMsg(true, "Workflow List", $list);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -66,7 +66,7 @@ class WorkflowController extends Controller
 
             return responseMsg(true, "All Workflow List", $workflow);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -80,8 +80,7 @@ class WorkflowController extends Controller
 
             return responseMsg(true, "Data Deleted", '');
         } catch (Exception $e) {
-            return response()->json($e, 400);
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
-
 }

@@ -10,14 +10,14 @@ use Exception;
 class MasterController extends Controller
 {
     /**
- * Controller for Add, Update, View , Delete of Workflow Master Table
- * -------------------------------------------------------------------------------------------------
- * Created On-07-10-2022
- * Created By-Mrinal Kumar
- * Modification On: 19-12-2022
- * Status : Closed
- * -------------------------------------------------------------------------------------------------
- */
+     * Controller for Add, Update, View , Delete of Workflow Master Table
+     * -------------------------------------------------------------------------------------------------
+     * Created On-07-10-2022
+     * Created By-Mrinal Kumar
+     * Modification On: 19-12-2022
+     * Status : Closed
+     * -------------------------------------------------------------------------------------------------
+     */
 
 
     //create master
@@ -33,7 +33,7 @@ class MasterController extends Controller
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -46,7 +46,7 @@ class MasterController extends Controller
 
             return responseMsg(true, "Successfully Updated", $list);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -60,7 +60,7 @@ class MasterController extends Controller
 
             return responseMsg(true, "Master List", $list);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -74,7 +74,7 @@ class MasterController extends Controller
 
             return responseMsg(true, "All Master List", $masters);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -88,13 +88,7 @@ class MasterController extends Controller
 
             return responseMsg(true, "Data Deleted", '');
         } catch (Exception $e) {
-            return response()->json($e, 400);
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
-    
-    
-
-
 }
-
-

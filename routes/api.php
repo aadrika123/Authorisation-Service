@@ -101,7 +101,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('wfworkflow/delete', 'deleteWorkflow');                   // Delete Workflow
     });
 
-
     /**
      * ============== Role Controller CRUD Operation =================
      */
@@ -117,33 +116,61 @@ Route::middleware('auth:sanctum')->group(function () {
      * ============== Ward User CRUD operation ======================
      */
     Route::controller(WardUserController::class)->group(function () {
-        Route::post('ward-user/save', 'createWardUser');                     // Save Workflow
-        Route::post('ward-user/edit', 'updateWardUser');                     // Edit Workflow 
-        Route::post('ward-user/byId', 'WardUserbyId');                       // Get Workflow By Id
-        Route::post('ward-user/list', 'getAllWardUser');                     // Get All Workflow
-        Route::post('ward-user/delete', 'deleteWardUser');                   // Delete Workflow
-        Route::post('ward-user/list-tc', 'tcList');
+        Route::post('workflow/ward-user/save', 'createWardUser');                     // Save Workflow
+        Route::post('workflow/ward-user/edit', 'updateWardUser');                     // Edit Workflow 
+        Route::post('workflow/ward-user/byId', 'WardUserbyId');                       // Get Workflow By Id
+        Route::post('workflow/ward-user/list', 'getAllWardUser');                     // Get All Workflow
+        Route::post('workflow/ward-user/delete', 'deleteWardUser');                   // Delete Workflow
+        Route::post('workflow/ward-user/list-tc', 'tcList');
     });
 
 
-    // /**
-    //  * Role User Map CRUD operation
-    //  */
+    /**
+     * Role User Map CRUD operation
+     */
     Route::controller(WorkflowRoleUserMapController::class)->group(function () {
-        Route::post('role-user-maps/get-roles-by-id', 'getRolesByUserId');                        // Get Permitted Roles By User ID
-        Route::post('role-user-maps/update-user-roles', 'updateUserRoles');                       // Enable or Disable User Role
+        Route::post('workflow/role-user-maps/get-roles-by-id', 'getRolesByUserId');                        // Get Permitted Roles By User ID
+        Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                       // Enable or Disable User Role
     });
 
     /**
      * Workflow Role Map CRUD operation
      */
     Route::controller(WorkflowRoleMapController::class)->group(function () {
-        Route::post('role-map/save', 'createRoleMap');                     // Save Workflow
-        Route::post('role-map/edit', 'updateRoleMap');                     // Edit Workflow 
-        Route::post('role-map/byId', 'roleMapbyId');                       // Get Workflow By Id
-        Route::post('role-map/list', 'getAllRoleMap');                     // Get All Workflow
-        Route::post('role-map/delete', 'deleteRoleMap');                   // Delete Workflow
-        Route::post('role-map/workflow-info', 'workflowInfo');
+        Route::post('workflow/role-map/save', 'createRoleMap');                     // Save Workflow
+        Route::post('workflow/role-map/edit', 'updateRoleMap');                     // Edit Workflow 
+        Route::post('workflow/role-map/byId', 'roleMapbyId');                       // Get Workflow By Id
+        Route::post('workflow/role-map/list', 'getAllRoleMap');                     // Get All Workflow
+        Route::post('workflow/role-map/delete', 'deleteRoleMap');                   // Delete Workflow
+        Route::post('workflow/role-map/workflow-info', 'workflowInfo');
+    });
+
+    /**
+     * Workflow Mapping CRUD operation
+     */
+    Route::controller(WorkflowMapController::class)->group(function () {
+
+        //Mapping
+        Route::post('getroledetails', 'getRoleDetails');
+        Route::post('getUserById', 'getUserById');
+        Route::post('getWorkflowNameByUlb', 'getWorkflowNameByUlb');
+        Route::post('getRoleByUlb', 'getRoleByUlb');
+        Route::post('getWardByUlb', 'getWardByUlb');
+        Route::post('getUserByRole', 'getUserByRole');     #both r same please use one
+        Route::post('getUserByRoleId', 'getUserByRoleId'); #both r same please use one    
+        Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
+        Route::post('getUserByWorkflow', 'getUserByWorkflow');
+        Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
+        Route::post('getUlbInWorkflow', 'getUlbInWorkflow');
+        Route::post('getWorkflowByRole', 'getWorkflowByRole');
+        Route::post('getWardByRole', 'getWardByRole');
+
+        Route::post('getUserInUlb', 'getUserInUlb');
+        Route::post('getRoleInUlb', 'getRoleInUlb');
+        Route::post('getWorkflowInUlb', 'getWorkflowInUlb');
+        Route::post('getRoleByUserUlbId', 'getRoleByUserUlbId');
+        Route::post('getRoleByWardUlbId', 'getRoleByWardUlbId');
+        Route::post('get-ulb-workflow', 'getWorkflow');
     });
 
     /* | Created On-02-06-2023
@@ -201,33 +228,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('citizen-profile-details', 'profileDetails');
     });
 
-    /**
-     * Workflow Mapping CRUD operation
-     */
-    Route::controller(WorkflowMapController::class)->group(function () {
 
-        //Mapping
-        Route::post('getroledetails', 'getRoleDetails');
-        Route::post('getUserById', 'getUserById');
-        Route::post('getWorkflowNameByUlb', 'getWorkflowNameByUlb');
-        Route::post('getRoleByUlb', 'getRoleByUlb');
-        Route::post('getWardByUlb', 'getWardByUlb');
-        Route::post('getUserByRole', 'getUserByRole');     #both r same please use one
-        Route::post('getUserByRoleId', 'getUserByRoleId'); #both r same please use one    
-        Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
-        Route::post('getUserByWorkflow', 'getUserByWorkflow');
-        Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
-        Route::post('getUlbInWorkflow', 'getUlbInWorkflow');
-        Route::post('getWorkflowByRole', 'getWorkflowByRole');
-        Route::post('getWardByRole', 'getWardByRole');
-
-        Route::post('getUserInUlb', 'getUserInUlb');
-        Route::post('getRoleInUlb', 'getRoleInUlb');
-        Route::post('getWorkflowInUlb', 'getWorkflowInUlb');
-        Route::post('getRoleByUserUlbId', 'getRoleByUserUlbId');
-        Route::post('getRoleByWardUlbId', 'getRoleByWardUlbId');
-        Route::post('get-ulb-workflow', 'getWorkflow');
-    });
 
 
 
