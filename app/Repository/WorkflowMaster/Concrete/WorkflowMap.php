@@ -17,10 +17,10 @@ use Exception;
 
 
 //============================================================================================
-    //=============================       NEW MAPPING          ===================================
-    //============================================================================================
+//=============================       NEW MAPPING          ===================================
+//============================================================================================
 
-    class WorkflowMap implements iWorkflowMapRepository
+class WorkflowMap implements iWorkflowMapRepository
 {
     // //role in a workflow
     // public function getRoleByWorkflow(Request $request)
@@ -45,7 +45,7 @@ use Exception;
     //     return responseMsg(true, "Data Retrived", $roles);
     // }
 
-    
+
     //get role details by 
     // public function getRoleDetails(Request $request)
     // {
@@ -95,7 +95,7 @@ use Exception;
 
 
 
-     // tables = wf_workflows + wf_masters
+    // tables = wf_workflows + wf_masters
     // ulbId -> workflow name
     // workflows in a ulb
     public function getWorkflowNameByUlb(Request $request)
@@ -111,7 +111,7 @@ use Exception;
             ->get();
         return responseMsg(true, "Data Retrived", $workkFlow);
     }
-    
+
 
     // tables = wf_workflows + wf_workflowrolemap + wf_roles
     // ulbId -> rolename
@@ -166,7 +166,6 @@ use Exception;
         return responseMsg(true, "Data Retrived", remove_null($wards));
     }
 
-    // table = 6 & 7
     //role_id -> users
     //users in a role
     public function getUserByRole(Request $request)
@@ -177,10 +176,4 @@ use Exception;
             ->get('users.user_name');
         return responseMsg(true, "Data Retrived", $workkFlow);
     }
-    
-
-    
-
-
-
-}  
+}

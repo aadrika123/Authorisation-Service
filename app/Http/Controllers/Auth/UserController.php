@@ -270,6 +270,7 @@ class UserController extends Controller
             $ulbId = authUser()->ulb_id;
             $data = $mUser->getUserRoleDtls()
                 ->where('users.ulb_id', $ulbId)
+                ->orderbyDesc('users.id')
                 ->get();
             if ($data->isEmpty())
                 throw new Exception('No User Found');

@@ -23,19 +23,18 @@ class WorkflowMapController extends Controller
 
     //Mapping 
     public function getRoleDetails(Request $request)
-    {   
-        
+    {
+
         $ulbId = auth()->user()->ulb_id;
         $request->validate([
             'workflowId' => 'required|int',
             'wfRoleId' => 'required|int'
-
         ]);
 
         $roledetails = new WfWorkflowrolemap();
         $get = $roledetails->getRoleDetails($request);
-        return responseMsg(true, 'All Role Deatils' , $get);
-    }    
+        return responseMsg(true, 'All Role Deatils', $get);
+    }
 
 
 
@@ -66,7 +65,7 @@ class WorkflowMapController extends Controller
 
 
     //----------------------------------------------------------------------
-                 //By Model 
+    //By Model 
     //----------------------------------------------------------------------
     public function getRoleByWorkflow(Request $request)
     {
@@ -77,8 +76,7 @@ class WorkflowMapController extends Controller
 
         $roledetails = new WfWorkflowrolemap();
         $get = $roledetails->getRoleByWorkflow($request, $ulbId);
-        return responseMsg(true, 'All Role Details' , $get);
-       
+        return responseMsg(true, 'All Role Details', $get);
     }
 
     public function getUserByWorkflow(Request $request)
@@ -86,36 +84,32 @@ class WorkflowMapController extends Controller
         $request->validate([
             'workflowId' => 'required|int'
         ]);
-        
+
         $users = new WfWorkflowrolemap();
         $getusers = $users->getUserByWorkflow($request);
         return responseMsg(true, 'All user Details', $getusers);
-
     }
 
 
     public function getWardsInWorkflow(Request $request)
     {
-        try{
+        try {
             $wards = new WfWorkflowrolemap();
             $getwards = $wards->getWardsInWorkflow($request);
             return responseMsg(true, 'All wards in Workflow', $getwards);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json(false, $e->getmessage());
-
         }
     }
 
 
     public function getUlbInWorkflow(Request $request)
     {
-        try{
+        try {
             $ulb = new WfWorkflow();
             $getulb = $ulb->getUlbInWorkflow($request);
             return responseMsg(true, 'All Ulb in Workflow', $getulb);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json(false, $e->getmessage());
         }
     }
@@ -123,12 +117,11 @@ class WorkflowMapController extends Controller
 
     public function getWorkflowByRole(Request $request)
     {
-        try{
+        try {
             $workflow = new WfWorkflowrolemap();
             $getworkflow = $workflow->getWorkflowByRole($request);
             return responseMsg(true, 'Workflow By Role', $getworkflow);
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json(false, $e->getmessage());
         }
     }
@@ -136,51 +129,28 @@ class WorkflowMapController extends Controller
 
     public function getUserByRoleId(Request $request)
     {
-        try{
+        try {
             $workflow = new WfRoleusermap();
             $getworkflow = $workflow->getUserByRoleId($request);
             return responseMsg(true, 'User By Role', $getworkflow);
-        }
-        catch(Exception $e){
-            return responseMsg(false,$e->getmessage(),'');
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getmessage(), '');
         }
     }
-    
+
     //workking
     //table = ulb_ward_master
     //ulbId->WardName
     //wards in ulb
     public function getWardByRole(Request $request)
     {
-        
-        try{
+
+        try {
             $ward = new WfRoleusermap();
             $getward = $ward->getWardByRole($request);
             return responseMsg(true, 'Ward  By Role', $getward);
-        }
-        catch (Exception $e){
-            return responseMsg(false, $e->getmessage(),'');
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getmessage(), '');
         }
     }
-
-
-    public function getUlbByRole(Request $request)
-    {
-         try{
-            $ulb = new WfWorkflowrolemap();
-            $getulb = $ulb->getUlbyRole($request);
-            return responseMsg(true, 'Ulb By Role', $getulb);
-         }
-         catch (Exception $e){
-            return responseMsg(false, $e->getmessage(),'');
-         }
-    }
-
-    
-
-
-    
-
-
-
 }
