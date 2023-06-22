@@ -2,6 +2,7 @@
 
 namespace App\Models\Workflows;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ class WfRole extends Model
 {
     use HasFactory;
 
-    public function getUserByRoleId($request)
+    public function getRoleByUserUlbId($request)
     {
        
             $users = WfRole::select('wf_roles.*')
@@ -25,6 +26,6 @@ class WfRole extends Model
             }
             return responseMsg(false, "No Data Available", "");
        
-        }
+    }
     
 }
