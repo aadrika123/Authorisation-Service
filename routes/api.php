@@ -60,68 +60,66 @@ Route::controller(UlbController::class)->group(function () {
 });
 
 /**
-     * Workflow Mapping CRUD operation
-     */
+ * Workflow Mapping CRUD operation
+ */
 
-     Route::controller(WorkflowMapController::class)->group(function () {
+Route::controller(WorkflowMapController::class)->group(function () {
 
-        //Mapping
-        Route::post('getroledetails', 'getRoleDetails');
-        Route::post('getUserById', 'getUserById');
-        Route::post('getWorkflowNameByUlb', 'getWorkflowNameByUlb');
-        Route::post('getRoleByUlb', 'getRoleByUlb');
-        Route::post('getWardByUlb', 'getWardByUlb');
-        Route::post('getUserByRole', 'getUserByRole');
+    //Mapping
+    Route::post('getroledetails', 'getRoleDetails');
+    Route::post('getUserById', 'getUserById');
+    Route::post('getWorkflowNameByUlb', 'getWorkflowNameByUlb');
+    Route::post('getRoleByUlb', 'getRoleByUlb');
+    Route::post('getWardByUlb', 'getWardByUlb');
+    Route::post('getUserByRole', 'getUserByRole');
 
-        //mapping
-        Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
-        Route::post('getUserByWorkflow', 'getUserByWorkflow');
-        Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
-        Route::post('getUlbInWorkflow', 'getUlbInWorkflow'); 
-        Route::post('getWorkflowByRole', 'getWorkflowByRole');
-        Route::post('getUserByRoleId', 'getUserByRoleId');
-        Route::post('getWardByRole', 'getWardByRole');
-        Route::post('getUlbByRole', 'getUlbByRole');
-        Route::post('getUserInUlb', 'getUserInUlb');
-        Route::post('getRoleInUlb', 'getRoleInUlb');
-        Route::post('getWorkflowInUlb', 'getWorkflowInUlb');
+    //mapping
+    Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
+    Route::post('getUserByWorkflow', 'getUserByWorkflow');
+    Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
+    Route::post('getUlbInWorkflow', 'getUlbInWorkflow');
+    Route::post('getWorkflowByRole', 'getWorkflowByRole');
+    Route::post('getUserByRoleId', 'getUserByRoleId');
+    Route::post('getWardByRole', 'getWardByRole');
+    Route::post('getUlbByRole', 'getUlbByRole');
+    Route::post('getUserInUlb', 'getUserInUlb');
+    Route::post('getRoleInUlb', 'getRoleInUlb');
+    Route::post('getWorkflowInUlb', 'getWorkflowInUlb');
 
-        Route::post('getRoleByUserUlbId', 'getRoleByUserUlbId');
-        Route::post('getRoleByWardUlbId', 'getRoleByWardUlbId');
+    Route::post('getRoleByUserUlbId', 'getRoleByUserUlbId');
+    Route::post('getRoleByWardUlbId', 'getRoleByWardUlbId');
 
-        Route::post('get-ulb-workflow', 'getWorkflow');
-    });
+    Route::post('get-ulb-workflow', 'getWorkflow');
+});
 
 
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::controller(MenuController::class)->group(function(){
-        Route::post('crud/menu/get-all-menues','getAllMenues');
-        Route::post('crud/menu/get-menu-by-roles','getMenuByRoles');
-        Route::post('menu-roles/update-menu-by-role','updateMenuByRole');
-        Route::post('crud/menu/add-new-menues','addNewMenues');
-        Route::post('crud/menu/delete-menues','deleteMenuesDetails');
-        Route::post('sub-menu/tree-structure', 'getTreeStructureMenu');  
-        Route::post('menu-roles/list-parent-serial', 'listParentSerial');  
-        Route::post('sub-menu/get-children-node', 'getChildrenNode'); 
-        Route::post('crud/menu/update-menues', 'updateMenuMaster');  
-        Route::post('menu/get-menu-by-id', 'getMenuById'); 
-        Route::post('menu/get-menu-by-module-id', 'getMenuByModuleId'); 
+    Route::controller(MenuController::class)->group(function () {
+        Route::post('crud/menu/get-all-menues', 'getAllMenues');
+        Route::post('crud/menu/get-menu-by-roles', 'getMenuByRoles');
+        Route::post('menu-roles/update-menu-by-role', 'updateMenuByRole');
+        Route::post('crud/menu/add-new-menues', 'addNewMenues');
+        Route::post('crud/menu/delete-menues', 'deleteMenuesDetails');
+        Route::post('sub-menu/tree-structure', 'getTreeStructureMenu');
+        Route::post('menu-roles/list-parent-serial', 'listParentSerial');
+        Route::post('sub-menu/get-children-node', 'getChildrenNode');
+        Route::post('crud/menu/update-menues', 'updateMenuMaster');
+        Route::post('menu/get-menu-by-id', 'getMenuById');
+        Route::post('menu/by-module', 'getMenuByModuleId');
     });
 
     /**
      * workflow Master CRUD operation
      */
-    Route::controller(MasterController::class)->group(function(){
+    Route::controller(MasterController::class)->group(function () {
         Route::post('workflow/master/save', 'createMaster');
         Route::post('workflow/master/edit', 'updateMaster');
-        Route::post('workflow/master/byId', 'masterbyId');  
-        Route::post('workflow/master/list', 'getAllMaster'); 
-        Route::post('workflow/master/delete', 'deleteMaster'); 
-                     // Get menu by role 
-
+        Route::post('workflow/master/byId', 'masterbyId');
+        Route::post('workflow/master/list', 'getAllMaster');
+        Route::post('workflow/master/delete', 'deleteMaster');
     });
 
 
@@ -142,19 +140,15 @@ Route::middleware('auth:sanctum')->group(function () {
      * ============== Role Controller CRUD Operation =================
      */
     Route::controller(RoleController::class)->group(function () {
-        Route::post('roles/save', 'createRole');                   // Save Role
-        Route::post('roles/edit', 'editRole');                     // edit Role
-        Route::post('roles/get', 'getRole');                       // Get Role By Id
-        Route::post('roles/list', 'getAllRoles');                  //Get All Roles          
-        Route::post('roles/delete', 'deleteRole');                 // Delete Role
+        Route::post('workflow/roles/save', 'createRole');                   // Save Role
+        Route::post('workflow/roles/edit', 'editRole');                     // edit Role
+        Route::post('workflow/roles/get', 'getRole');                       // Get Role By Id
+        Route::post('workflow/roles/list', 'getAllRoles');                  // Get All Roles          
+        Route::post('workflow/roles/delete', 'deleteRole');                 // Delete Role
     });
-    /**
-     * ===================================================================
-     */
 
-     
     /**
-     * Ward User CRUD operation
+     * ============== Ward User CRUD operation ======================
      */
     Route::controller(WardUserController::class)->group(function () {
         Route::post('ward-user/save', 'createWardUser');                     // Save Workflow
@@ -185,8 +179,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('role-map/delete', 'deleteRoleMap');                   // Delete Workflow
         Route::post('role-map/workflow-info', 'workflowInfo');
     });
-        
-     /* | Created On-02-06-2023
+
+    /* | Created On-02-06-2023
      * | Created By-Mrinal Kumar
      */
     Route::controller(UlbController::class)->group(function () {
@@ -245,7 +239,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Workflow Mapping CRUD operation
      */
 
-     Route::controller(WorkflowMapController::class)->group(function () {
+    Route::controller(WorkflowMapController::class)->group(function () {
 
         //Mapping
         Route::post('getroledetails', 'getRoleDetails');
@@ -259,7 +253,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('getRoleByWorkflow', 'getRoleByWorkflow');
         Route::post('getUserByWorkflow', 'getUserByWorkflow');
         Route::post('getWardsInWorkflow', 'getWardsInWorkflow');
-        Route::post('getUlbInWorkflow', 'getUlbInWorkflow'); 
+        Route::post('getUlbInWorkflow', 'getUlbInWorkflow');
         Route::post('getWorkflowByRole', 'getWorkflowByRole');
         Route::post('getUserByRoleId', 'getUserByRoleId');
         Route::post('getWardByRole', 'getWardByRole');
@@ -276,10 +270,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    Route::controller(TestController::class)->group(function(){
-        Route::post('repo/test','test');
+    Route::controller(TestController::class)->group(function () {
+        Route::post('repo/test', 'test');
     });
-    
+
     Route::controller(WorkflowMap::class)->group(function () {
         Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
@@ -288,8 +282,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ApiGatewayController::class)->group(function () {
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');
     });
-
 });
-
-
-    
