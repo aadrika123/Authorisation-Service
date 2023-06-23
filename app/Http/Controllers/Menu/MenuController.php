@@ -8,6 +8,7 @@ use App\Models\Menu\MenuMaster;
 use App\Models\Workflows\WfRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
 {
@@ -16,6 +17,13 @@ class MenuController extends Controller
      */
     public function getMenuByModuleId(Request $req)
     {
+        $validated = Validator::make(
+            $req->all(),
+            ['moduleId' => 'required']
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
         try {
             $user = authUser();
             $userId = $user->id;
