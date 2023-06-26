@@ -41,6 +41,10 @@ class MasterController extends Controller
     public function updateMaster(Request $req)
     {
         try {
+            $req->validate([
+                'workflowName' => 'required',
+                'id' => 'required'
+            ]);
             $update = new WfMaster();
             $list  = $update->updateMaster($req);
 
@@ -54,7 +58,9 @@ class MasterController extends Controller
     public function masterbyId(Request $req)
     {
         try {
-
+            $req->validate([
+                'id' => 'required'
+            ]);
             $listById = new WfMaster();
             $list  = $listById->listbyId($req);
 
@@ -83,6 +89,9 @@ class MasterController extends Controller
     public function deleteMaster(Request $req)
     {
         try {
+            $req->validate([
+                'id' => 'required'
+            ]);
             $delete = new WfMaster();
             $delete->deleteMaster($req);
 

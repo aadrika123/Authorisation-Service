@@ -126,4 +126,107 @@ class MenuController extends Controller
         }
         return $refvalue['id'];
     }
+
+    /**
+     * | List all Menus
+     */
+    public function menuList(Request $request)
+    {
+        try {
+            $mMenuMaster = new MenuMaster();
+            $refmenues = $mMenuMaster->fetchAllMenues();
+            $menues = $refmenues->sortByDesc("id");
+            $listedMenues = collect($menues)->map(function ($value) use ($mMenuMaster) {
+                if ($value['parent_serial'] != 0) {
+                    $parent = $mMenuMaster->getMenuById($value['parent_serial']);
+                    $parentName = $parent['menu_string'];
+                    $value['parentName'] = $parentName;
+                    return $value;
+                }
+                return $value;
+            })->values();
+            return responseMsgs(true, "List of Menues!", $listedMenues, "", "02", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+        }
+    }
+
+    /**
+     * | Save Menu
+     */
+    public function createMenu(Request $request)
+    {
+        try {
+            $request->validate([
+                'menuName'      => 'required',
+                'route'         => 'nullable',
+            ]);
+            $mMenuMaster = new MenuMaster();
+            $mMenuMaster->store($request);
+            return responseMsgs(true, "Data Saved!", "", "", "02", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    /**
+     * | Update Menu
+     */
+    public function updateMenu(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'serial' => 'nullable|int',
+            'parentSerial' => 'nullable|int',
+            'route' => 'nullable|',
+            'delete' => 'nullable|boolean'
+        ]);
+        try {
+            $mMenuMaster = new MenuMaster();
+            $mMenuMaster->edit($request);
+            return responseMsgs(true, "Menu Updated!", "", "", "02", "733", "POST", "");
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    /**
+     * | Delete Menu
+     */
+    public function deleteMenu(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required'
+            ]);
+            MenuMaster::where('id', $request->id)
+                ->update(['is_deleted' => true]);
+            return responseMsgs(true, "Menu Deleted!", "", "", "02", "733", "POST", "");
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    /**
+     * | Menu by Id
+     */
+    public function getMenuById(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'menuId' => 'required|int'
+            ]);
+            $mMenuMaster = new MenuMaster();
+            $menues = $mMenuMaster->getMenuById($request->menuId);
+            if ($menues['parent_serial'] == 0) {
+                return responseMsgs(true, "Menu List!", $menues, "", "01", "", "POST", "");
+            }
+            $parent = $mMenuMaster->getMenuById($menues['parent_serial']);
+            $menues['parentName'] = $parent['menu_string'];
+            return responseMsgs(true, "Menu List!", $menues, "", "01", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", "", "POST", "");
+        }
+    }
 }

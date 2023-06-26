@@ -47,4 +47,43 @@ class MenuMaster extends Model
             ->where('is_deleted', false)
             ->firstOrFail();
     }
+
+    /**
+     * | Save Menu
+     */
+    public function store($request)
+    {
+        $newMenues = new MenuMaster();
+        $newMenues->menu_string  =  $request->menuName;
+        $newMenues->top_level  =  $request->topLevel;
+        $newMenues->sub_level  =  $request->subLevel;
+        $newMenues->parent_serial  =  $request->parentSerial ?? 0;
+        $newMenues->description  =  $request->description;
+        $newMenues->serial = $request->serial;
+        $newMenues->route = $request->route;
+        $newMenues->icon = $request->icon;
+        $newMenues->module_id = $request->moduleId;
+        $newMenues->save();
+    }
+
+    /**
+     * | Update the menu master details
+     */
+    public function edit($request)
+    {
+        $refValues = MenuMaster::where('id', $request->id)->first();
+        MenuMaster::where('id', $request->id)
+            ->update(
+                [
+                    'serial'        => $request->serial         ?? $refValues->serial,
+                    'description'   => $request->description    ?? $refValues->description,
+                    'menu_string'   => $request->menuName       ?? $refValues->menu_string,
+                    'parent_serial' => $request->parentSerial   ?? $refValues->parent_serial,
+                    'route'         => $request->route          ?? $refValues->route,
+                    'icon'          => $request->icon           ?? $refValues->icon,
+                    'is_deleted'    => $request->delete         ?? $refValues->is_deleted,
+                    'module_id'    => $request->moduleId        ?? $refValues->module_id,
+                ]
+            );
+    }
 }

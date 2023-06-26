@@ -12,7 +12,7 @@ class RoleController extends Controller
 {
 
     /**
-     * | Create Role
+     * | Create Workflow Role
      */
     public function createRole(Request $req)
     {
@@ -24,8 +24,8 @@ class RoleController extends Controller
             return validationError($validated);
         }
         try {
-            $create = new WfRole();
-            $create->addRole($req);
+            $mWfRole = new WfRole();
+            $mWfRole->addRole($req);
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {
@@ -33,7 +33,9 @@ class RoleController extends Controller
         }
     }
 
-    //update master
+    /**
+     * | Update Workflow Role
+     */
     public function editRole(Request $req)
     {
         $validated = Validator::make(
@@ -48,16 +50,18 @@ class RoleController extends Controller
             return validationError($validated);
         }
         try {
-            $update = new WfRole();
-            $list  = $update->updateRole($req);
+            $mWfRole = new WfRole();
+            $role    = $mWfRole->updateRole($req);
 
-            return responseMsg(true, "Successfully Updated", $list);
+            return responseMsg(true, "Successfully Updated", $role);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
 
-    //master list by id
+    /**
+     * | Get Role by Id
+     */
     public function getRole(Request $req)
     {
         $validated = Validator::make(
@@ -68,8 +72,8 @@ class RoleController extends Controller
             return validationError($validated);
         }
         try {
-            $listById = new WfRole();
-            $list  = $listById->rolebyId($req);
+            $mWfRole = new WfRole();
+            $list  = $mWfRole->rolebyId($req);
 
             if ($list->isEmpty())
                 throw new Exception("No data Found");
@@ -80,23 +84,27 @@ class RoleController extends Controller
         }
     }
 
-    //all master list
+    /**
+     * | Role List
+     */
     public function getAllRoles()
     {
         try {
-            $list = new WfRole();
-            $masters = $list->roleList();
+            $mWfRole = new WfRole();
+            $roles = $mWfRole->roleList();
 
-            if ($masters->isEmpty())
+            if ($roles->isEmpty())
                 throw new Exception("No data Found");
 
-            return responseMsg(true, "All Role List", $masters);
+            return responseMsg(true, "All Role List", $roles);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
 
-    //delete master
+    /**
+     * | Delete Role
+     */
     public function deleteRole(Request $req)
     {
         $validated = Validator::make(
@@ -107,8 +115,8 @@ class RoleController extends Controller
             return validationError($validated);
         }
         try {
-            $delete = new WfRole();
-            $delete->deleteRole($req);
+            $mWfRole = new WfRole();
+            $mWfRole->deleteRole($req);
 
             return responseMsg(true, "Data Deleted", '');
         } catch (Exception $e) {

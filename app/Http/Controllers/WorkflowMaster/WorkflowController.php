@@ -33,6 +33,10 @@ class WorkflowController extends Controller
     public function updateWorkflow(Request $req)
     {
         try {
+            $req->validate([
+                'wfMasterId' => 'required',
+                'ulbId' => 'required',
+            ]);
             $update = new WfWorkflow();
             $list  = $update->updateWorkflow($req);
 
