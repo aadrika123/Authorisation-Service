@@ -66,11 +66,11 @@ Route::controller(UlbController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(MenuController::class)->group(function () {
-        Route::post('user-managment/v1/crud/menu/list', 'menuList');
         Route::post('user-managment/v1/crud/menu/save', 'createMenu');
         Route::post('user-managment/v1/crud/menu/edit', 'updateMenu');
         Route::post('user-managment/v1/crud/menu/delete', 'deleteMenu');
         Route::post('user-managment/v1/crud/menu/get', 'getMenuById');
+        Route::post('user-managment/v1/crud/menu/list', 'menuList');
 
         Route::post('menu-roles/update-menu-by-role', 'updateMenuByRole');
         Route::post('menu-roles/list-parent-serial', 'listParentSerial');

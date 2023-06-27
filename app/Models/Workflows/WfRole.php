@@ -57,8 +57,6 @@ class WfRole extends Model
         $data->save();
     }
 
-
-
     public function getRoleByUserUlbId($request)
     {
         $users = WfRole::select('wf_roles.*')
