@@ -14,9 +14,23 @@ class MenuMaster extends Model
      */
     public function fetchAllMenues()
     {
-        return MenuMaster::where('is_deleted', false)
+        return MenuMaster::select('menu_masters.*', 'wf_workflows.alt_name as workflow_name')
+            ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
+            ->where('is_deleted', false)
             ->orderBy("menu_masters.serial", "Asc")
             ->get();
+    }
+
+    /**
+     * | Get Menues By Id
+     */
+    public function getMenuById($id)
+    {
+        return MenuMaster::select('menu_masters.*', 'wf_workflows.alt_name as workflow_name')
+            ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
+            ->where('is_deleted', false)
+            ->where('menu_masters.id', $id)
+            ->firstOrFail();
     }
 
     /**
@@ -39,16 +53,6 @@ class MenuMaster extends Model
     }
 
     /**
-     * | Get Menues By Id
-     */
-    public function getMenuById($id)
-    {
-        return MenuMaster::where('id', $id)
-            ->where('is_deleted', false)
-            ->firstOrFail();
-    }
-
-    /**
      * | Save Menu
      */
     public function store($request)
@@ -63,6 +67,7 @@ class MenuMaster extends Model
         $newMenues->route = $request->route;
         $newMenues->icon = $request->icon;
         $newMenues->module_id = $request->moduleId;
+        $newMenues->workflow_id = $request->workflowId;
         $newMenues->save();
     }
 
@@ -82,7 +87,8 @@ class MenuMaster extends Model
                     'route'         => $request->route          ?? $refValues->route,
                     'icon'          => $request->icon           ?? $refValues->icon,
                     'is_deleted'    => $request->delete         ?? $refValues->is_deleted,
-                    'module_id'    => $request->moduleId        ?? $refValues->module_id,
+                    'module_id'     => $request->moduleId       ?? $refValues->module_id,
+                    'workflow_id'   => $request->workflowId     ?? $refValues->workflow_id,
                 ]
             );
     }

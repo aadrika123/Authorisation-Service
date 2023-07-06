@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 class MenuController extends Controller
 {
 
-
     /**
      * | Save Menu
      */
@@ -22,7 +21,9 @@ class MenuController extends Controller
         try {
             $request->validate([
                 'menuName'      => 'required',
+                'moduleId'      => 'required',
                 'route'         => 'nullable',
+                'workflowId'    => 'nullable'
             ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->store($request);
@@ -38,11 +39,11 @@ class MenuController extends Controller
     public function updateMenu(Request $request)
     {
         $request->validate([
-            'id' => 'required',
-            'serial' => 'nullable|int',
+            'id'           => 'required',
+            'serial'       => 'nullable|int',
             'parentSerial' => 'nullable|int',
-            'route' => 'nullable|',
-            'delete' => 'nullable|boolean'
+            'route'        => 'nullable',
+            'delete'       => 'nullable|boolean'
         ]);
         try {
             $mMenuMaster = new MenuMaster();

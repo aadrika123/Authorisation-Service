@@ -50,7 +50,9 @@ class WorkflowController extends Controller
     public function workflowbyId(Request $req)
     {
         try {
-
+            $req->validate([
+                'id' => 'required'
+            ]);
             $listById = new WfWorkflow();
             $list  = $listById->listbyId($req);
 

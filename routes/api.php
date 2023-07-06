@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ApiRoleController;
 use App\Http\Controllers\ApiGatewayController;
 use App\Http\Controllers\Auth\UserController;
@@ -124,19 +125,42 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-master/delete', 'deleteMaster');
     });
 
-
     /**
      * | Wf workflow CRUD operation
      */
-
     Route::controller(WorkflowController::class)->group(function () {
         Route::post('user-managment/v1/crud/wf-workflow/save', 'createWorkflow');                     // Save Workflow
         Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');                     // Edit Workflow 
-        Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');                       // Get Workflow By Id
+        Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');                        // Get Workflow By Id
         Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');                     // Get All Workflow
         Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');                   // Delete Workflow
     });
 
+    /**
+     * | Api master CRUD operation
+     */
+    Route::controller(ApiController::class)->group(function () {
+        Route::post('user-managment/v1/crud/api-master/save', 'createApi');                  // Save Api
+        Route::post('user-managment/v1/crud/api-master/edit', 'updateApi');                  // Edit Api 
+        Route::post('user-managment/v1/crud/api-master/get', 'apibyId');                     // Get Api By Id
+        Route::post('user-managment/v1/crud/api-master/list', 'getAllApi');                  // Get All Api
+        Route::post('user-managment/v1/crud/api-master/delete', 'deleteApi');                // Delete Api
+        Route::post('user-managment/v1/developer-list', 'listDeveloper');                    // Developer List
+        Route::post('user-managment/v1/api-category', 'listCategory');                       // Category List
+    });
+
+
+    /**
+     * | Workflow Role Map CRUD operation
+     */
+    Route::controller(WorkflowRoleMapController::class)->group(function () {
+        Route::post('user-managment/v1/crud/workflow-role-map/save', 'createRoleMap');                     // Save Workflow
+        Route::post('user-managment/v1/crud/workflow-role-map/edit', 'updateRoleMap');                     // Edit Workflow 
+        Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                       // Get Workflow By Id
+        Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');                     // Get All Workflow
+        Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');                   // Delete Workflow
+        Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
+    });
 
 
     /**
@@ -160,17 +184,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                       // Enable or Disable User Role
     });
 
-    /**
-     * | Workflow Role Map CRUD operation
-     */
-    Route::controller(WorkflowRoleMapController::class)->group(function () {
-        Route::post('workflow/role-map/save', 'createRoleMap');                     // Save Workflow
-        Route::post('workflow/role-map/edit', 'updateRoleMap');                     // Edit Workflow 
-        Route::post('workflow/role-map/get', 'roleMapbyId');                       // Get Workflow By Id
-        Route::post('workflow/role-map/list', 'getAllRoleMap');                     // Get All Workflow
-        Route::post('workflow/role-map/delete', 'deleteRoleMap');                   // Delete Workflow
-        Route::post('workflow/role-map/workflow-info', 'workflowInfo');
-    });
+
 
     /**
      * | Workflow Mapping

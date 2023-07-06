@@ -18,8 +18,6 @@ class WorkflowRoleMapController extends Controller
      * Created By-Tannu Verma
      */
 
-
-
     use Workflow;
 
     public function createRoleMap(Request $req)
@@ -37,7 +35,7 @@ class WorkflowRoleMapController extends Controller
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -50,8 +48,7 @@ class WorkflowRoleMapController extends Controller
 
             return responseMsg(true, "Successfully Updated", $list);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), '');
-            //  return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -59,27 +56,35 @@ class WorkflowRoleMapController extends Controller
     public function roleMapbyId(Request $req)
     {
         try {
+            $req->validate([
+                'id' => 'required'
+            ]);
 
             $listById = new WfWorkflowrolemap();
-            $list  = $listById->listbyId($req);
+            $list  = $listById->roleMaps($req)
+                ->where('wf_workflowrolemaps.id', $req->id)
+                ->first();
 
-            return responseMsg(true, "Role Map List", $list);
+            return responseMsg(true, "Role Map List", remove_null($list));
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
-    //all master list
+
+    /**
+     * | All Role Maps
+     */
     public function getAllRoleMap()
     {
         try {
 
-            $list = WfWorkflowrolemap::paginate(10);
-            $masters = $list->roleMaps();
+            $list = new WfWorkflowrolemap();
+            $masters = $list->roleMaps()->get();
 
             return responseMsg(true, "All Role Map List", $masters);
         } catch (Exception $e) {
-            return response()->json(false, $e->getMessage());
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -92,7 +97,7 @@ class WorkflowRoleMapController extends Controller
 
             return responseMsg(true, "Data Deleted", '');
         } catch (Exception $e) {
-            return response()->json($e, 400);
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 

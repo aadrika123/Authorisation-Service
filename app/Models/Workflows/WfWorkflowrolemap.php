@@ -74,21 +74,6 @@ class WfWorkflowrolemap extends Model
     }
 
     /**
-     * Role Map List by id
-     */
-    public function listbyId($req)
-    {
-        $data = WfWorkflowrolemap::select('*')
-            ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
-            ->join('wf_masters', 'wf_masters.id', 'wf_workflows.wf_master_id')
-            ->join('wf_roles', 'wf_roles.id', 'wf_workflowrolemaps.wf_role_id')
-            ->where('wf_workflowrolemaps.is_suspended', false)
-            ->where('wf_workflowrolemaps.id', $req->id)
-            ->first();
-        return $data;
-    }
-
-    /**
      * All Role Map list
      */
     public function roleMaps()
@@ -109,8 +94,8 @@ class WfWorkflowrolemap extends Model
             ->join('wf_roles', 'wf_roles.id', 'wf_workflowrolemaps.wf_role_id')
             ->join('ulb_masters', 'ulb_masters.id', 'wf_workflows.ulb_id')
             ->where('wf_workflowrolemaps.is_suspended', false)
-            ->orderBy('workflow_id')
-            ->get();
+            ->orderBy('workflow_id');
+        // ->get();
         return $data;
     }
 
@@ -165,6 +150,7 @@ class WfWorkflowrolemap extends Model
             ->leftJoin('wf_roles as rr', 'wf_workflowrolemaps.backward_role_id', '=', 'rr.id')
             ->where('workflow_id', $request->workflowId)
             ->where('wf_role_id', $request->wfRoleId)
+            ->where('wf_workflowrolemaps.is_suspended', false)
             ->orderBy('role_id')
             ->first();
 
