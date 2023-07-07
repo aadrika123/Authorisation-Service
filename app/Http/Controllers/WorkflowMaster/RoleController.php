@@ -4,6 +4,8 @@ namespace App\Http\Controllers\WorkflowMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Workflows\WfRole;
+use App\Models\Workflows\WfWorkflow;
+use App\Models\Workflows\WfWorkflowrolemap;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -24,8 +26,26 @@ class RoleController extends Controller
             return validationError($validated);
         }
         try {
+            $ulbId = authUser()->ulb_id;
             $mWfRole = new WfRole();
-            $mWfRole->addRole($req);
+            $mWfWorkflowrolemaps = new WfWorkflowrolemap();
+            $mWfWorkflow = new WfWorkflow();
+            $role = $mWfRole->addRole($req);
+            $roleId = $role->id;
+            $roleMapRequest = collect();
+
+            // if ($ulbId) {
+            //     $workflows = $mWfWorkflow->getWorklowByUlbId($ulbId);
+            //     foreach ($workflows as $workflow) {
+            //         $data->workflowId  = $workflow->id;
+            //         $data->wfRoleId    = $roleId;
+            //         $data->isSuspended = true;
+            //         // $roleMapRequest->push($data);
+            //         //Workflow Role Mapping at the time of Role Creation.
+            //         $mWfWorkflowrolemaps->addRoleMap($data);
+            //     }
+            // }
+            // dd($req);
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {

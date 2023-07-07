@@ -20,6 +20,7 @@ class WfRole extends Model
         $role->created_by = $createdBy;
         $role->stamp_date_time = Carbon::now();
         $role->save();
+        return $role;
     }
 
     //update role

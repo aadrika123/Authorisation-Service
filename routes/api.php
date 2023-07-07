@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\Menu\MenuRoleController;
+use App\Http\Controllers\Menu\MenuRoleMapController;
+use App\Http\Controllers\Menu\MenuRoleUserMapController;
 use App\Http\Controllers\Menu\TestController;
 use App\Http\Controllers\WorkflowMaster\MasterController;
 use App\Http\Controllers\WorkflowMaster\RoleController;
@@ -129,11 +131,11 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Wf workflow CRUD operation
      */
     Route::controller(WorkflowController::class)->group(function () {
-        Route::post('user-managment/v1/crud/wf-workflow/save', 'createWorkflow');                     // Save Workflow
-        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');                     // Edit Workflow 
-        Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');                        // Get Workflow By Id
-        Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');                     // Get All Workflow
-        Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');                   // Delete Workflow
+        Route::post('user-managment/v1/crud/wf-workflow/save', 'createWorkflow');               // Save Workflow
+        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');               // Edit Workflow 
+        Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');                  // Get Workflow By Id
+        Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');               // Get All Workflow
+        Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');             // Delete Workflow
     });
 
     /**
@@ -151,15 +153,50 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     /**
-     * | Workflow Role Map CRUD operation
+     * | Workflow Role Mapping CRUD operation
      */
     Route::controller(WorkflowRoleMapController::class)->group(function () {
-        Route::post('user-managment/v1/crud/workflow-role-map/save', 'createRoleMap');                     // Save Workflow
-        Route::post('user-managment/v1/crud/workflow-role-map/edit', 'updateRoleMap');                     // Edit Workflow 
-        Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                       // Get Workflow By Id
-        Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');                     // Get All Workflow
-        Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');                   // Delete Workflow
+        Route::post('user-managment/v1/crud/workflow-role-map/save', 'createRoleMap');             // Save WorkflowRoleMap
+        Route::post('user-managment/v1/crud/workflow-role-map/edit', 'updateRoleMap');             // Edit WorkflowRoleMap 
+        Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                // Get WorkflowRoleMap By Id
+        Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');             // Get All WorkflowRoleMap
+        Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');           // Delete WorkflowRoleMap
         Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
+    });
+
+    /**
+     * | Workflow Role User Mapping CRUD operation
+     */
+    Route::controller(WorkflowRoleUserMapController::class)->group(function () {
+        Route::post('user-managment/v1/crud/workflow-role-user/save', 'createRoleUser');                // Save WorkflowRoleUserMap
+        Route::post('user-managment/v1/crud/workflow-role-user/edit', 'updateRoleUser');                // Edit WorkflowRoleUserMap 
+        Route::post('user-managment/v1/crud/workflow-role-user/get', 'roleUserbyId');                   // Get WorkflowRoleUserMap By Id
+        Route::post('user-managment/v1/crud/workflow-role-user/list', 'getAllRoleUser');                // Get All WorkflowRoleUserMap
+        Route::post('user-managment/v1/crud/workflow-role-user/delete', 'deleteRoleUser');              // Delete WorkflowRoleUserMap
+        Route::post('workflow/role-user-maps/get-roles-by-id', 'getRolesByUserId');                     // Get Permitted Roles By User ID
+        Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                    // Enable or Disable User Role
+    });
+
+    /**
+     * | Menu Role Mapping CRUD operation
+     */
+    Route::controller(MenuRoleMapController::class)->group(function () {
+        Route::post('user-managment/v1/crud/menu-role-map/save', 'createRoleMap');                    // Save MenuRole
+        Route::post('user-managment/v1/crud/menu-role-map/edit', 'updateRoleMap');                    // Edit MenuRole 
+        Route::post('user-managment/v1/crud/menu-role-map/get', 'roleMapbyId');                       // Get MenuRole By Id
+        Route::post('user-managment/v1/crud/menu-role-map/list', 'getAllRoleMap');                    // Get All MenuRole
+        Route::post('user-managment/v1/crud/menu-role-map/delete', 'deleteRoleMap');                  // Delete MenuRole
+    });
+
+    /**
+     * | Menu Role User Mapping CRUD operation
+     */
+    Route::controller(MenuRoleUserMapController::class)->group(function () {
+        Route::post('user-managment/v1/crud/menu-role-user/save', 'createRoleUser');                  // Save MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/edit', 'updateRoleUser');                  // Edit MenuRoleUser 
+        Route::post('user-managment/v1/crud/menu-role-user/get', 'roleUserbyId');                     // Get MenuRoleUser By Id
+        Route::post('user-managment/v1/crud/menu-role-user/list', 'getAllRoleUser');                  // Get All MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/delete', 'deleteRoleUser');                // Delete MenuRoleUser
     });
 
 
@@ -167,23 +204,13 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Ward User CRUD operation
      */
     Route::controller(WardUserController::class)->group(function () {
-        Route::post('workflow/ward-user/save', 'createWardUser');                     // Save Workflow
-        Route::post('workflow/ward-user/edit', 'updateWardUser');                     // Edit Workflow 
-        Route::post('workflow/ward-user/get', 'WardUserbyId');                       // Get Workflow By Id
-        Route::post('workflow/ward-user/list', 'getAllWardUser');                     // Get All Workflow
-        Route::post('workflow/ward-user/delete', 'deleteWardUser');                   // Delete Workflow
+        Route::post('workflow/ward-user/save', 'createWardUser');                     // Save WardUser
+        Route::post('workflow/ward-user/edit', 'updateWardUser');                     // Edit WardUser 
+        Route::post('workflow/ward-user/get', 'WardUserbyId');                       // Get WardUser By Id
+        Route::post('workflow/ward-user/list', 'getAllWardUser');                     // Get All WardUser
+        Route::post('workflow/ward-user/delete', 'deleteWardUser');                   // Delete WardUser
         Route::post('workflow/ward-user/list-tc', 'tcList');
     });
-
-
-    /**
-     * | Role User Map CRUD operation
-     */
-    Route::controller(WorkflowRoleUserMapController::class)->group(function () {
-        Route::post('workflow/role-user-maps/get-roles-by-id', 'getRolesByUserId');                        // Get Permitted Roles By User ID
-        Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                       // Enable or Disable User Role
-    });
-
 
 
     /**

@@ -63,12 +63,12 @@ class WorkflowController extends Controller
     }
 
     //all master list
-    public function getAllWorkflow()
+    public function getAllWorkflow(Request $req)
     {
         try {
-
+            $ulbId = authUser()->ulb_id;
             $list = new WfWorkflow();
-            $workflow = $list->listWorkflow();
+            $workflow = $list->listUlbWorkflow($ulbId);
 
             return responseMsg(true, "All Workflow List", $workflow);
         } catch (Exception $e) {

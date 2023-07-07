@@ -29,89 +29,6 @@ class WorkflowRoleUserMapRepository implements iWorkflowRoleUserMapRepository
         // $this->_redis = Redis::connection();
     }
 
-    public function create(Request $request)
-    {
-        $createdBy = Auth()->user()->id;
-
-        try {
-            $checkExisting = WfRoleusermap::where('wf_role_id', $request->wfRoleId)
-                ->where('user_id', $request->userId)
-                ->first();
-            if ($checkExisting) {
-                $checkExisting->wf_role_id = $request->wfRoleId;
-                $checkExisting->user_id = $request->userId;
-                $checkExisting->save();
-            }
-            // create
-            $device = new WfRoleusermap;
-            $device->wf_role_id = $request->wfRoleId;
-            $device->user_id = $request->userId;
-            $device->created_by = $createdBy;
-            $device->stamp_date_time = Carbon::now();
-            $device->created_at = Carbon::now();
-            $device->save();
-        } catch (Exception $e) {
-            return response()->json($e, 400);
-        }
-    }
-
-    /**
-     * GetAll data
-     */
-    public function list()
-    {
-        $data = WfRoleusermap::where('is_suspended', false)
-            ->orderByDesc('id')->get();
-        return $data;
-    }
-
-
-    /**
-     * Delete data
-     */
-    public function delete($id)
-    {
-        $data = WfRoleusermap::find($id);
-        $data->delete();
-        return response()->json('Successfully Deleted', 200);
-    }
-
-
-    /**
-     * Update data
-     */
-    public function update(Request $request, $id)
-    {
-        $createdBy = Auth()->user()->id;
-
-        try {
-            $device = WfRoleusermap::find($id);
-            $device->wf_role_id = $request->wfRoleId;
-            $device->user_id = $request->userId;
-            $device->created_by = $createdBy;
-            $device->save();
-            return responseMsg(true, "Successfully Updated", "");
-        } catch (Exception $e) {
-            return response()->json($e, 400);
-        }
-    }
-
-    /**
-     * list view by IDs
-     */
-
-    public function view($id)
-    {
-        $data = WfRoleusermap::where('id', $id)
-            ->where('is_suspended', false)
-            ->get();
-        if ($data) {
-            return response()->json($data, 200);
-        } else {
-            return response()->json(['Message' => 'Data not found'], 404);
-        }
-    }
-
     /**
      * | Get All Permitted Roles By User ID
      * | @param Request req
@@ -143,7 +60,7 @@ class WorkflowRoleUserMapRepository implements iWorkflowRoleUserMapRepository
                 WHERE r.is_suspended = false
                 AND r.status = 1
                 ";
-                
+
             $roles = DB::select($query);
             //$this->_redis->set('roles-user-u-' . $req->userId, json_encode($roles));               // Caching Should Be flush on New role Permission to the user
             // }

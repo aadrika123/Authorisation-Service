@@ -5,6 +5,7 @@ namespace App\Models\Workflows;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use PHPUnit\Framework\Attributes\IgnoreFunctionForCodeCoverage;
 
 class WfWorkflow extends Model
 {
@@ -50,7 +51,7 @@ class WfWorkflow extends Model
     }
 
     //All workflow list
-    public function listWorkflow()
+    public function listUlbWorkflow($ulbId)
     {
         $data = WfWorkflow::select(
             'wf_workflows.*',
@@ -64,6 +65,7 @@ class WfWorkflow extends Model
             ->leftJoin('wf_roles', 'wf_roles.id', 'wf_workflows.initiator_role_id')
             ->leftJoin('wf_roles as frole', 'frole.id', 'wf_workflows.finisher_role_id')
             ->where('wf_workflows.is_suspended', false)
+            ->where('wf_workflows.ulb_id', $ulbId)
             ->orderByDesc('wf_workflows.id')
             ->get();
         return $data;
@@ -87,5 +89,15 @@ class WfWorkflow extends Model
             ->join('ulb_masters', 'ulb_masters.id', '=', 'wf_workflows.ulb_id')
             ->get();
         return $users;
+    }
+
+    /**
+     * | Get Workflow by ulbId
+     */
+    public function getWorklowByUlbId($ulbId)
+    {
+        return WfWorkflow::where('ulb_id', $ulbId)
+            ->where('is_suspended', false)
+            ->get();
     }
 }

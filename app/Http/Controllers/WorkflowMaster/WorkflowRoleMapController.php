@@ -24,12 +24,35 @@ class WorkflowRoleMapController extends Controller
     {
         try {
             $req->validate([
-                'workflowId' => 'required',
-                'wfRoleId' => 'required',
-                // 'forwardRoleId' => 'required',
-                // 'backwardRoleId' => 'required',
+                'workflowId'      => 'required',
+                'wfRoleId'        => 'required',
+                'forwardRoleId'   => 'nullable|integer',
+                'backwardRoleId'  => 'nullable|integer',
+                'isInitiator'     => 'nullable|in:true,false',
+                'isFinisher'      => 'nullable|in:true,false',
+                'allowFullList'   => 'nullable|in:true,false',
+                'canEscalate'     => 'nullable|in:true,false',
+                'serialNo'        => 'nullable',
+                'isBtc'           => 'nullable|in:true,false',
+                'isEnabled'       => 'nullable|in:true,false',
+                'canViewDocument' => 'nullable|in:true,false',
+                'canUploadDocument'          => 'nullable|in:true,false',
+                'canVerifyDocument'          => 'nullable|in:true,false',
+                'allowFreeCommunication'     => 'nullable|in:true,false',
+                'canForward'                 => 'nullable|in:true,false',
+                'canBackward'                => 'nullable|in:true,false',
+                'isPseudo'                   => 'nullable|in:true,false',
+                'showFieldVerification'      => 'nullable|in:true,false',
+                'canViewForm'                => 'nullable|in:true,false',
+                'canSeeTcVerification'       => 'nullable|in:true,false',
+                'canEdit'                    => 'nullable|in:true,false',
+                'canSendSms'                 => 'nullable|in:true,false',
+                'canComment'                 => 'nullable|in:true,false',
+                'isCustomEnabled'            => 'nullable|in:true,false',
+                'jeComparison'               => 'nullable|in:true,false',
+                'technicalComparison'        => 'nullable|in:true,false',
+                'canViewTechnicalComparison' => 'nullable|in:true,false',
             ]);
-
             $create = new WfWorkflowrolemap();
             $create->addRoleMap($req);
 
@@ -43,6 +66,9 @@ class WorkflowRoleMapController extends Controller
     public function updateRoleMap(Request $req)
     {
         try {
+            $req->validate([
+                'id' => 'required'
+            ]);
             $update = new WfWorkflowrolemap();
             $list  = $update->updateRoleMap($req);
 

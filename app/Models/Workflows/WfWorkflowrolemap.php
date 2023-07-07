@@ -20,28 +20,37 @@ class WfWorkflowrolemap extends Model
     {
         $createdBy = Auth()->user()->id;
         $data = new WfWorkflowrolemap;
-        $data->workflow_id = $req->workflowId;
-        $data->wf_role_id = $req->wfRoleId;
-        $data->forward_role_id = $req->forwardRoleId;
-        $data->backward_role_id = $req->backwardRoleId;
-        $data->is_initiator = $req->isInitiator;
-        $data->is_finisher = $req->isFinisher;
-        $data->allow_full_list = $req->allowFullList;
-        $data->can_escalate = $req->canEscalate;
-        $data->serial_no = $req->serialNo;
-        $data->is_btc = $req->isBtc;
-        $data->is_enabled = $req->isEnabled;
-        $data->can_view_document = $req->canViewDocument;
-        $data->can_upload_document = $req->canUploadDocument;
-        $data->can_verify_document = $req->canVerifyDocument;
-        $data->allow_free_communication = $req->allowFreeCommunication;
-        $data->can_forward = $req->canForward;
-        $data->can_backward = $req->canBackward;
-        $data->is_pseudo = $req->isPseudo;
-        $data->show_field_verification = $req->showFieldVerification;
-        $data->created_by = $createdBy;
-        $data->stamp_date_time = Carbon::now();
-        $data->created_at = Carbon::now();
+        $data->workflow_id                    = $req->workflowId;
+        $data->wf_role_id                     = $req->wfRoleId;
+        $data->is_suspended                   = $req->isSuspended ?? false;
+        $data->forward_role_id                = $req->forwardRoleId;
+        $data->backward_role_id               = $req->backwardRoleId;
+        $data->is_initiator                   = $req->isInitiator;
+        $data->is_finisher                    = $req->isFinisher;
+        $data->allow_full_list                = $req->allowFullList ?? false;
+        $data->can_escalate                   = $req->canEscalate ?? false;
+        $data->serial_no                      = $req->serialNo;
+        $data->is_btc                         = $req->isBtc ?? false;
+        $data->is_enabled                     = $req->isEnabled ?? false;
+        $data->can_view_document              = $req->canViewDocument ?? true;
+        $data->can_upload_document            = $req->canUploadDocument ?? false;
+        $data->can_verify_document            = $req->canVerifyDocument ?? false;
+        $data->allow_free_communication       = $req->allowFreeCommunication ?? true;
+        $data->can_forward                    = $req->canForward ?? false;
+        $data->can_backward                   = $req->canBackward ?? false;
+        $data->is_pseudo                      = $req->isPseudo ?? false;
+        $data->show_field_verification        = $req->showFieldVerification ?? false;
+        $data->can_view_form                  = $req->canViewForm ?? false;
+        $data->can_see_tc_verification        = $req->canSeeTcVerification ?? false;
+        $data->can_edit                       = $req->canEdit ?? false;
+        $data->can_send_sms                   = $req->canSendSms ?? false;
+        $data->can_comment                    = $req->canComment ?? true;
+        $data->is_custom_enabled              = $req->isCustomEnabled ?? false;
+        $data->je_comparison                  = $req->jeComparison ?? false;
+        $data->technical_comparison           = $req->technicalComparison ?? false;
+        $data->can_view_technical_comparison  = $req->canViewTechnicalComparison ?? false;
+        $data->created_by               = $createdBy;
+        $data->stamp_date_time          = Carbon::now();
         $data->save();
     }
 
@@ -51,25 +60,35 @@ class WfWorkflowrolemap extends Model
     public function updateRoleMap($req)
     {
         $data = WfWorkflowrolemap::find($req->id);
-        $data->workflow_id = $req->workflowId;
-        $data->wf_role_id = $req->wfRoleId;
-        $data->forward_role_id = $req->forwardRoleId;
-        $data->backward_role_id = $req->backwardRoleId;
-        $data->is_initiator = $req->isInitiator;
-        $data->is_finisher = $req->isFinisher;
-        $data->allow_full_list = $req->allowFullList;
-        $data->can_escalate = $req->canEscalate;
-        $data->serial_no = $req->serialNo;
-        $data->is_btc = $req->isBtc;
-        $data->is_enabled = $req->isEnabled;
-        $data->can_view_document = $req->canViewDocument;
-        $data->can_upload_document = $req->canUploadDocument;
-        $data->can_verify_document = $req->canVerifyDocument;
-        $data->allow_free_communication = $req->allowFreeCommunication;
-        $data->can_forward = $req->canForward;
-        $data->can_backward = $req->canBackward;
-        $data->is_pseudo = $req->isPseudo;
-        $data->show_field_verification = $req->showFieldVerification;
+        $data->workflow_id                    = $req->workflowId                 ?? $data->workflow_id;
+        $data->wf_role_id                     = $req->wfRoleId                   ?? $data->wf_role_id;
+        $data->is_suspended                   = $req->isSuspended                ?? $data->is_suspended;
+        $data->forward_role_id                = $req->forwardRoleId              ?? $data->forward_role_id;
+        $data->backward_role_id               = $req->backwardRoleId             ?? $data->backward_role_id;
+        $data->is_initiator                   = $req->isInitiator                ?? $data->is_initiator;
+        $data->is_finisher                    = $req->isFinisher                 ?? $data->is_finisher;
+        $data->allow_full_list                = $req->allowFullList              ?? $data->allow_full_list;
+        $data->can_escalate                   = $req->canEscalate                ?? $data->can_escalate;
+        $data->serial_no                      = $req->serialNo                   ?? $data->serial_no;
+        $data->is_btc                         = $req->isBtc                      ?? $data->is_btc;
+        $data->is_enabled                     = $req->isEnabled                  ?? $data->is_enabled;
+        $data->can_view_document              = $req->canViewDocument            ?? $data->can_view_document;
+        $data->can_upload_document            = $req->canUploadDocument          ?? $data->can_upload_document;
+        $data->can_verify_document            = $req->canVerifyDocument          ?? $data->can_verify_document;
+        $data->allow_free_communication       = $req->allowFreeCommunication     ?? $data->allow_free_communication;
+        $data->can_forward                    = $req->canForward                 ?? $data->can_forward;
+        $data->can_backward                   = $req->canBackward                ?? $data->can_backward;
+        $data->is_pseudo                      = $req->isPseudo                   ?? $data->is_pseudo;
+        $data->show_field_verification        = $req->showFieldVerification      ?? $data->show_field_verification;
+        $data->can_view_form                  = $req->canViewForm                ?? $data->can_view_form;
+        $data->can_see_tc_verification        = $req->canSeeTcVerification       ?? $data->can_see_tc_verification;
+        $data->can_edit                       = $req->canEdit                    ?? $data->can_edit;
+        $data->can_send_sms                   = $req->canSendSms                 ?? $data->can_send_sms;
+        $data->can_comment                    = $req->canComment                 ?? $data->can_comment;
+        $data->is_custom_enabled              = $req->isCustomEnabled            ?? $data->is_custom_enabled;
+        $data->je_comparison                  = $req->jeComparison               ?? $data->je_comparison;
+        $data->technical_comparison           = $req->technicalComparison        ?? $data->technical_comparison;
+        $data->can_view_technical_comparison  = $req->canViewTechnicalComparison ?? $data->can_view_technical_comparison;
         $data->save();
     }
 
@@ -105,7 +124,7 @@ class WfWorkflowrolemap extends Model
     public function deleteRoleMap($req)
     {
         $data = WfWorkflowrolemap::find($req->id);
-        $data->is_suspended = 'true';
+        $data->is_suspended = true;
         $data->save();
     }
 
