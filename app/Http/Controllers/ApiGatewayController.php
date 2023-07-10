@@ -29,7 +29,9 @@ class ApiGatewayController extends Controller
                 'currentAccessToken' => $req->user()->currentAccessToken(),
                 'apiToken' => $req->user()->currentAccessToken()->token
             ]);
-            $response = Http::$method(
+            $response = Http::withHeaders([
+                        'API-KEY'=> collect($req->headers)->toArray()['api-key']
+            ])->$method(
                     $url . $req->getRequestUri(),
                     $req->all()
                 );
