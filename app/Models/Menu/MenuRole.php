@@ -22,6 +22,7 @@ class MenuRole extends Model
         $newMenues->menu_role_name  =  $request->menuRoleName;
         $newMenues->created_by      =  authUser()->id;
         $newMenues->save();
+        return $newMenues;
     }
 
     /**
@@ -36,5 +37,16 @@ class MenuRole extends Model
                     'menu_role_name' => $request->menuRoleName ?? $refValues->menu_role_name,
                 ]
             );
+    }
+
+    /**
+     * | List of Menu Role
+     */
+    public function listMenuRole()
+    {
+        return $mMenuRole = MenuRole::select('menu_roles.id', 'menu_role_name', 'is_suspended', 'users.name as created_by')
+            ->join('users', 'users.id', 'menu_roles.created_by')
+            ->where('menu_roles.is_suspended', false)
+            ->orderbydesc('id');
     }
 }

@@ -18,6 +18,7 @@ class ApiRole extends Model
         $newApis->api_role_name  =  $request->apiRoleName;
         $newApis->created_by     =  authUser()->id;
         $newApis->save();
+        return $newApis;
     }
 
     /**
@@ -32,5 +33,16 @@ class ApiRole extends Model
                     'api_role_name' => $request->apiRoleName ?? $refValues->api_role_name,
                 ]
             );
+    }
+
+    /**
+     * | List of Api Role
+     */
+    public function listApiRole()
+    {
+        return  ApiRole::select('api_roles.id', 'api_role_name', 'is_suspended', 'users.name as created_by')
+            ->where('api_roles.is_suspended', false)
+            ->join('users', 'users.id', 'api_roles.created_by')
+            ->orderbydesc('id');
     }
 }

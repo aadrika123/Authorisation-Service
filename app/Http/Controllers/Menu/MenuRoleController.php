@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Menu;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu\MenuMaster;
 use App\Models\Menu\MenuRole;
+use App\Models\Menu\MenuRolemap;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -17,9 +19,28 @@ class MenuRoleController extends Controller
         try {
             $request->validate([
                 'menuRoleName' => 'required',
+                // 'moduleId'     => 'required|integer'
             ]);
+            $mMenuRolemap = new MenuRolemap();
             $mMenuRole = new MenuRole();
-            $mMenuRole->store($request);
+            $mMenuMaster  = new MenuMaster();
+            $menuRole = $mMenuRole->store($request);
+
+            $menuRoleId = $menuRole->id;
+            // if ($request->moduleId) {
+            $menus = $mMenuMaster->fetchAllMenues()
+                // ->where('module_id', $request->moduleId)
+                ->get();
+            foreach ($menus as $menu) {
+                $data['menuId']      = $menu->id;
+                $data['menuRoleId']  = $menuRoleId;
+                $data['isSuspended'] = true;
+
+                //Menu Role Mapping at the time of Role Creation.
+                $mMenuRolemap->addRoleMap($data);
+            }
+            // }
+
             return responseMsgs(true, "Data Saved!", "", "", "02", "", "POST", "");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
@@ -70,9 +91,13 @@ class MenuRoleController extends Controller
             $request->validate([
                 'id' => 'required|int'
             ]);
-            $mMenuRole = MenuRole::find($request->id);
+            $mMenuRole = new MenuRole();
+            $list = $mMenuRole->listMenuRole()
+                ->where('menu_roles.id', $request->id)
+                ->first();
+            // $mMenuRole = MenuRole::find($request->id);
 
-            return responseMsgs(true, "Menu Role!", $mMenuRole, "", "01", "", "POST", "");
+            return responseMsgs(true, "Menu Role!", $list, "", "01", "", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", "", "POST", "");
         }
@@ -84,11 +109,33 @@ class MenuRoleController extends Controller
     public function listMenuRole(Request $request)
     {
         try {
-            $mMenuRole = MenuRole::all();
+            $mMenuRole = new MenuRole();
+            $list = $mMenuRole->listMenuRole()
+                ->get();
 
-            return responseMsgs(true, "List of Menu Role!", $mMenuRole, "", "01", "", "POST", "");
+            return responseMsgs(true, "List of Menu Role!", $list, "", "01", "", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", "", "POST", "");
+        }
+    }
+
+    /**
+     * | Menu Role Mapping List By Menu Role Id
+     */
+    public function menuByMenuRole(Request $req)
+    {
+        try {
+            $req->validate([
+                'menuRoleId' => 'required'
+            ]);
+            $mMenuRolemap = new MenuRolemap();
+            $menuRole = $mMenuRolemap->roleMaps()
+                ->where('menu_rolemaps.menu_role_id', $req->menuRoleId)
+                ->get();
+
+            return responseMsg(true, "Menu Role Map List", $menuRole);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 }

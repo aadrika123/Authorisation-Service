@@ -1,26 +1,32 @@
 <?php
 
-namespace App\Http\Controllers\Menu;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Menu\MenuRoleusermap;
+use App\Models\Api\ApiRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
 
-class MenuRoleUserMapController extends Controller
+class ApiRoleUserMapController extends Controller
 {
     /**
-     * | Create Menu Role Mapping
+     * | Create api Role Mapping
      */
     public function createRoleUser(Request $req)
     {
         try {
             $req->validate([
                 'userId'     => 'required',
-                'menuRoleId' => 'required'
+                'apiRoleId' => 'required'
             ]);
-            $mMenuRoleusermap = new MenuRoleusermap();
-            $mMenuRoleusermap->addRoleUser($req);
+            $mApiRoleusermap = new ApiRoleusermap();
+            $checkExisting = $mApiRoleusermap->where('user_id', $req->userId)
+                ->where('api_role_id', $req->apiRoleId)
+                ->first();
+            if ($checkExisting)
+                throw new Exception('User Already Maps to this Api Role');
+
+            $mApiRoleusermap->addRoleUser($req);
 
             return responseMsgs(true, "Data Saved", "");
         } catch (Exception $e) {
@@ -29,7 +35,7 @@ class MenuRoleUserMapController extends Controller
     }
 
     /**
-     * | Update Menu Role Mapping
+     * | Update api Role Mapping
      */
     public function updateRoleUser(Request $req)
     {
@@ -37,8 +43,8 @@ class MenuRoleUserMapController extends Controller
             $req->validate([
                 'id' => 'required'
             ]);
-            $mMenuRoleusermap = new MenuRoleusermap();
-            $list  = $mMenuRoleusermap->updateRoleUser($req);
+            $mApiRoleusermap = new ApiRoleusermap();
+            $list  = $mApiRoleusermap->updateRoleUser($req);
 
             return responseMsgs(true, "Data Updated", $list);
         } catch (Exception $e) {
@@ -47,7 +53,7 @@ class MenuRoleUserMapController extends Controller
     }
 
     /**
-     * | Menu Role Mapping By id
+     * | api Role Mapping By id
      */
     public function roleUserbyId(Request $req)
     {
@@ -56,12 +62,12 @@ class MenuRoleUserMapController extends Controller
                 'id' => 'required'
             ]);
 
-            $mMenuRoleusermap = new MenuRoleusermap();
-            $list  = $mMenuRoleusermap->listRoleUser($req)
-                ->where('menu_roleusermaps.id', $req->id)
+            $mApiRoleusermap = new ApiRoleusermap();
+            $list  = $mApiRoleusermap->listRoleUser($req)
+                ->where('api_roleusermaps.id', $req->id)
                 ->first();
 
-            return responseMsgs(true, "Menu Role Map", remove_null($list));
+            return responseMsgs(true, "Api Role Map", remove_null($list));
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
@@ -69,22 +75,22 @@ class MenuRoleUserMapController extends Controller
 
 
     /**
-     * | Menu Role Mapping List
+     * | api Role Mapping List
      */
     public function getAllRoleUser()
     {
         try {
-            $mMenuRoleusermap = new MenuRoleusermap();
-            $menuRole = $mMenuRoleusermap->listRoleUser()->get();
+            $mApiRoleusermap = new ApiRoleusermap();
+            $menuRole = $mApiRoleusermap->listRoleUser()->get();
 
-            return responseMsgs(true, "Menu Role Map List", $menuRole);
+            return responseMsgs(true, "Api Role Map List", $menuRole);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
 
     /**
-     * | Delete Menu Role Mapping
+     * | Delete api Role Mapping
      */
     public function deleteRoleUser(Request $req)
     {
@@ -92,7 +98,7 @@ class MenuRoleUserMapController extends Controller
             $req->validate([
                 'id' => 'required'
             ]);
-            $delete = new MenuRoleusermap();
+            $delete = new ApiRoleusermap();
             $delete->deleteRoleUser($req);
 
             return responseMsgs(true, "Data Deleted", '');

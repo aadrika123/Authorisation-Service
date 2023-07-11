@@ -1,36 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Menu;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Menu\MenuRolemap;
+use App\Models\Api\ApiRolemap;
 use Exception;
 use Illuminate\Http\Request;
+use Spatie\FlareClient\Api;
 
-class MenuRoleMapController extends Controller
+class ApiRoleMapController extends Controller
 {
     /**
-     * |  Create Menu Role Mapping
+     * |  Create Api Role Mapping
      */
     public function createRoleMap(Request $req)
     {
         try {
             $req->validate([
-                'menuId'     => 'required',
-                'menuRoleId' => 'required'
+                'apiId'     => 'required',
+                'apiRoleId' => 'required'
             ]);
-            $mMenuRolemap = new MenuRolemap();
-            $checkExisting = $mMenuRolemap->where('menu_id', $req->menuId)
-                ->where('menu_role_id', $req->menuRoleId)
+            $mApiRolemap = new ApiRolemap();
+            $checkExisting = $mApiRolemap->where('api_id', $req->apiId)
+                ->where('api_role_id', $req->apiRoleId)
                 ->first();
 
             if ($checkExisting)
-                throw new Exception('Menu Already Maps to Menu Role');
+                throw new Exception('Api Already Maps to Api Role');
             $mreqs = [
-                'menuId'     => $req->menuId,
-                'menuRoleId' => $req->menuRoleId
+                'apiId'     => $req->apiId,
+                'apiRoleId' => $req->apiRoleId
             ];
-            $mMenuRolemap->addRoleMap($mreqs);
+            $mApiRolemap->addRoleMap($mreqs);
 
             return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {
@@ -39,7 +40,7 @@ class MenuRoleMapController extends Controller
     }
 
     /**
-     * | Update Menu Role Mapping
+     * | Update Api Role Mapping
      */
     public function updateRoleMap(Request $req)
     {
@@ -47,8 +48,8 @@ class MenuRoleMapController extends Controller
             $req->validate([
                 'id' => 'required'
             ]);
-            $mMenuRolemap = new MenuRolemap();
-            $list  = $mMenuRolemap->updateRoleMap($req);
+            $mApiRolemap = new ApiRolemap();
+            $list  = $mApiRolemap->updateRoleMap($req);
 
             return responseMsg(true, "Successfully Updated", $list);
         } catch (Exception $e) {
@@ -57,7 +58,7 @@ class MenuRoleMapController extends Controller
     }
 
     /**
-     * | Menu Role Mapping By id
+     * | Api Role Mapping By id
      */
     public function roleMapbyId(Request $req)
     {
@@ -66,13 +67,13 @@ class MenuRoleMapController extends Controller
                 'id' => 'required'
             ]);
 
-            $mMenuRolemap = new MenuRolemap();
-            $list  = $mMenuRolemap->roleMaps($req)
-                ->where('menu_rolemaps.id', $req->id)
-                ->where('menu_rolemaps.is_suspended', false)
+            $mApiRolemap = new ApiRolemap();
+            $list  = $mApiRolemap->roleMaps($req)
+                ->where('api_rolemaps.id', $req->id)
+                ->where('api_rolemaps.is_suspended', false)
                 ->first();
 
-            return responseMsg(true, "Menu Role Map", remove_null($list));
+            return responseMsg(true, "Api Role Map", remove_null($list));
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
@@ -80,24 +81,24 @@ class MenuRoleMapController extends Controller
 
 
     /**
-     * | Menu Role Mapping List
+     * | Api Role Mapping List
      */
     public function getAllRoleMap()
     {
         try {
-            $mMenuRolemap = new MenuRolemap();
-            $menuRole = $mMenuRolemap->roleMaps()
-                ->where('menu_rolemaps.is_suspended', false)
+            $mApiRolemap = new ApiRolemap();
+            $menuRole = $mApiRolemap->roleMaps()
+                ->where('api_rolemaps.is_suspended', false)
                 ->get();
 
-            return responseMsg(true, "Menu Role Map List", $menuRole);
+            return responseMsg(true, "Api Role Map List", $menuRole);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
 
     /**
-     * | Delete Menu Role Mapping
+     * | Delete Api Role Mapping
      */
     public function deleteRoleMap(Request $req)
     {
@@ -105,7 +106,7 @@ class MenuRoleMapController extends Controller
             $req->validate([
                 'id' => 'required'
             ]);
-            $delete = new MenuRolemap();
+            $delete = new ApiRolemap();
             $delete->deleteRoleMap($req);
 
             return responseMsg(true, "Data Deleted", '');

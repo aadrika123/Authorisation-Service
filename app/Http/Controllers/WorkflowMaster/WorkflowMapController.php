@@ -153,4 +153,18 @@ class WorkflowMapController extends Controller
             return responseMsg(false, $e->getmessage(), '');
         }
     }
+
+    public function workflowbyModule(Request $request)
+    {
+        try {
+            $request->validate([
+                'moduleId' => 'required|int'
+            ]);
+            $mWfWorkflow = new WfWorkflow();
+            $moduleList  = $mWfWorkflow->workflowbyModule($request->moduleId);
+            return responseMsg(true, 'Workflow List', $moduleList);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getmessage(), '');
+        }
+    }
 }

@@ -18,7 +18,7 @@ class ApiController extends Controller
             $req->validate([
                 'description' => 'required',
                 'category'    => 'required',
-                'end_point'   => 'required',
+                'endPoint'    => 'required',
                 'tags'        => 'required|array',
             ]);
 
@@ -67,7 +67,6 @@ class ApiController extends Controller
     public function getAllApi()
     {
         try {
-
             $list = new ApiMaster();
             $Api = $list->listApi();
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Menu;
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
 use App\Models\Menu\MenuMaster;
+use App\Models\ModuleMaster;
 use App\Models\Workflows\WfRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
@@ -27,9 +28,9 @@ class MenuController extends Controller
             ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->store($request);
-            return responseMsgs(true, "Data Saved!", "", "", "02", "", "POST", "");
+            return responseMsgs(true, "Data Saved!", "", "120101", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120101", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
 
@@ -38,19 +39,19 @@ class MenuController extends Controller
      */
     public function updateMenu(Request $request)
     {
-        $request->validate([
-            'id'           => 'required',
-            'serial'       => 'nullable|int',
-            'parentSerial' => 'nullable|int',
-            'route'        => 'nullable',
-            'delete'       => 'nullable|boolean'
-        ]);
         try {
+            $request->validate([
+                'id'           => 'required',
+                'serial'       => 'nullable|int',
+                'parentSerial' => 'nullable|int',
+                'route'        => 'nullable',
+                'delete'       => 'nullable|boolean'
+            ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->edit($request);
-            return responseMsgs(true, "Menu Updated!", "", "", "02", "733", "POST", "");
+            return responseMsgs(true, "Menu Updated!", "", "120102", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsg(false, $e->getMessage(), "", "", "120102", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
 
@@ -67,7 +68,7 @@ class MenuController extends Controller
                 ->update(['is_deleted' => true]);
             return responseMsgs(true, "Menu Deleted!", "", "", "02", "733", "POST", "");
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
         }
     }
 
@@ -83,10 +84,10 @@ class MenuController extends Controller
             ]);
             $mMenuMaster = new MenuMaster();
             $menues = $mMenuMaster->getMenuById($request->menuId);
-            if ($menues['parent_serial'] == 0) {
+            if ($menues['parent_id'] == 0) {
                 return responseMsgs(true, "Menu List!", $menues, "", "01", "", "POST", "");
             }
-            $parent = $mMenuMaster->getMenuById($menues['parent_serial']);
+            $parent = $mMenuMaster->getMenuById($menues['parent_id']);
             $menues['parentName'] = $parent['menu_string'];
             return responseMsgs(true, "Menu List!", $menues, "", "01", "", "POST", "");
         } catch (Exception $e) {
@@ -101,11 +102,12 @@ class MenuController extends Controller
     {
         try {
             $mMenuMaster = new MenuMaster();
-            $refmenues = $mMenuMaster->fetchAllMenues();
+            $refmenues = $mMenuMaster->fetchAllMenues()
+                ->get();
             $menues = $refmenues->sortByDesc("id");
             $listedMenues = collect($menues)->map(function ($value) use ($mMenuMaster) {
-                if ($value['parent_serial'] != 0) {
-                    $parent = $mMenuMaster->getMenuById($value['parent_serial']);
+                if ($value['parent_id'] != 0) {
+                    $parent = $mMenuMaster->getMenuById($value['parent_id']);
                     $parentName = $parent['menu_string'];
                     $value['parentName'] = $parentName;
                     return $value;
@@ -118,6 +120,32 @@ class MenuController extends Controller
         }
     }
 
+    /**
+     * | Module List
+     */
+    public function moduleList(Request $request)
+    {
+        try {
+            $mModuleMaster = new ModuleMaster();
+            $data = $mModuleMaster->moduleList();
+
+            return responseMsgs(true, "List of Module!", $data, "", "02", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+        }
+    }
+
+    public function listParentSerial()
+    {
+        try {
+            $mMenuMaster = new MenuMaster();
+            $parentMenu = $mMenuMaster->getParentMenue()
+                ->get();
+            return responseMsgs(true, "parent Menu!", $parentMenu, "", "", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 
     /**
      * | Get Menu by module 
@@ -165,23 +193,28 @@ class MenuController extends Controller
             ];
             return responseMsgs(true, "Parent Menu!", $menuPermission, "", "", "", "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
         }
     }
 
+
+    /**
+     * | menu Tree
+     */
     public function generateMenuTree($request)
     {
         $mMenuMaster = new MenuMaster();
-        $mMenues = $mMenuMaster->fetchAllMenues();
+        $mMenues = $mMenuMaster->fetchAllMenues()
+            ->get();
 
         $data = collect($mMenues)->map(function ($value, $key) {
             $return = array();
-            $return['id'] = $value['id'];
-            $return['parentId'] = $value['parent_serial'];
-            $return['path'] = $value['route'];
-            $return['icon'] = config('app.url') . '/api/getImageLink?path=' . $value['icon'];
-            $return['name'] = $value['menu_string'];
-            $return['order'] = $value['serial'];
+            $return['id']       = $value['id'];
+            $return['parentId'] = $value['parent_id'];
+            $return['path']     = $value['route'];
+            $return['icon']     = config('app.url') . '/api/getImageLink?path=' . $value['icon'];
+            $return['name']     = $value['menu_string'];
+            $return['order']    = $value['serial'];
             $return['children'] = array();
             return ($return);
         });
@@ -208,9 +241,9 @@ class MenuController extends Controller
         if ($request->roleId && $request->moduleId) {
             $mRoleMenues = $mMenuMaster->getMenuByRole($request->roleId, $request->moduleId); //addition of module Id
 
-            $roleWise = collect($mRoleMenues)->map(function ($value) use ($mMenuMaster) {
-                if ($value['parent_serial'] > 0) {
-                    return $roleWise = $this->getParent($value['parent_serial']);
+            $roleWise = collect($mRoleMenues)->map(function ($value) {
+                if ($value['parent_id'] > 0) {
+                    return $this->getParent($value['parent_id']);
                 }
                 return $value['id'];
             });
@@ -228,8 +261,8 @@ class MenuController extends Controller
     {
         $mMenuMaster = new MenuMaster();
         $refvalue = $mMenuMaster->getMenuById($parentId);
-        if ($refvalue['parent_serial'] > 0) {
-            $this->getParent($refvalue['parent_serial']);
+        if ($refvalue['parent_id'] > 0) {
+            $this->getParent($refvalue['parent_id']);
         }
         return $refvalue['id'];
     }

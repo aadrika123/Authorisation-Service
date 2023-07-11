@@ -77,7 +77,7 @@ class WfWorkflow extends Model
     public function deleteWorkflow($req)
     {
         $data = WfWorkflow::find($req->id);
-        $data->is_suspended = "true";
+        $data->is_suspended = true;
         $data->save();
     }
 
@@ -98,6 +98,18 @@ class WfWorkflow extends Model
     {
         return WfWorkflow::where('ulb_id', $ulbId)
             ->where('is_suspended', false)
+            ->get();
+    }
+
+    /**
+     * | Get Workflow List by Module
+     */
+    public function  workflowbyModule($moduleId)
+    {
+        return WfWorkflow::select('wf_workflows.id', 'workflow_name')
+            ->join('wf_masters', 'wf_masters.id', 'wf_workflows.wf_master_id')
+            ->where('module_id', $moduleId)
+            ->where('wf_workflows.is_suspended', false)
             ->get();
     }
 }

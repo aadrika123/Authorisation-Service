@@ -18,9 +18,9 @@ class MenuRolemap extends Model
     public function addRoleMap($req)
     {
         $data = new MenuRolemap;
-        $data->menu_id      = $req->menuId;
-        $data->menu_role_id = $req->menuRoleId;
-        $data->is_suspended = $req->isSuspended ?? false;
+        $data->menu_id      = $req['menuId'];
+        $data->menu_role_id = $req['menuRoleId'];
+        $data->is_suspended = $req['isSuspended'] ?? false;
         $data->save();
     }
 
@@ -30,8 +30,8 @@ class MenuRolemap extends Model
     public function updateRoleMap($req)
     {
         $data = MenuRolemap::find($req->id);
-        $data->menu_id      = $req->menuId ?? $data->menu_id;
-        $data->menu_role_id = $req->menuRoleId ?? $data->menu_role_id;
+        // $data->menu_id      = $req->menuId ?? $data->menu_id;
+        // $data->menu_role_id = $req->menuRoleId ?? $data->menu_role_id;
         $data->is_suspended = $req->isSuspended ?? $data->is_suspended;
         $data->save();
     }
@@ -42,10 +42,11 @@ class MenuRolemap extends Model
     public function roleMaps()
     {
         $data = DB::table('menu_rolemaps')
+            ->select('menu_rolemaps.id', 'menu_id', 'menu_role_id', 'menu_rolemaps.is_suspended', 'menu_string', 'route', 'menu_role_name')
             ->leftjoin('menu_masters', 'menu_masters.id', 'menu_rolemaps.menu_id')
-            ->leftjoin('menu_roles', 'menu_roles.id', 'menu_rolemaps.menu_role_id')
-            ->where('menu_rolemaps.is_suspended', false)
-            ->orderBy('menu_rolemaps.id');
+            ->join('menu_roles', 'menu_roles.id', 'menu_rolemaps.menu_role_id')
+            // ->where('menu_rolemaps.is_suspended', false)
+            ->orderByDesc('menu_rolemaps.id');
         return $data;
     }
 

@@ -10,6 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class WfRole extends Model
 {
     use HasFactory;
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
 
     //add role
     public function addRole($req)
@@ -44,9 +48,10 @@ class WfRole extends Model
     //role list
     public function roleList()
     {
-        return  WfRole::where('is_suspended', false)
-            ->orderByDesc('id')
-            ->get();
+        return  WfRole::select('wf_roles.id', 'role_name', 'wf_roles.is_suspended', 'users.name as created_by')
+            ->join('users', 'users.id', 'wf_roles.created_by')
+            ->where('is_suspended', false)
+            ->orderByDesc('id');
     }
 
     //delete role

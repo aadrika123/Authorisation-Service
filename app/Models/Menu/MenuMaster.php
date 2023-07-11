@@ -17,8 +17,8 @@ class MenuMaster extends Model
         return MenuMaster::select('menu_masters.*', 'wf_workflows.alt_name as workflow_name')
             ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
             ->where('is_deleted', false)
-            ->orderBy("menu_masters.serial", "Asc")
-            ->get();
+            ->orderByDesc("id");
+        // ->orderBy("menu_masters.serial");
     }
 
     /**
@@ -40,7 +40,7 @@ class MenuMaster extends Model
     {
         $a = MenuMaster::select(
             'menu_masters.id',
-            'menu_masters.parent_serial'
+            'menu_masters.parent_id'
         )
             ->join('wf_rolemenus', 'wf_rolemenus.menu_id', '=', 'menu_masters.id')
             ->where('menu_masters.is_deleted', false)
@@ -58,16 +58,14 @@ class MenuMaster extends Model
     public function store($request)
     {
         $newMenues = new MenuMaster();
-        $newMenues->menu_string  =  $request->menuName;
-        $newMenues->top_level  =  $request->topLevel;
-        $newMenues->sub_level  =  $request->subLevel;
-        $newMenues->parent_serial  =  $request->parentSerial ?? 0;
-        $newMenues->description  =  $request->description;
-        $newMenues->serial = $request->serial;
-        $newMenues->route = $request->route;
-        $newMenues->icon = $request->icon;
-        $newMenues->module_id = $request->moduleId;
-        $newMenues->workflow_id = $request->workflowId;
+        $newMenues->serial        = $request->serial;
+        $newMenues->description   = $request->description;
+        $newMenues->menu_string   = $request->menuName;
+        $newMenues->parent_id     = $request->parentId ?? 0;
+        $newMenues->route         = $request->route;
+        $newMenues->icon          = $request->icon;
+        $newMenues->module_id     = $request->moduleId;
+        $newMenues->workflow_id   = $request->workflowId;
         $newMenues->save();
     }
 
@@ -83,7 +81,7 @@ class MenuMaster extends Model
                     'serial'        => $request->serial         ?? $refValues->serial,
                     'description'   => $request->description    ?? $refValues->description,
                     'menu_string'   => $request->menuName       ?? $refValues->menu_string,
-                    'parent_serial' => $request->parentSerial   ?? $refValues->parent_serial,
+                    'parent_id'     => $request->parentId       ?? $refValues->parent_id,
                     'route'         => $request->route          ?? $refValues->route,
                     'icon'          => $request->icon           ?? $refValues->icon,
                     'is_deleted'    => $request->delete         ?? $refValues->is_deleted,
@@ -91,5 +89,21 @@ class MenuMaster extends Model
                     'workflow_id'   => $request->workflowId     ?? $refValues->workflow_id,
                 ]
             );
+    }
+
+    /**
+     * | Get Parent Menues
+     */
+    public function getParentMenue()
+    {
+        return MenuMaster::select(
+            'id',
+            'menu_string',
+            'parent_id',
+            'serial'
+        )
+            ->where('parent_id', 0)
+            ->where('is_deleted', false)
+            ->orderBy("menu_masters.serial");
     }
 }

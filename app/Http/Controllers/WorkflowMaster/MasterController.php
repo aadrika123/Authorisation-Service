@@ -12,9 +12,8 @@ class MasterController extends Controller
     /**
      * Controller for Add, Update, View , Delete of Workflow Master Table
      * -------------------------------------------------------------------------------------------------
-     * Created On-07-10-2022
+     * Created On-07-07-2023
      * Created By-Mrinal Kumar
-     * Modification On: 19-12-2022
      * Status : Closed
      * -------------------------------------------------------------------------------------------------
      */
@@ -31,9 +30,9 @@ class MasterController extends Controller
             $create = new WfMaster();
             $create->addMaster($req);
 
-            return responseMsg(true, "Successfully Saved", "");
+            return responseMsgs(true, "Successfully Saved", "", "120101", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120101", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -42,15 +41,15 @@ class MasterController extends Controller
     {
         try {
             $req->validate([
+                'id' => 'required',
                 'workflowName' => 'required',
-                'id' => 'required'
             ]);
             $update = new WfMaster();
             $list  = $update->updateMaster($req);
 
-            return responseMsg(true, "Successfully Updated", $list);
+            return responseMsgs(true, "Successfully Updated", $list, "120102", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120102", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -64,23 +63,22 @@ class MasterController extends Controller
             $listById = new WfMaster();
             $list  = $listById->listbyId($req);
 
-            return responseMsg(true, "Master List", $list);
+            return responseMsgs(true, "Master List", $list, "120103", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120103", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
     //all master list
-    public function getAllMaster()
+    public function getAllMaster(Request $req)
     {
         try {
-
             $list = new WfMaster();
             $masters = $list->listMaster();
 
-            return responseMsg(true, "All Master List", $masters);
+            return responseMsgs(true, "All Master List", $masters, "120104", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120104", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -95,9 +93,9 @@ class MasterController extends Controller
             $delete = new WfMaster();
             $delete->deleteMaster($req);
 
-            return responseMsg(true, "Data Deleted", '');
+            return responseMsgs(true, "Data Deleted", '', "120105", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120105", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }

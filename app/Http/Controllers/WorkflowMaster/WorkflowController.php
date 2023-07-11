@@ -23,9 +23,9 @@ class WorkflowController extends Controller
             $create = new WfWorkflow();
             $create->addWorkflow($req);
 
-            return responseMsg(true, "Workflow Saved", "");
+            return responseMsgs(true, "Workflow Saved", "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -40,9 +40,9 @@ class WorkflowController extends Controller
             $update = new WfWorkflow();
             $list  = $update->updateWorkflow($req);
 
-            return responseMsg(true, "Successfully Updated", $list);
+            return responseMsgs(true, "Data Updated", $list, "120202", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120202", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -56,9 +56,9 @@ class WorkflowController extends Controller
             $listById = new WfWorkflow();
             $list  = $listById->listbyId($req);
 
-            return responseMsg(true, "Workflow List", $list);
+            return responseMsgs(true, "Workflow List", $list, "120203", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120203", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -70,9 +70,9 @@ class WorkflowController extends Controller
             $list = new WfWorkflow();
             $workflow = $list->listUlbWorkflow($ulbId);
 
-            return responseMsg(true, "All Workflow List", $workflow);
+            return responseMsgs(true, "All Workflow List", $workflow, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -84,9 +84,9 @@ class WorkflowController extends Controller
             $delete = new WfWorkflow();
             $delete->deleteWorkflow($req);
 
-            return responseMsg(true, "Data Deleted", '');
+            return responseMsgs(true, "Data Deleted", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }

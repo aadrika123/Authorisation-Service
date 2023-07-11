@@ -47,9 +47,9 @@ class RoleController extends Controller
             // }
             // dd($req);
 
-            return responseMsg(true, "Successfully Saved", "");
+            return responseMsgs(true, "Successfully Saved", "", "120301", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120301", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -73,9 +73,9 @@ class RoleController extends Controller
             $mWfRole = new WfRole();
             $role    = $mWfRole->updateRole($req);
 
-            return responseMsg(true, "Successfully Updated", $role);
+            return responseMsgs(true, "Successfully Updated", $role, "120302", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120302", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -93,32 +93,35 @@ class RoleController extends Controller
         }
         try {
             $mWfRole = new WfRole();
-            $list  = $mWfRole->rolebyId($req);
+            $list  = $mWfRole->roleList()
+                ->where('wf_roles.id', $req->id)
+                ->first();
 
-            if ($list->isEmpty())
+            if (!$list)
                 throw new Exception("No data Found");
 
-            return responseMsg(true, "Role List", $list);
+            return responseMsgs(true, "Role List", $list, "120303", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120303", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
     /**
      * | Role List
      */
-    public function getAllRoles()
+    public function getAllRoles(Request $req)
     {
         try {
             $mWfRole = new WfRole();
-            $roles = $mWfRole->roleList();
+            $roles = $mWfRole->roleList()
+                ->get();
 
             if ($roles->isEmpty())
                 throw new Exception("No data Found");
 
-            return responseMsg(true, "All Role List", $roles);
+            return responseMsgs(true, "All Role List", $roles, "120304", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120304", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -138,9 +141,9 @@ class RoleController extends Controller
             $mWfRole = new WfRole();
             $mWfRole->deleteRole($req);
 
-            return responseMsg(true, "Data Deleted", '');
+            return responseMsgs(true, "Data Deleted", "", "120305", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120305", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
