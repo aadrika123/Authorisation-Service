@@ -167,4 +167,28 @@ class WorkflowMapController extends Controller
             return responseMsg(false, $e->getmessage(), '');
         }
     }
+
+    /**
+     * |
+     */
+    //working
+    //get workflow by ulb and master id
+    public function getWorkflow(Request $request)
+    {
+        try {
+            $request->validate([
+                "ulbId" => "required|numeric",
+                "workflowMstrId" => "required|numeric",
+            ]);
+            $workflow = WfWorkflow::select('wf_workflows.*')
+                ->where('ulb_id', $request->ulbId)
+                ->where('wf_master_id', $request->workflowMstrId)
+                ->where('is_suspended', false)
+                ->first();
+
+            return responseMsg(true, "Workflow Details", $workflow);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 }
