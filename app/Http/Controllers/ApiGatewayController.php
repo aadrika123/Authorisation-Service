@@ -11,7 +11,6 @@ class ApiGatewayController extends Controller
 {
     public function apiGatewayService(Request $req)
     {
-        
         try {
             // Converting environmental variables to Services
             $baseURLs = Config::get('constants.MICROSERVICES_APIS');
@@ -33,12 +32,10 @@ class ApiGatewayController extends Controller
                 'apiToken' => $req->user()->currentAccessToken()->token,
             ]);           
 
-
+            
+            
             #======================
-            if($service!="public-transport")
-            {
-                dd($_FILES);
-            } 
+            
             $response = Http::withHeaders(
                 [
                     "Authorization" => "Bearer $bearerToken",
@@ -46,69 +43,108 @@ class ApiGatewayController extends Controller
                 ]
             );
             $fileName = [];
-            $new =[];  
-            // if($service!="public-transport")
-            {          
+            $new =[]; 
             foreach($_FILES as $index=>$val)
             {
                 array_push($fileName,$index);
             }
             
-                // dd($_FILES);
-            } 
-            // dd($fileName);
-            foreach($req->all() as $key=>$val)
+            foreach(collect($req->all())->toArray() as $key=>$val)
             {
                 if(in_array($key,$fileName))
                 {
                     continue;
-                }
-                $new[$key] =(is_array($val))?json_encode($val):$val;            
+                } 
+                $new[$key] = $val;          
             }
+            $dotIndexes = $this->generateDotIndexes($_FILES); 
             
-            foreach($fileName as $val)
+            foreach($dotIndexes as $val)
             {
+                $patern = "/\.name/i";
+                if(!preg_match($patern,$val))
+                {
+                    continue;
+                }
+                $name = "";
+                $test = collect(explode(".",preg_replace($patern,"",$val)));
+                $t = $test->filter(function($val,$index){
+                    return $index > 0 ? true : "" ;
+                });
+                $t = $t->map(function($val){
+                    return "[".$val."]";
+                });
+                $name = (($test[0]).implode("",$t->toArray()));
                 $response = $response->attach(
-                    $val,
-                    file_get_contents($_FILES[$val]["tmp_name"]),
-                    $_FILES[$val]["name"]
+                    $name,
+                    file_get_contents($this->getArrayValueByDotNotation($_FILES,preg_replace($patern,".tmp_name",$val))),
+                    $this->getArrayValueByDotNotation($_FILES,$val)                    
                 );
             }
-            
-            $response = $response->$method($url . $req->getRequestUri(),$new);
+            $textIndex = $this->generateDotIndexes($new);            
+            $new2 = [];           
+            foreach($textIndex as $val)            
+            {
+                $name = "";
+                $test = collect(explode(".",$val));
+                $t = $test->filter(function($val,$index){
+                    return $index > 0 ? true : "" ;
+                });
+                $t = $t->map(function($val){
+                    return "[".$val."]";
+                });
+                $name = (($test[0]).implode("",$t->toArray()));
+                $new2[]= [                    
+                    "contents"=>$this->getArrayValueByDotNotation($new,$val),
+                    "name"=>$name                    
+                ];
+            }
+            $response = $response->$method($url . $req->getRequestUri(),($fileName?$new2:$new));
             #======================
             
             return $response;
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
 
+    public function getArrayValueByDotNotation(array $array, string $key)
+    {
+        $keys = explode('.', $key);
 
+        foreach ($keys as $key) 
+        {
+            if (isset($array[$key])) 
+            {
+                $array = $array[$key];
+            } 
+            else 
+            {
+                return null; // Key doesn't exist in the array
+            }
+        }
 
+        return $array;
+    }
 
-    //     public function apiGatewayService(Request $req)
-    //     {
+    public function generateDotIndexes(array $array, $prefix = '', $result = [])
+    {    
+        
+        foreach ($array as $key => $value) 
+        {            
+            $newKey = $prefix . $key; 
+            if (is_array($value)) 
+            {                
+                $result = $this->generateDotIndexes($value, $newKey . '.', $result);
+            } 
+            else 
+            {                
+                $result[] = $newKey;
+            }
+        }
+        return $result;
+    }
 
-    //        return $files = $_FILES['documents'];
-    //         // $data = $req->input('data');
-
-    //         $httpClient = Http::attach(
-    //             'file1',
-    //             file_get_contents($files['documents'][0]['temp_name']->getPathname()),
-    //             $files[0]->getClientOriginalName()
-    //         );
-
-    //         for ($i = 1; $i < count($files); $i++) {
-    //             $httpClient = $httpClient->attach(
-    //                 'file' . ($i + 1),
-    //                 file_get_contents($files[$i]->getPathname()),
-    //                 $files[$i]->getClientOriginalName()
-    //             );
-    //         }
-    // return  $httpClient;
-    //         $response = $httpClient->post('http://destination-url', [
-    //             'additional_data' => $data,
-    //         ]);
-    //     }
 }
