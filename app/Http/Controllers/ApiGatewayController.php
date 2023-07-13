@@ -163,12 +163,14 @@ class ApiGatewayController extends Controller
             $url = $services[$service];
             $bearerToken = (collect(($req->headers->all())['authorization']??"")->first());
             $contentType = (collect(($req->headers->all())['content-type'] ?? "")->first());
+            $ipAddress = getClientIpAddress();
             $method = $req->method();
             $req = $req->merge([
                 'auth' => authUser(),
                 'token' => $req->bearerToken(),
                 'currentAccessToken' => $req->user()->currentAccessToken(),
                 'apiToken' => $req->user()->currentAccessToken()->token,
+                'ipAddress' => $ipAddress
             ]);           
 
 
