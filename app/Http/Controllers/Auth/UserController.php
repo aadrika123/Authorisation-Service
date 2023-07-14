@@ -77,36 +77,131 @@ class UserController extends Controller
     }
 
     /**
-     * | User Store
+     * | User Creation
      */
-    public function store(AuthUserRequest $request)
+    public function createUser(AuthUserRequest $request)
     {
         try {
             // Validation---@source-App\Http\Requests\AuthUserRequest
             $user = new User;
-            $this->saving($user, $request);                     // Storing data using Auth trait
-            $user->password = Hash::make($request->password);
+            $checkEmail = User::where('email', $request->email)->first();
+            if ($checkEmail)
+                throw new Exception('The email has already been taken.');
+            $this->saving($user, $request);                     #_Storing data using Auth trait
+            $firstname = explode(" ", $request->name);
+            $user->user_name = $firstname[0] . '.' . substr($request->mobile, 0, 3);
+            $user->password = Hash::make($firstname[0] . '@' . substr($request->mobile, 7, 3));
             $user->save();
-            return responseMsg(true, "User Registered Successfully !! Please Continue to Login", "");
+            $data['userName'] = $user->user_name;
+            return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
+            Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "");
         }
     }
 
-    // Store the user in database from Authority
-    public function authorizeStore(AuthorizeRequestUser $request)
+    /**
+     * | Update User Details
+     */
+    public function updateUser(Request $request)
     {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
         try {
-            $request['ulb'] = auth()->user()->ulb_id;
-            $user = new User;
-            $this->saving($user, $request);                     // Storing data using Auth trait
-            $user->password = Hash::make($request->password);
-            $user->save();
-            return responseMsg(true, "User Registered Successfully !! Please Continue to Login", "");
+            $id = $request->id;
+            $user = User::find($id);
+            if (!$user)
+                throw new Exception("User Not Exist");
+            $stmt = $user->email == $request->email;
+            if ($stmt) {
+                $this->saving($user, $request);
+                $this->savingExtras($user, $request);
+                $user->save();
+            }
+            if (!$stmt) {
+                $check = User::where('email', $request->email)->first();
+                if ($check) {
+                    throw new Exception('Email Is Already Existing');
+                }
+                if (!$check) {
+                    $this->saving($user, $request);
+                    $this->savingExtras($user, $request);
+                    $user->save();
+                }
+            }
+            return responseMsgs(true, "Successfully Updated", "", "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
         }
     }
+
+    /**
+     * | List User
+     */
+    public function listUser(Request $req)
+    {
+        try {
+            $perPage = $req->perPage ?? 10;
+            $ulbId = authUser()->ulb_id;
+            $data = User::select(
+                '*',
+                DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
+                DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
+            )
+                ->where('ulb_id', $ulbId)
+                ->orderByDesc('id')
+                ->paginate($perPage);
+
+            return responseMsgs(true, "User List", $data, "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
+    /**
+     * | List User
+     */
+    public function userById(Request $req)
+    {
+        try {
+            $req->validate(
+                ["id" => 'required']
+            );
+            $data = User::find($req->id);
+
+            return responseMsgs(true, "User Data", $data, "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
+
+    /**
+     * | Delete User
+     */
+    public function deleteUser(Request $request)
+    {
+        try {
+            $request->validate(
+                ["id" => 'required']
+            );
+            $data = User::find($request->id);
+            $data->suspended = true;
+            $data->save();
+            return responseMsgs(true, "Data Deleted", '', "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
 
     /**
      * |
@@ -177,71 +272,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * | Edit My Profile
-     */
-    public function editMyProfile(Request $request)
-    {
-        $user = authUser();
-        $meta['id'] = $user->id;
-        $meta['ulb'] = $user->ulb_id;
-        $request->request->add($meta);
-        return $this->update($request);
-    }
 
-    /**
-     * | Update User Details
-     */
-    public function update(Request $request)
-    {
-        $validated = Validator::make(
-            $request->all(),
-            [
-                "id" => 'required',
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255']
-            ]
-        );
-        if ($validated->fails()) {
-            return validationError($validated);
-        }
-
-        try {
-            $id = $request->id;
-            $user = User::find($id);
-            $stmt = $user->email == $request->email;
-            if ($stmt) {
-                $this->saving($user, $request);
-                $this->savingExtras($user, $request);
-                $user->save();
-            }
-            if (!$stmt) {
-                $check = User::where('email', '=', $request->email)->first();
-                if ($check) {
-                    throw new Exception('Email Is Already Existing');
-                }
-                if (!$check) {
-                    $this->saving($user, $request);
-                    $this->savingExtras($user, $request);
-                    $user->save();
-                }
-            }
-            return responseMsgs(true, "Successfully Updated", "", "", "01", ".ms", "POST", "");
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
-        }
-    }
-
-    /**
-     * | Delete User
-     */
-    public function deleteUser(Request $request)
-    {
-        $data = User::find($request->id);
-        $data->suspended = true;
-        $data->save();
-        return responseMsg(true, "Data Deleted", '');
-    }
 
     /**
      * | Get Users Details by Id

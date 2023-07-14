@@ -132,16 +132,10 @@ class WorkflowRoleUserMapController extends Controller
     {
         $validated = FacadesValidator::make(
             $req->all(),
-            [
-                'userId' => 'required'
-            ]
+            ['userId' => 'required']
         );
         if ($validated->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validated->errors()
-            ], 422);
+            return validationError($validated);
         }
 
         return $this->EloquentRoleUserMap->getRolesByUserId($req);

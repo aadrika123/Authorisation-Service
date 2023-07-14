@@ -38,10 +38,9 @@ trait Auth
         $user->name = $request->name;
         $user->mobile = $request->mobile;
         $user->email = $request->email;
-        // $user->ulb_id = $request->ulb;
-        if ($request->ulb) {
-            $user->ulb_id = $request->ulb;
-        }
+        $user->alternate_mobile = $request->altMobile;
+        $user->address = $request->address;
+        $user->ulb_id = authUser()->ulb_id;
         if ($request->userType) {
             $user->user_type = $request->userType;
         }

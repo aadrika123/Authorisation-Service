@@ -272,7 +272,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getUserById', 'getUserById');
         Route::post('workflow/getWorkflowNameByUlb', 'getWorkflowNameByUlb');
         Route::post('workflow/getRoleByUlb', 'getRoleByUlb');
-        Route::post('workflow/getWardByUlb', 'getWardByUlb');
         Route::post('workflow/getUserByRole', 'getUserByRole');     #both r same please use one
         Route::post('workflow/getUserByRoleId', 'getUserByRoleId'); #both r same please use one    
         Route::post('workflow/getRoleByWorkflow', 'getRoleByWorkflow');
@@ -289,6 +288,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getRoleByWardUlbId', 'getRoleByWardUlbId');
         Route::post('workflow/get-ulb-workflow', 'getWorkflow');
         Route::post('user-managment/v1/crud/workflow-by-module', 'workflowbyModule');
+        Route::post('workflow/v1/crud/ward-by-ulb', 'getWardByUlb');
     });
 
     /* | Created On-02-06-2023
@@ -329,16 +329,19 @@ Route::middleware('auth:sanctum')->group(function () {
      * | 
      */
     Route::controller(UserController::class)->group(function () {
-        Route::post('authorised-register', 'authorizeStore');               // authorised user adding user // 
+        Route::post('user-managment/v1/crud/user/create', 'createUser');    #_Authorised User Adding User
+        Route::post('user-managment/v1/crud/user/update', 'updateUser');    #_For Edit/Update User Details
+        Route::post('user-managment/v1/crud/user/delete', 'deleteUser');    #_Delete User
+        Route::post('user-managment/v1/crud/user/list', 'listUser');        #_List User
+        Route::post('user-managment/v1/crud/user/get', 'userById');         #_Get User
+
+
         Route::post('change-password', 'changePass');                       // Change password with login
         Route::post('otp/change-password', 'changePasswordByOtp');           // Change Password With OTP   
 
         // User Profile APIs
         Route::get('my-profile-details', 'myProfileDetails');   // For get My profile Details
-        Route::post('edit-my-profile', 'editMyProfile');        // For Edit My profile Details ---->>edited by mrinal method changed from put to post
 
-        Route::post('edit-user', 'update');
-        Route::post('delete-user', 'deleteUser');
         Route::get('get-user/{id}', 'getUser');
         Route::post('get-all-users', 'getAllUsers');
         Route::post('list-employees', 'employeeList');
