@@ -182,7 +182,7 @@ class WfWorkflowrolemap extends Model
     //Role by Workflow
     public function getRoleByWorkflow($request, $ulbId)
     {
-        $roles = WfWorkflowrolemap::select('wf_roles.id as role_id', 'wf_roles.role_name')
+        return WfWorkflowrolemap::select('wf_roles.id as role_id', 'wf_roles.role_name')
             ->join('wf_roles', 'wf_roles.id', '=', 'wf_workflowrolemaps.wf_role_id')
             ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
             ->where('wf_workflows.ulb_id', $ulbId)
@@ -194,8 +194,6 @@ class WfWorkflowrolemap extends Model
             })
             ->orderBy('serial_no')
             ->get();
-
-        return $roles;
     }
 
     public function getUserByWorkflow($request)

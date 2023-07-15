@@ -140,7 +140,7 @@ class WorkflowRoleMapController extends Controller
             $mreqs = new Request(["workflowId" => $workflowId]);
             $role = $mWfWorkflowrolemap->getRoleByWorkflow($mreqs,$ulbId);
 
-            $data['members'] = collect($role)['original']['data'];
+            $data['members'] = collect($role);
 
             //logged in user role
             $role = $this->getRole($mreqs);
