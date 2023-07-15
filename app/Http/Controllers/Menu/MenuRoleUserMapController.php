@@ -102,6 +102,12 @@ class MenuRoleUserMapController extends Controller
         }
     }
 
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
+
+    // Roles by User Id
     public function roleByUserId(Request $req)
     {
         try {
@@ -119,6 +125,7 @@ class MenuRoleUserMapController extends Controller
         }
     }
 
+    //Roles Except Given user id
     public function roleExcludingUserId(Request $req)
     {
         try {

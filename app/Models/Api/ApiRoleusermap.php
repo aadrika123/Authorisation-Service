@@ -59,6 +59,10 @@ class ApiRoleusermap extends Model
         $data->save();
     }
 
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
     public function getRoleByUserId()
     {
         return ApiRoleusermap::select('api_roleusermaps.id', 'api_roleusermaps.api_role_id', 'api_roles.api_role_name')

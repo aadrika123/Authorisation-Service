@@ -227,15 +227,20 @@ class MenuController extends Controller
         }
 
         # looping for the generation of child nodes / operation will end if the parentId is not match to id 
-        foreach ($data as $key => &$item)
+        foreach ($data as $key => &$item) {
             if ($item['id'] && isset($itemsByReference[$item['parentId']]))
                 $itemsByReference[$item['parentId']]['children'][] = &$item;
 
-        # this loop is to remove the external loop of the child node ie. not allowing the child node to create its own treee
-        foreach ($data as $key => &$item) {
+            # to remove the external loop of the child node ie. not allowing the child node to create its own treee
             if ($item['parentId'] && isset($itemsByReference[$item['parentId']]))
                 unset($data[$key]);
         }
+
+        # this loop is to remove the external loop of the child node ie. not allowing the child node to create its own treee
+        // foreach ($data as $key => &$item) {
+        //     if ($item['parentId'] && isset($itemsByReference[$item['parentId']]))
+        //         unset($data[$key]);
+        // }
 
         $data = collect($data)->values();
         if ($request->roleId && $request->moduleId) {

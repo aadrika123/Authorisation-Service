@@ -14,7 +14,16 @@ class MenuMaster extends Model
      */
     public function fetchAllMenues()
     {
-        return MenuMaster::select('menu_masters.*', 'wf_workflows.alt_name as workflow_name')
+        return MenuMaster::select(
+            // 'menu_masters.*',
+            'menu_masters.id',
+            'menu_masters.parent_id',
+            'menu_masters.route',
+            'menu_masters.icon',
+            'menu_masters.menu_string',
+            'menu_masters.serial',
+            'wf_workflows.alt_name as workflow_name'
+        )
             ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
             ->where('is_deleted', false)
             ->orderByDesc("id");

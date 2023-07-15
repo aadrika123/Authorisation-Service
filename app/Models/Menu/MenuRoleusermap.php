@@ -59,6 +59,10 @@ class MenuRoleusermap extends Model
         $data->save();
     }
 
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
     public function getRoleByUserId()
     {
         return MenuRoleusermap::select('menu_roleusermaps.id', 'menu_roleusermaps.menu_role_id', 'menu_roles.menu_role_name')

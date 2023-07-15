@@ -162,6 +162,13 @@ class WorkflowRoleUserMapController extends Controller
         return $this->EloquentRoleUserMap->updateUserRoles($req);
     }
 
+
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
+
+    // Roles by User Id
     public function roleByUserId(Request $req)
     {
         $validator = FacadesValidator::make($req->all(),  [
@@ -180,6 +187,7 @@ class WorkflowRoleUserMapController extends Controller
         }
     }
 
+    //Roles Except Given user id
     public function roleExcludingUserId(Request $req)
     {
         $validator = FacadesValidator::make($req->all(),  [

@@ -107,6 +107,13 @@ class ApiRoleUserMapController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
+
+    // Roles by User Id
     public function roleByUserId(Request $req)
     {
         $validator = Validator::make($req->all(), [
@@ -126,6 +133,8 @@ class ApiRoleUserMapController extends Controller
         }
     }
 
+
+    //Roles Except Given user id
     public function roleExcludingUserId(Request $req)
     {
         $validator = Validator::make($req->all(), [

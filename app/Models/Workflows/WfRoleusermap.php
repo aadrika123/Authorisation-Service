@@ -58,6 +58,11 @@ class WfRoleusermap extends Model
             ->orderByDesc('wf_roles.id');
     }
 
+
+    /**
+     * created by : Ashutosh Kumar
+     * created at : 14-07-23
+     */
     public function getRoleByUserId()
     {
         return WfRoleusermap::select('wf_roleusermaps.id', 'wf_roleusermaps.wf_role_id', 'wf_roles.role_name')
