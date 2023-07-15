@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\WorkflowMaster;
 
 use App\Http\Controllers\Controller;
+use App\Models\Auth\User;
 use App\Models\Workflows\WfWorkflow;
 use App\Models\Workflows\WfWorkflowrolemap;
 use App\Traits\Workflow\Workflow;
@@ -159,4 +160,54 @@ class WorkflowRoleMapController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+        // tabs permission
+        public function permission($workflowId, $roleId)
+        {
+            $permission = WfWorkflowrolemap::select('wf_workflowrolemaps.*')
+                ->where('wf_workflowrolemaps.workflow_id', $workflowId)
+                ->where('wf_workflowrolemaps.wf_role_id', $roleId)
+                ->first();
+    
+            $data = [
+                'allow_full_list' => $permission->allow_full_list,
+                'can_escalate' => $permission->can_escalate,
+                'can_btc' => $permission->is_btc,
+                'is_enabled' => $permission->is_enabled,
+                'can_view_document' => $permission->can_view_document,
+                'can_upload_document' => $permission->can_upload_document,
+                'can_verify_document' => $permission->can_verify_document,
+                'allow_free_communication' => $permission->allow_free_communication,
+                'can_forward' => $permission->can_forward,
+                'can_backward' => $permission->can_backward,
+                'can_approve' => $permission->is_finisher,
+                'can_reject' => $permission->is_finisher,
+                'is_pseudo' => $permission->is_pseudo,
+                'show_field_verification' => $permission->show_field_verification,
+                'can_view_form' => $permission->can_view_form,
+                'can_see_tc_verification' => $permission->can_see_tc_verification,
+                'can_edit' => $permission->can_edit,
+                'can_send_sms' => $permission->can_send_sms,
+                'can_comment' => $permission->can_comment,
+                'is_custom_enabled' => $permission->is_custom_enabled,
+                'je_comparison' => $permission->je_comparison,
+                'technical_comparison' => $permission->technical_comparison,
+                'can_view_technical_comparison' => $permission->can_view_technical_comparison,
+            ];
+    
+            return $data;
+        }
+    
+        public function pseudoUser($ulbId)
+        {
+            $pseudo = User::select(
+                'id',
+                'user_name'
+            )
+                ->where('user_type', 'Pseudo')
+                ->where('ulb_id', $ulbId)
+                ->where('suspended', false)
+                ->get();
+            return $pseudo;
+        }
 }
