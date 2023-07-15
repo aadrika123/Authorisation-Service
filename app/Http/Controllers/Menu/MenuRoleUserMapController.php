@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu\MenuRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MenuRoleUserMapController extends Controller
 {
@@ -38,9 +39,9 @@ class MenuRoleUserMapController extends Controller
                 'id' => 'required'
             ]);
             $mMenuRoleusermap = new MenuRoleusermap();
-            $list  = $mMenuRoleusermap->updateRoleUser($req);
+            $mMenuRoleusermap->updateRoleUser($req);
 
-            return responseMsgs(true, "Data Updated", $list);
+            return responseMsgs(true, "Data Updated", []);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
@@ -98,6 +99,40 @@ class MenuRoleUserMapController extends Controller
             return responseMsgs(true, "Data Deleted", '');
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    public function roleByUserId(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'userId' => 'required|integer'
+            ]);
+
+            $menuRoleUserMap = new MenuRoleusermap;
+            $data = $menuRoleUserMap->getRoleByUserId()
+                ->where('menu_roleusermaps.user_id', '=', $req->userId)
+                ->get();
+            return responseMsgs(true, 'Menu Role Map By User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+        }
+    }
+
+    public function roleExcludingUserId(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'userId' => 'required|integer'
+            ]);
+
+            $menuRoleUserMap = new MenuRoleusermap;
+            $data = $menuRoleUserMap->getRoleByUserId()
+                ->where('menu_roleusermaps.user_id', '!=', $req->userId)
+                ->get();
+            return responseMsgs(true, 'Menu Role Map Except User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 }

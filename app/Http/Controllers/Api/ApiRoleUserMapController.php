@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Api\ApiRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ApiRoleUserMapController extends Controller
 {
@@ -44,9 +45,9 @@ class ApiRoleUserMapController extends Controller
                 'id' => 'required'
             ]);
             $mApiRoleusermap = new ApiRoleusermap();
-            $list  = $mApiRoleusermap->updateRoleUser($req);
+            $mApiRoleusermap->updateRoleUser($req);
 
-            return responseMsgs(true, "Data Updated", $list);
+            return responseMsgs(true, "Data Updated", []);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
@@ -104,6 +105,43 @@ class ApiRoleUserMapController extends Controller
             return responseMsgs(true, "Data Deleted", '');
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+    public function roleByUserId(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'userId' => 'required|integer'
+        ]);
+        if ($validator->fails())
+            return responseMsgs(false, $validator->errors(), []);
+
+        try {
+            $apiRoleUserMap = new ApiRoleusermap;
+            $data = $apiRoleUserMap->getRoleByUserId()
+                ->where('api_roleusermaps.user_id', '=',  $req->userId)
+                ->get();
+            return responseMsgs(true, 'API Role Map By User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+        }
+    }
+
+    public function roleExcludingUserId(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'userId' => 'required|integer'
+        ]);
+        if ($validator->fails())
+            return responseMsgs(false, $validator->errors(), []);
+
+        try {
+            $apiRoleUserMap = new ApiRoleusermap;
+            $data = $apiRoleUserMap->getRoleByUserId()
+                ->where('api_roleusermaps.user_id', '!=', $req->userId)
+                ->get();
+            return responseMsgs(true, 'API Role Map Except User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 }

@@ -161,4 +161,40 @@ class WorkflowRoleUserMapController extends Controller
         }
         return $this->EloquentRoleUserMap->updateUserRoles($req);
     }
+
+    public function roleByUserId(Request $req)
+    {
+        $validator = FacadesValidator::make($req->all(),  [
+            'userId' => 'required|integer'
+        ]);
+        if ($validator->fails())
+            return responseMsgs(false, $validator->errors(), []);
+        try {
+            $WfRoleUserMap = new WfRoleusermap;
+            $data = $WfRoleUserMap->getRoleByUserId()
+                ->where('wf_roleusermaps.user_id', '=', $req->userId)
+                ->get();
+            return responseMsgs(true, 'Work Flow Role Map By User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+        }
+    }
+
+    public function roleExcludingUserId(Request $req)
+    {
+        $validator = FacadesValidator::make($req->all(),  [
+            'userId' => 'required|integer'
+        ]);
+        if ($validator->fails())
+            return responseMsgs(false, $validator->errors(), []);
+        try {
+            $WfRoleUserMap = new WfRoleusermap;
+            $data = $WfRoleUserMap->getRoleByUserId()
+                ->where('wf_roleusermaps.user_id', '!=', $req->userId)
+                ->get();
+            return responseMsgs(true, 'Work Flow Role Map Except User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+        }
+    }
 }

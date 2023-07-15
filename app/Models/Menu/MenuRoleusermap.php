@@ -58,4 +58,12 @@ class MenuRoleusermap extends Model
         $data->is_suspended = true;
         $data->save();
     }
+
+    public function getRoleByUserId()
+    {
+        return MenuRoleusermap::select('menu_roleusermaps.id', 'menu_roleusermaps.menu_role_id', 'menu_roles.menu_role_name')
+            ->join('menu_roles', 'menu_roles.id', 'menu_roleusermaps.menu_role_id')
+            ->where('menu_roleusermaps.is_suspended', false)
+            ->orderBy('menu_roleusermaps.id');
+    }
 }

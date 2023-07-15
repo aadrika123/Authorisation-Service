@@ -136,6 +136,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-role-user/delete', 'deleteRoleUser');              // Delete WorkflowRoleUserMap
         Route::post('workflow/role-user-maps/get-roles-by-id', 'getRolesByUserId');                     // Get Permitted Roles By User ID
         Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                    // Enable or Disable User Role
+        Route::post('user-managment/v1/crud/workflow-role-map/role-by-user-id', 'roleByUserId');
+        Route::post('user-managment/v1/crud/workflow-role-map/role-excluding-user-id', 'roleExcludingUserId');
     });
 
     /**
@@ -193,6 +195,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/menu-role-user/get', 'roleUserbyId');                     // Get MenuRoleUser By Id
         Route::post('user-managment/v1/crud/menu-role-user/list', 'getAllRoleUser');                  // Get All MenuRoleUser
         Route::post('user-managment/v1/crud/menu-role-user/delete', 'deleteRoleUser');                // Delete MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/list-by-user-id', 'roleByUserId');      // Get MenuRoleUser By User Id
+        Route::post('user-managment/v1/crud/menu-role-user/list-except-user-id', 'roleExcludingUserId');      // Get MenuRoleUser By User Id
     });
 
 
@@ -246,6 +250,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/api-role-user/get', 'roleUserbyId');                     // Get ApiRoleUser By Id
         Route::post('user-managment/v1/crud/api-role-user/list', 'getAllRoleUser');                  // Get All ApiRoleUser
         Route::post('user-managment/v1/crud/api-role-user/delete', 'deleteRoleUser');                // Delete ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/role-by-user-id', 'roleByUserId');                // Delete ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/role-except-user-id', 'roleExcludingUserId');                // Delete ApiRoleUser
     });
 
 

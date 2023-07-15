@@ -4,6 +4,7 @@ namespace App\Models\Workflows;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class WfRoleusermap extends Model
 {
@@ -55,5 +56,13 @@ class WfRoleusermap extends Model
             ->join('users', 'users.id', 'wf_roleusermaps.user_id')
             ->where('wf_roleusermaps.is_suspended', false)
             ->orderByDesc('wf_roles.id');
+    }
+
+    public function getRoleByUserId()
+    {
+        return WfRoleusermap::select('wf_roleusermaps.id', 'wf_roleusermaps.wf_role_id', 'wf_roles.role_name')
+            ->join('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
+            ->where('wf_roleusermaps.is_suspended', false)
+            ->orderBy('wf_roleusermaps.id');
     }
 }

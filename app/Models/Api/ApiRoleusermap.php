@@ -58,4 +58,12 @@ class ApiRoleusermap extends Model
         $data->is_suspended = true;
         $data->save();
     }
+
+    public function getRoleByUserId()
+    {
+        return ApiRoleusermap::select('api_roleusermaps.id', 'api_roleusermaps.api_role_id', 'api_roles.api_role_name')
+            ->join('api_roles', 'api_roles.id', 'api_roleusermaps.api_role_id')
+            ->where('api_roleusermaps.is_suspended', false)
+            ->orderBy('api_roleusermaps.id');
+    }
 }
