@@ -38,4 +38,26 @@ class WorkflowMap extends Controller
         $wards->sortBy('ward_name')->values();
         return responseMsg(true, "Data Retrived", remove_null($wards));
     }
+
+    public function getRoleByWorkflow(Request $request)
+    {
+        $ulbId = authUser()->ulb_id;
+        $request->validate([
+            'workflowId' => 'required|int'
+        ]);
+        $roles = WfWorkflowrolemap::select('wf_roles.id as role_id', 'wf_roles.role_name')
+            ->join('wf_roles', 'wf_roles.id', '=', 'wf_workflowrolemaps.wf_role_id')
+            ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
+            ->where('wf_workflows.ulb_id', $ulbId)
+            ->where('workflow_id', $request->workflowId)
+            ->where(function ($where) {
+                $where->orWhereNotNull("wf_workflowrolemaps.forward_role_id")
+                    ->orWhereNotNull("wf_workflowrolemaps.backward_role_id")
+                    ->orWhereNotNull("wf_workflowrolemaps.serial_no");
+            })
+            ->orderBy('serial_no')
+            ->get();
+
+        return responseMsg(true, "Data Retrived", $roles);
+    }
 }

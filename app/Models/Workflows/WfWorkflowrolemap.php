@@ -244,4 +244,5 @@ class WfWorkflowrolemap extends Model
             ->get('ulb_masters.*');
         return $users;
     }
+
 }

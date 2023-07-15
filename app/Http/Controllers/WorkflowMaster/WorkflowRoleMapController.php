@@ -133,14 +133,12 @@ class WorkflowRoleMapController extends Controller
     {
         try {
             //workflow members
-            $mWorkflowMap = new WfWorkflow();
-            $mWfWorkflows = new WfWorkflow();
             $mWfWorkflowrolemap = new WfWorkflowrolemap();
             $ulbId = authUser()->ulb_id;
             $workflowId = $req->workflowId;
 
             $mreqs = new Request(["workflowId" => $workflowId]);
-            $role = $mWorkflowMap->getRoleByWorkflow($mreqs);
+            $role = $mWfWorkflowrolemap->getRoleByWorkflow($mreqs,$ulbId);
 
             $data['members'] = collect($role)['original']['data'];
 
