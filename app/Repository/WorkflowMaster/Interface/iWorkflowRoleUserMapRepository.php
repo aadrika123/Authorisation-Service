@@ -15,6 +15,5 @@ use Illuminate\Http\Request;
 
 interface iWorkflowRoleUserMapRepository
 {
-    public function getRolesByUserId($req);             // Get Permitted Roles By User ID
     public function updateUserRoles($req);              // Enable or Disable the User Roles
 }

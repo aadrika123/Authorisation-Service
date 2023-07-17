@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Menu;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu\MenuRole;
 use App\Models\Menu\MenuRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
@@ -23,9 +24,9 @@ class MenuRoleUserMapController extends Controller
             $mMenuRoleusermap = new MenuRoleusermap();
             $mMenuRoleusermap->addRoleUser($req);
 
-            return responseMsgs(true, "Data Saved", "");
+            return responseMsgs(true, "Data Saved", "", "120901", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120901", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -41,9 +42,9 @@ class MenuRoleUserMapController extends Controller
             $mMenuRoleusermap = new MenuRoleusermap();
             $mMenuRoleusermap->updateRoleUser($req);
 
-            return responseMsgs(true, "Data Updated", []);
+            return responseMsgs(true, "Data Updated", [], "120902", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120902", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -62,9 +63,9 @@ class MenuRoleUserMapController extends Controller
                 ->where('menu_roleusermaps.id', $req->id)
                 ->first();
 
-            return responseMsgs(true, "Menu Role Map", remove_null($list));
+            return responseMsgs(true, "Menu Role Map", remove_null($list), "120903", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120903", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -72,15 +73,15 @@ class MenuRoleUserMapController extends Controller
     /**
      * | Menu Role Mapping List
      */
-    public function getAllRoleUser()
+    public function getAllRoleUser(Request $req)
     {
         try {
             $mMenuRoleusermap = new MenuRoleusermap();
             $menuRole = $mMenuRoleusermap->listRoleUser()->get();
 
-            return responseMsgs(true, "Menu Role Map List", $menuRole);
+            return responseMsgs(true, "Menu Role Map List", $menuRole, "120904", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120904", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -96,9 +97,9 @@ class MenuRoleUserMapController extends Controller
             $delete = new MenuRoleusermap();
             $delete->deleteRoleUser($req);
 
-            return responseMsgs(true, "Data Deleted", '');
+            return responseMsgs(true, "Data Deleted", '', "120905", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), "", "120905", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -114,14 +115,16 @@ class MenuRoleUserMapController extends Controller
             $validator = Validator::make($req->all(), [
                 'userId' => 'required|integer'
             ]);
+            if ($validator->fails())
+                return validationError($validator);
 
             $menuRoleUserMap = new MenuRoleusermap;
             $data = $menuRoleUserMap->getRoleByUserId()
                 ->where('menu_roleusermaps.user_id', '=', $req->userId)
                 ->get();
-            return responseMsgs(true, 'Menu Role Map By User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+            return responseMsgs(true, 'Menu Role Map By User Id', $data, "120907", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+            return responseMsgs(false, $e->getMessage(), [], "120907", "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 
@@ -132,14 +135,24 @@ class MenuRoleUserMapController extends Controller
             $validator = Validator::make($req->all(), [
                 'userId' => 'required|integer'
             ]);
+            if ($validator->fails())
+                return validationError($validator);
 
             $menuRoleUserMap = new MenuRoleusermap;
-            $data = $menuRoleUserMap->getRoleByUserId()
-                ->where('menu_roleusermaps.user_id', '!=', $req->userId)
+            $mMenuRole = new MenuRole();
+            $menuRole = $menuRoleUserMap->getRoleByUserId()
+                ->where('menu_roleusermaps.user_id', $req->userId)
                 ->get();
-            return responseMsgs(true, 'Menu Role Map Except User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
+
+            $menuRoleId = $menuRole->pluck('menu_role_id');
+
+            $menuRole = $mMenuRole->listMenuRole()
+                ->whereNotIn('menu_roles.id', $menuRoleId)
+                ->get();
+
+            return responseMsgs(true, 'Menu Role Map Except User Id', $menuRole, "120908", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
+            return responseMsgs(false, $e->getMessage(), [], "120908", "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 }

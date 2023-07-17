@@ -129,15 +129,14 @@ Route::middleware('auth:sanctum')->group(function () {
          Controller No : 5
      */
     Route::controller(WorkflowRoleUserMapController::class)->group(function () {
-        Route::post('user-managment/v1/crud/workflow-role-user/save', 'createRoleUser');                // Save WorkflowRoleUserMap
-        Route::post('user-managment/v1/crud/workflow-role-user/edit', 'updateRoleUser');                // Edit WorkflowRoleUserMap 
-        Route::post('user-managment/v1/crud/workflow-role-user/get', 'roleUserbyId');                   // Get WorkflowRoleUserMap By Id
-        Route::post('user-managment/v1/crud/workflow-role-user/list', 'getAllRoleUser');                // Get All WorkflowRoleUserMap
-        Route::post('user-managment/v1/crud/workflow-role-user/delete', 'deleteRoleUser');              // Delete WorkflowRoleUserMap
-        Route::post('workflow/role-user-maps/get-roles-by-id', 'getRolesByUserId');                     // Get Permitted Roles By User ID
-        Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                    // Enable or Disable User Role
-        Route::post('user-managment/v1/crud/workflow-role-map/role-by-user-id', 'roleByUserId');
-        Route::post('user-managment/v1/crud/workflow-role-map/role-excluding-user-id', 'roleExcludingUserId');
+        Route::post('user-managment/v1/crud/workflow-role-user/save', 'createRoleUser');                #API_ID=120501  |  #_Save WorkflowRoleUserMap
+        Route::post('user-managment/v1/crud/workflow-role-user/edit', 'updateRoleUser');                #API_ID=120502  |  #_Edit WorkflowRoleUserMap 
+        Route::post('user-managment/v1/crud/workflow-role-user/get', 'roleUserbyId');                   #API_ID=120503  |  #_Get WorkflowRoleUserMap By Id
+        Route::post('user-managment/v1/crud/workflow-role-user/list', 'getAllRoleUser');                #API_ID=120504  |  #_Get All WorkflowRoleUserMap
+        Route::post('user-managment/v1/crud/workflow-role-user/delete', 'deleteRoleUser');              #API_ID=120505  |  #_Delete WorkflowRoleUserMap
+        Route::post('user-managment/v1/crud/workflow-role-user/by-user', 'roleByUserId');               #API_ID=120506  |  #_Get Permitted Roles By User ID
+        Route::post('user-managment/v1/crud/workflow-role-user/excluding-user', 'roleExcludingUserId'); #API_ID=120507  |
+        Route::post('workflow/role-user-maps/update-user-roles', 'updateUserRoles');                    #_Enable or Disable User Role
     });
 
     /**
@@ -190,13 +189,13 @@ Route::middleware('auth:sanctum')->group(function () {
          Controller No : 9
      */
     Route::controller(MenuRoleUserMapController::class)->group(function () {
-        Route::post('user-managment/v1/crud/menu-role-user/save', 'createRoleUser');                  // Save MenuRoleUser
-        Route::post('user-managment/v1/crud/menu-role-user/edit', 'updateRoleUser');                  // Edit MenuRoleUser 
-        Route::post('user-managment/v1/crud/menu-role-user/get', 'roleUserbyId');                     // Get MenuRoleUser By Id
-        Route::post('user-managment/v1/crud/menu-role-user/list', 'getAllRoleUser');                  // Get All MenuRoleUser
-        Route::post('user-managment/v1/crud/menu-role-user/delete', 'deleteRoleUser');                // Delete MenuRoleUser
-        Route::post('user-managment/v1/crud/menu-role-user/list-by-user-id', 'roleByUserId');      // Get MenuRoleUser By User Id
-        Route::post('user-managment/v1/crud/menu-role-user/list-except-user-id', 'roleExcludingUserId');      // Get MenuRoleUser By User Id
+        Route::post('user-managment/v1/crud/menu-role-user/save', 'createRoleUser');              #API_ID=120501 | #_Save MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/edit', 'updateRoleUser');              #API_ID=120502 | #_Edit MenuRoleUser 
+        Route::post('user-managment/v1/crud/menu-role-user/get', 'roleUserbyId');                 #API_ID=120503 | #_Get MenuRoleUser By Id
+        Route::post('user-managment/v1/crud/menu-role-user/list', 'getAllRoleUser');              #API_ID=120504 | #_Get All MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/delete', 'deleteRoleUser');            #API_ID=120505 | #_Delete MenuRoleUser
+        Route::post('user-managment/v1/crud/menu-role-user/by-user', 'roleByUserId');             #API_ID=120506 | #_Get MenuRoleUser By User Id
+        Route::post('user-managment/v1/crud/menu-role-user/except-user', 'roleExcludingUserId');  #API_ID=120507 | #_Get MenuRoleUser Excluding User
     });
 
 
@@ -245,13 +244,13 @@ Route::middleware('auth:sanctum')->group(function () {
          Controller No : 13
      */
     Route::controller(ApiRoleUserMapController::class)->group(function () {
-        Route::post('user-managment/v1/crud/api-role-user/save', 'createRoleUser');                  // Save ApiRoleUser
-        Route::post('user-managment/v1/crud/api-role-user/edit', 'updateRoleUser');                  // Edit ApiRoleUser 
-        Route::post('user-managment/v1/crud/api-role-user/get', 'roleUserbyId');                     // Get ApiRoleUser By Id
-        Route::post('user-managment/v1/crud/api-role-user/list', 'getAllRoleUser');                  // Get All ApiRoleUser
-        Route::post('user-managment/v1/crud/api-role-user/delete', 'deleteRoleUser');                // Delete ApiRoleUser
-        Route::post('user-managment/v1/crud/api-role-user/role-by-user-id', 'roleByUserId');                // Delete ApiRoleUser
-        Route::post('user-managment/v1/crud/api-role-user/role-except-user-id', 'roleExcludingUserId');                // Delete ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/save', 'createRoleUser');     #API_ID=121301 | #_Save ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/edit', 'updateRoleUser');     #API_ID=121302 | #_Edit ApiRoleUser 
+        Route::post('user-managment/v1/crud/api-role-user/get', 'roleUserbyId');        #API_ID=121303 | #_Get ApiRoleUser By Id
+        Route::post('user-managment/v1/crud/api-role-user/list', 'getAllRoleUser');     #API_ID=121304 | #_Get All ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/delete', 'deleteRoleUser');   #API_ID=121305 | #_Delete ApiRoleUser
+        Route::post('user-managment/v1/crud/api-role-user/by-user', 'roleByUserId');    #API_ID=121306 | #_ApiRole By User Id
+        Route::post('user-managment/v1/crud/api-role-user/except-user', 'roleExcludingUserId'); #API_ID=121307 | #_ApiRole Excluding User
     });
 
 
