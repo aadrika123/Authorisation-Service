@@ -303,6 +303,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
         Route::post('list-ulb-by-district', 'districtWiseUlb');
         Route::post('list-district', 'districtList');
+        Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
     });
 
     /**
