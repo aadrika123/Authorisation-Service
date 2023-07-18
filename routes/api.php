@@ -13,6 +13,7 @@ use App\Http\Controllers\Menu\MenuRoleController;
 use App\Http\Controllers\Menu\MenuRoleMapController;
 use App\Http\Controllers\Menu\MenuRoleUserMapController;
 use App\Http\Controllers\Menu\TestController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\WorkflowMaster\MasterController;
 use App\Http\Controllers\WorkflowMaster\RoleController;
 use App\Http\Controllers\WorkflowMaster\WardUserController;
@@ -365,6 +366,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
         Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
         Route::post('citizen-profile-details', 'profileDetails');
+    });
+
+    Route::controller(PermissionController::class)->group(function () {
+        Route::post('get-user-permission', 'getUserPermission');                        // 01
     });
 
     Route::controller(TestController::class)->group(function () {

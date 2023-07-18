@@ -70,4 +70,15 @@ class WfRoleusermap extends Model
             ->where('wf_roleusermaps.is_suspended', false)
             ->orderBy('wf_roleusermaps.id');
     }
+
+    /**
+     * | get Role By User Id
+     */
+    public function getRoleIdByUserId($userId)
+    {
+        return WfRoleusermap::select('id', 'wf_role_id', 'user_id')
+            ->where('user_id', $userId)
+            ->where('is_suspended', false)
+            ->get();
+    }
 }
