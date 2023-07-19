@@ -32,10 +32,10 @@ class ApiGatewayController extends Controller
     //             'apiToken' => $req->user()->currentAccessToken()->token,
     //         ]);           
 
-            
-            
+
+
     //         #======================
-            
+
     //         $response = Http::withHeaders(
     //             [
     //                 "Authorization" => "Bearer $bearerToken",
@@ -48,7 +48,7 @@ class ApiGatewayController extends Controller
     //         {
     //             array_push($fileName,$index);
     //         }
-            
+
     //         foreach(collect($req->all())->toArray() as $key=>$val)
     //         {
     //             if(in_array($key,$fileName))
@@ -58,7 +58,7 @@ class ApiGatewayController extends Controller
     //             $new[$key] = $val;          
     //         }
     //         $dotIndexes = $this->generateDotIndexes($_FILES); 
-            
+
     //         foreach($dotIndexes as $val)
     //         {
     //             $patern = "/\.name/i";
@@ -101,7 +101,7 @@ class ApiGatewayController extends Controller
     //         }
     //         $response = $response->$method($url . $req->getRequestUri(),($fileName?$new2:$new));
     //         #======================
-            
+
     //         return $response;
     //     } 
     //     catch (Exception $e) 
@@ -131,7 +131,7 @@ class ApiGatewayController extends Controller
 
     // public function generateDotIndexes(array $array, $prefix = '', $result = [])
     // {    
-        
+
     //     foreach ($array as $key => $value) 
     //     {            
     //         $newKey = $prefix . $key; 
@@ -161,7 +161,7 @@ class ApiGatewayController extends Controller
                 throw new Exception("Service Not Available");
 
             $url = $services[$service];
-            $bearerToken = (collect(($req->headers->all())['authorization']??"")->first());
+            $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
             $contentType = (collect(($req->headers->all())['content-type'] ?? "")->first());
             $ipAddress = getClientIpAddress();
             $method = $req->method();
@@ -171,7 +171,7 @@ class ApiGatewayController extends Controller
                 'currentAccessToken' => $req->user()->currentAccessToken(),
                 'apiToken' => $req->user()->currentAccessToken()->token,
                 'ipAddress' => $ipAddress
-            ]);           
+            ]);
 
 
 
@@ -180,70 +180,63 @@ class ApiGatewayController extends Controller
             $response = Http::withHeaders(
                 [
                     "Authorization" => "Bearer $bearerToken",
-                    'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",    
+                    'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",
                 ]
             );
             $fileName = [];
-            $new =[]; 
-            foreach($_FILES as $index=>$val)
-            {
-                array_push($fileName,$index);
+            $new = [];
+            foreach ($_FILES as $index => $val) {
+                array_push($fileName, $index);
             }
 
-            foreach(collect($req->all())->toArray() as $key=>$val)
-            {
-                $new[$key] = $val;          
+            foreach (collect($req->all())->toArray() as $key => $val) {
+                $new[$key] = $val;
             }
-            $dotIndexes = $this->generateDotIndexes($_FILES); 
+            $dotIndexes = $this->generateDotIndexes($_FILES);
 
-            foreach($dotIndexes as $val)
-            {
+            foreach ($dotIndexes as $val) {
                 $patern = "/\.name/i";
-                if(!preg_match($patern,$val))
-                {
+                if (!preg_match($patern, $val)) {
                     continue;
                 }
                 $name = "";
-                $test = collect(explode(".",preg_replace($patern,"",$val)));
-                $t = $test->filter(function($val,$index){
-                    return $index > 0 ? true : "" ;
+                $test = collect(explode(".", preg_replace($patern, "", $val)));
+                $t = $test->filter(function ($val, $index) {
+                    return $index > 0 ? true : "";
                 });
-                $t = $t->map(function($val){
-                    return "[".$val."]";
+                $t = $t->map(function ($val) {
+                    return "[" . $val . "]";
                 });
-                $name = (($test[0]).implode("",$t->toArray()));
+                $name = (($test[0]) . implode("", $t->toArray()));
                 $response = $response->attach(
                     $name,
-                    file_get_contents($this->getArrayValueByDotNotation($_FILES,preg_replace($patern,".tmp_name",$val))),
-                    $this->getArrayValueByDotNotation($_FILES,$val)                    
+                    file_get_contents($this->getArrayValueByDotNotation($_FILES, preg_replace($patern, ".tmp_name", $val))),
+                    $this->getArrayValueByDotNotation($_FILES, $val)
                 );
             }
-            $textIndex = $this->generateDotIndexes($new);            
-            $new2 = [];           
-            foreach($textIndex as $val)            
-            {
+            $textIndex = $this->generateDotIndexes($new);
+            $new2 = [];
+            foreach ($textIndex as $val) {
                 $name = "";
-                $test = collect(explode(".",$val));
-                $t = $test->filter(function($val,$index){
-                    return $index > 0 ? true : "" ;
+                $test = collect(explode(".", $val));
+                $t = $test->filter(function ($val, $index) {
+                    return $index > 0 ? true : "";
                 });
-                $t = $t->map(function($val){
-                    return "[".$val."]";
+                $t = $t->map(function ($val) {
+                    return "[" . $val . "]";
                 });
-                $name = (($test[0]).implode("",$t->toArray()));
-                $new2[]= [                    
-                    "contents"=>$this->getArrayValueByDotNotation($new,$val),
-                    "name"=>$name                    
+                $name = (($test[0]) . implode("", $t->toArray()));
+                $new2[] = [
+                    "contents" => $this->getArrayValueByDotNotation($new, $val),
+                    "name" => $name
                 ];
-            } 
+            }
             // dd($req->all(),$new2);
-            $response = $response->$method($url . $req->getRequestUri(),($fileName?$new2:$new));
+            $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             #======================
 
             return $response;
-        } 
-        catch (Exception $e) 
-        {
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
@@ -252,14 +245,10 @@ class ApiGatewayController extends Controller
     {
         $keys = explode('.', $key);
 
-        foreach ($keys as $key) 
-        {
-            if (isset($array[$key])) 
-            {
+        foreach ($keys as $key) {
+            if (isset($array[$key])) {
                 $array = $array[$key];
-            } 
-            else 
-            {
+            } else {
                 return null; // Key doesn't exist in the array
             }
         }
@@ -268,21 +257,16 @@ class ApiGatewayController extends Controller
     }
 
     public function generateDotIndexes(array $array, $prefix = '', $result = [])
-    {    
+    {
 
-        foreach ($array as $key => $value) 
-        {            
-            $newKey = $prefix . $key; 
-            if (is_array($value)) 
-            {                
+        foreach ($array as $key => $value) {
+            $newKey = $prefix . $key;
+            if (is_array($value)) {
                 $result = $this->generateDotIndexes($value, $newKey . '.', $result);
-            } 
-            else 
-            {                
+            } else {
                 $result[] = $newKey;
             }
         }
         return $result;
     }
-
 }

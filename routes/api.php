@@ -66,6 +66,7 @@ Route::controller(CitizenController::class)->group(function () {
  */
 Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
+    Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
 });
 
@@ -305,7 +306,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(UlbController::class)->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
         Route::post('list-ulb-by-district', 'districtWiseUlb');
-        Route::post('list-district', 'districtList');
         Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
     });
 
