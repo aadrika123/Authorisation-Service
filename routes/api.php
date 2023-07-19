@@ -375,7 +375,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(PermissionController::class)->group(function () {
-        Route::post('get-user-permission', 'getUserPermission');                        // 01
+        Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
     });
 
     /**
