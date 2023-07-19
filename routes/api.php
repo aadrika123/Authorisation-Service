@@ -70,6 +70,10 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
 });
 
+Route::controller(WorkflowMapController::class)->group(function () {
+    Route::post('workflow/v2/crud/ward-by-ulb', 'getWardByUlb');        #_Ward Without Login
+});
+
 
 /**
  * | Protected Routes
