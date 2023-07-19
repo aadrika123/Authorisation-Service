@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ApiRoleUserMapController;
 use App\Http\Controllers\ApiGatewayController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
+use App\Http\Controllers\CustomController;
 use App\Http\Controllers\Faq\FaqController;
 use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\Menu\MenuRoleController;
@@ -122,7 +123,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                // Get WorkflowRoleMap By Id
         Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');             // Get All WorkflowRoleMap
         Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');           // Delete WorkflowRoleMap
-        Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
+        // Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
+        Route::post('workflow/role-map/workflow-info', 'workflowInfo');
     });
 
     /**
@@ -370,6 +372,21 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(PermissionController::class)->group(function () {
         Route::post('get-user-permission', 'getUserPermission');                        // 01
+    });
+
+    /**
+     * | for custom details
+     */
+    Route::controller(CustomController::class)->group(function () {
+        Route::post('get-all-custom-tab-data', 'getCustomDetails');
+        Route::post('post-custom-data', 'postCustomDetails');
+        Route::post('get-dues-api', 'duesApi');
+        Route::post('post-geo-location', 'tcGeoLocation');
+        Route::post('list-location', 'locationList');
+        Route::post('tc-collection-route', 'tcCollectionRoute');
+        Route::post('list-quick-access', 'quickAccessList');
+        Route::post('quick-access-byuserid', 'getQuickAccessListByUser');
+        Route::post('add-update-quickaccess', 'addUpdateQuickAccess');
     });
 
     Route::controller(TestController::class)->group(function () {

@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\OtpChangePass;
 use App\Models\Auth\User;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
+use App\Models\Workflows\WfRoleusermap;
 use App\Traits\Auth;
 use Carbon\Carbon;
 use Exception;
@@ -45,6 +46,7 @@ class UserController extends Controller
         if ($validated->fails())
             return validationError($validated);
         try {
+            $mWfRoleusermap = new WfRoleusermap();
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user)
                 throw new Exception("Oops! Given email does not exist");
@@ -52,8 +54,17 @@ class UserController extends Controller
                 throw new Exception("You are not authorized to log in!");
             if (Hash::check($req->password, $user->password)) {
                 $token = $user->createToken('my-app-token')->plainTextToken;
+                $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+                if (empty(collect($menuRoleDetails)->first())) {
+                    return ("User has No Roles!");
+                }
+                $role = collect($menuRoleDetails)->map(function ($value, $key) {
+                    $values = $value['roles'];
+                    return $values;
+                });
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
+                $data['userDetails']['role'] = $role;
                 return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }
 

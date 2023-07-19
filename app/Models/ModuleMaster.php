@@ -20,4 +20,9 @@ class ModuleMaster extends Model
             ->orderby('id')
             ->get();
     }
+
+    public function duesApi()
+    {
+        return ModuleMaster::orderby('id')->get();
+    }
 }
