@@ -231,11 +231,11 @@ class ApiGatewayController extends Controller
                     "name" => $name
                 ];
             }
-            // dd($req->all(),$new2);
+            // dd($);
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             #======================
 
-            return $response;
+            return json_decode($response);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
