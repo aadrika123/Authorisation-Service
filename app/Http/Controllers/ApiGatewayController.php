@@ -235,7 +235,7 @@ class ApiGatewayController extends Controller
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             #======================
 
-            return $response;
+            return response()->json($response);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
