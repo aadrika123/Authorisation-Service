@@ -233,13 +233,14 @@ class ApiGatewayController extends Controller
             }
 
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
-
-            if(isset($response['status'])){
-                if ($response['status'] == false)
+            if (isset(json_decode($response)->status)) {
+                if (json_decode($response)->status == false) {
                     throw new Exception($response['message']);
+                }
+                return json_decode($response);
+            } else {
+                return $response;
             }
-            #======================
-            return json_decode($response);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
