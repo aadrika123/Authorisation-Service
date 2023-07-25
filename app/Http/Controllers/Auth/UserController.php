@@ -178,6 +178,39 @@ class UserController extends Controller
     }
 
     /**
+     * | Multiple List User
+     */
+    public function multipleUserList(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                "ids" => 'required|array'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $perPage = $req->perPage ?? 10;
+            $ulbId = authUser()->ulb_id;
+            $data = User::select(
+                '*',
+                DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
+                DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
+            )
+                ->where('ulb_id', $ulbId)
+                ->whereIn('id', $req->ids)
+                ->orderByDesc('id')
+                ->paginate($perPage);
+
+            return responseMsgs(true, "User List", $data, "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
+
+    /**
      * | List User
      */
     public function userById(Request $req)

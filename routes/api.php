@@ -157,7 +157,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/menu/delete', 'deleteMenu');
         Route::post('user-managment/v1/crud/menu/get', 'getMenuById');
         Route::post('user-managment/v1/crud/menu/list', 'menuList');
-        Route::post('user-managment/v1/crud/module/list', 'moduleList');
+        Route::post('user-managment/v1/crud/module/list', 'moduleList')->withoutMiddleware('auth:sanctum');
         Route::post('user-managment/v1/crud/menu/list-parent-serial', 'listParentSerial');
 
         Route::post('menu-roles/update-menu-by-role', 'updateMenuByRole');
@@ -332,8 +332,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(FaqController::class)->group(function () {
         Route::post('user-managment/v1/crud/faq/save', 'createfaq');                  // Save FAQ
         Route::post('user-managment/v1/crud/faq/edit', 'updatefaq');                  // Edit FAQ 
-        Route::post('user-managment/v1/crud/faq/get', 'faqbyId');                     // Get FAQ By Id
-        Route::post('user-managment/v1/crud/faq/list', 'faqList');                    // Get All FAQ
+        Route::post('user-managment/v1/crud/faq/get', 'faqbyId')->withoutMiddleware('auth:sanctum');                     // Get FAQ By Id
+        Route::post('user-managment/v1/crud/faq/list', 'faqList')->withoutMiddleware('auth:sanctum');                    // Get All FAQ
         Route::post('user-managment/v1/crud/faq/delete', 'deletefaq');                // Delete FAQ
 
     });
@@ -342,11 +342,12 @@ Route::middleware('auth:sanctum')->group(function () {
      * | 
      */
     Route::controller(UserController::class)->group(function () {
-        Route::post('user-managment/v1/crud/user/create', 'createUser');    #_Authorised User Adding User
-        Route::post('user-managment/v1/crud/user/update', 'updateUser');    #_For Edit/Update User Details
-        Route::post('user-managment/v1/crud/user/delete', 'deleteUser');    #_Delete User
-        Route::post('user-managment/v1/crud/user/list', 'listUser');        #_List User
-        Route::post('user-managment/v1/crud/user/get', 'userById');         #_Get User
+        Route::post('user-managment/v1/crud/user/create', 'createUser');              #_Authorised User Adding User
+        Route::post('user-managment/v1/crud/user/update', 'updateUser');              #_For Edit/Update User Details
+        Route::post('user-managment/v1/crud/user/delete', 'deleteUser');              #_Delete User
+        Route::post('user-managment/v1/crud/user/list', 'listUser');                  #_List User
+        Route::post('user-managment/v1/crud/user/get', 'userById');                   #_Get User
+        Route::post('user-managment/v1/crud/multiple-user/list', 'multipleUserList'); #_Get Multiple User
 
 
         Route::post('change-password', 'changePass');                       // Change password with login

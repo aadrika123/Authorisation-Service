@@ -55,9 +55,12 @@ class FaqController extends Controller
             $request->validate([
                 'id' => 'required|int'
             ]);
-            $mFaq = Faq::findorfail($request->id);
+            $mFaq = new Faq();
+            $list = $mFaq->faqList()
+                ->where('faqs.id', $request->id)
+                ->first();
 
-            return responseMsgs(true, "Faq Role!", $mFaq, "", "01", "", "POST", "");
+            return responseMsgs(true, "Faq Role!", $list, "", "01", "", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", "", "POST", "");
         }
@@ -69,8 +72,17 @@ class FaqController extends Controller
     public function faqList(Request $request)
     {
         try {
+            $request->validate([
+                'moduleId' => 'nullable|int'
+            ]);
+
             $mFaq = new Faq();
-            $list = $mFaq->faqList()->get();
+            if ($request->moduleId) {
+                $list = $mFaq->faqList()
+                    ->where('module_id', $request->moduleId)
+                    ->get();
+            } else
+                $list = $mFaq->faqList()->get();
 
             return responseMsgs(true, "List of Faq!", $list, "", "01", "", "POST", "");
         } catch (Exception $e) {

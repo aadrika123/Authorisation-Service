@@ -38,7 +38,7 @@ class Faq extends Model
      */
     public function faqList()
     {
-        return Faq::select('faqs.id', 'question', 'answer', 'module_name')
+        return Faq::select('faqs.id', 'question', 'answer', 'module_name', 'module_id')
             ->join('module_masters', 'module_masters.id', 'faqs.module_id')
             ->where('faqs.is_suspended', false)
             ->orderbyDesc('faqs.id');
