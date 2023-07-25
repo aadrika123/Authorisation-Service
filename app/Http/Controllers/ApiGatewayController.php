@@ -232,6 +232,7 @@ class ApiGatewayController extends Controller
                 ];
             }
 
+            # Check if the response is valid to retirn in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
