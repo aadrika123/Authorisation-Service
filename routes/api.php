@@ -332,8 +332,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(FaqController::class)->group(function () {
         Route::post('user-managment/v1/crud/faq/save', 'createfaq');                  // Save FAQ
         Route::post('user-managment/v1/crud/faq/edit', 'updatefaq');                  // Edit FAQ 
-        Route::post('user-managment/v1/crud/faq/get', 'faqbyId')->withoutMiddleware('auth:sanctum');                     // Get FAQ By Id
-        Route::post('user-managment/v1/crud/faq/list', 'faqList')->withoutMiddleware('auth:sanctum');                    // Get All FAQ
+        Route::post('user-managment/v1/crud/faq/get', 'faqbyId')->withoutMiddleware('auth:sanctum');   // Get FAQ By Id
+        Route::post('user-managment/v1/crud/faq/list', 'faqList')->withoutMiddleware('auth:sanctum');  // Get All FAQ
         Route::post('user-managment/v1/crud/faq/delete', 'deletefaq');                // Delete FAQ
 
     });
