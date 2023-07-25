@@ -201,8 +201,8 @@ class UserController extends Controller
             )
                 ->where('ulb_id', $ulbId)
                 ->whereIn('id', $req->ids)
-                ->orderByDesc('id')
-                ->paginate($perPage);
+                // ->orderByDesc('id')
+                ->get();
 
             return responseMsgs(true, "User List", $data, "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
