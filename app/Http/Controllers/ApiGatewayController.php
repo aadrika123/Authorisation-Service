@@ -165,13 +165,19 @@ class ApiGatewayController extends Controller
             $contentType = (collect(($req->headers->all())['content-type'] ?? "")->first());
             $ipAddress = getClientIpAddress();
             $method = $req->method();
-            $req = $req->merge([
-                'auth' => authUser(),
-                'token' => $req->bearerToken(),
-                'currentAccessToken' => $req->user()->currentAccessToken(),
-                'apiToken' => $req->user()->currentAccessToken()->token,
-                'ipAddress' => $ipAddress
-            ]);
+            if($segments[1]=="trade" && strtolower($req->getMethod())=="get")
+            {
+
+            }
+            else{
+                $req = $req->merge([
+                    'auth' => authUser(),
+                    'token' => $req->bearerToken(),
+                    'currentAccessToken' => $req->user()->currentAccessToken(),
+                    'apiToken' => $req->user()->currentAccessToken()->token,
+                    'ipAddress' => $ipAddress
+                ]);
+            }
 
 
 
