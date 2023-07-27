@@ -15,6 +15,7 @@ use App\Http\Controllers\Menu\MenuRoleMapController;
 use App\Http\Controllers\Menu\MenuRoleUserMapController;
 use App\Http\Controllers\Menu\TestController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ThirdPartyController;
 use App\Http\Controllers\WorkflowMaster\MasterController;
 use App\Http\Controllers\WorkflowMaster\RoleController;
 use App\Http\Controllers\WorkflowMaster\WardUserController;
@@ -379,6 +380,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
     });
 
+    Route::controller(ThirdPartyController::class)->group(function () {
+        Route::post('user/send-otp', 'sendOtp');
+        Route::post('user/verify-otp', "verifyOtp");
+    });
+
     /**
      * | for custom details
      */
@@ -403,7 +409,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Api Gateway Routes
-    
+
     Route::controller(ApiGatewayController::class)->group(function () {
         Route::get('trade/payment-receipt/{id}/{transectionId}', 'apiGatewayService')->withoutMiddleware('auth:sanctum');
         Route::get('trade/provisional-certificate/{id}', 'apiGatewayService')->withoutMiddleware('auth:sanctum');

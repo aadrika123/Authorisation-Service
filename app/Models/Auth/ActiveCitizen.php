@@ -46,4 +46,17 @@ class ActiveCitizen extends Model
 
         return $mCitizen->id;
     }
+
+    public function changeToken($request)
+    {
+        $citizenInfo = ActiveCitizen::where('mobile', $request->mobileNo)
+            ->first();
+
+        if (isset($citizenInfo)) {
+            $token['token'] = $citizenInfo->createToken('my-app-token')->plainTextToken;
+            $citizenInfo->remember_token = $token['token'];
+            $citizenInfo->save();
+            return $token;
+        }
+    }
 }
