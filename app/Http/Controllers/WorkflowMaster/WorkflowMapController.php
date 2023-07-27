@@ -191,4 +191,28 @@ class WorkflowMapController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | in use
+     */
+    // working
+    // workflow in ulb
+    public function getWorkflowInUlb(Request $request)
+    {
+        try {
+            $ulbId = $request->ulbId ?? authUser()->ulb_id;
+            if (!$ulbId)
+                throw new Exception("ulbId is required");
+
+            $users = WfWorkflow::select('wf_masters.workflow_name', 'wf_workflows.id')
+                ->join('wf_masters', 'wf_masters.id', '=', 'wf_workflows.wf_master_id')
+                ->where('wf_workflows.ulb_id', $ulbId)
+                ->where('wf_masters.is_suspended',  false)
+                ->where('wf_workflows.is_suspended',  false)
+                ->get();
+            return responseMsg(true, "Data Retrived", $users);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 }

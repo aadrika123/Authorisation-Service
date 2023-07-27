@@ -53,7 +53,7 @@ class WorkflowRoleMapController extends Controller
                 'jeComparison'               => 'nullable|in:true,false',
                 'technicalComparison'        => 'nullable|in:true,false',
                 'canViewTechnicalComparison' => 'nullable|in:true,false',
-                'associated_workflow_id'     => 'nullable',
+                'associatedWorkflowId'     => 'nullable',
             ]);
             $create = new WfWorkflowrolemap();
             $create->addRoleMap($req);

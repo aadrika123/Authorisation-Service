@@ -26,8 +26,8 @@ class MenuMaster extends Model
         )
             ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
             ->where('is_deleted', false)
-            ->orderByDesc("id");
-        // ->orderBy("menu_masters.serial");
+            // ->orderByDesc("id");
+            ->orderBy("menu_masters.serial");
     }
 
     /**

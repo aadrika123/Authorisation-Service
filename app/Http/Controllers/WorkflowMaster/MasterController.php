@@ -24,7 +24,8 @@ class MasterController extends Controller
     {
         try {
             $req->validate([
-                'workflowName' => 'required'
+                'workflowName' => 'required',
+                'moduleId'     => 'required|integer'
             ]);
 
             $create = new WfMaster();

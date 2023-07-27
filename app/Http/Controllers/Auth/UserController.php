@@ -55,9 +55,9 @@ class UserController extends Controller
             if (Hash::check($req->password, $user->password)) {
                 $token = $user->createToken('my-app-token')->plainTextToken;
                 $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
-                if (empty(collect($menuRoleDetails)->first())) {
-                    return ("User has No Roles!");
-                }
+                // if (empty(collect($menuRoleDetails)->first())) {
+                //     throw new Exception('User has No Roles!');
+                // }
                 $role = collect($menuRoleDetails)->map(function ($value, $key) {
                     $values = $value['roles'];
                     return $values;

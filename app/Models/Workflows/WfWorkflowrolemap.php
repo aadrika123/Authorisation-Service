@@ -49,7 +49,7 @@ class WfWorkflowrolemap extends Model
         $data->je_comparison                  = $req->jeComparison ?? false;
         $data->technical_comparison           = $req->technicalComparison ?? false;
         $data->can_view_technical_comparison  = $req->canViewTechnicalComparison ?? false;
-        $data->associated_workflow            = $req->associatedWorkflow;
+        $data->associated_workflow_id         = $req->associatedWorkflowId;
         $data->created_by               = $createdBy;
         $data->stamp_date_time          = Carbon::now();
         $data->save();
@@ -90,7 +90,7 @@ class WfWorkflowrolemap extends Model
         $data->je_comparison                  = $req->jeComparison               ?? $data->je_comparison;
         $data->technical_comparison           = $req->technicalComparison        ?? $data->technical_comparison;
         $data->can_view_technical_comparison  = $req->canViewTechnicalComparison ?? $data->can_view_technical_comparison;
-        $data->associated_workflow            = $req->associatedWorkflow         ?? $data->associated_workflow;
+        $data->associated_workflow_id         = $req->associatedWorkflowId       ?? $data->associated_workflow_id;
         $data->save();
     }
 
@@ -242,5 +242,4 @@ class WfWorkflowrolemap extends Model
             ->get('ulb_masters.*');
         return $users;
     }
-
 }
