@@ -129,7 +129,7 @@ Route::controller(WorkflowMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                // Get WorkflowRoleMap By Id
         Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');             // Get All WorkflowRoleMap
         Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');           // Delete WorkflowRoleMap
-        Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
+        // Route::post('user-managment/v1/crud/workflow-role-map/workflow-info', 'workflowInfo');
         Route::post('workflow/role-map/workflow-info', 'workflowInfo');
     });
 
