@@ -119,8 +119,7 @@ class ApiGatewayController extends Controller
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
-                    return json_decode($response);
-                    // throw new Exception(json_decode($response)->message);
+                    throw new Exception(json_decode($response)->message);
                 }
                 return json_decode($response);
             } else {
@@ -187,7 +186,7 @@ class ApiGatewayController extends Controller
                     // 'token' => $req->bearerToken(),
                     // 'currentAccessToken' => $req->user()->currentAccessToken(),
                     // 'apiToken' => $req->user()->currentAccessToken()->token,
-                    "authReq"=>false,
+                    "authReq" => false,
                     'ipAddress' => $ipAddress
                 ]);
             }
@@ -250,10 +249,9 @@ class ApiGatewayController extends Controller
 
             # Check if the response is valid to retirn in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
-                if (isset(json_decode($response)->status)) {
+            if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
-                    return json_decode($response);
-                    // throw new Exception(json_decode($response)->message);
+                    throw new Exception(json_decode($response)->message);
                 }
                 return json_decode($response);
             } else {
