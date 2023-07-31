@@ -9,6 +9,24 @@ use Illuminate\Support\Facades\Http;
 
 class ApiGatewayController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['unAuthApis']);
+    }
+    /**
+     * | Check Points to check API
+     */
+    public function checkPoints(Request $req)
+    {
+        $segments = explode('/', $req->path());
+        $service = $segments[2];
+        if ($service == 'auth')
+            return $this->unAuthApis($req);
+        else
+            return $this->apiGatewayService($req);
+    }
+
+
     public function apiGatewayService(Request $req)
     {
 
@@ -101,6 +119,7 @@ class ApiGatewayController extends Controller
             $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
+                    // return responseMsg(false, json_decode($response)->message, []);
                     return json_decode($response);
                 }
                 return json_decode($response);
