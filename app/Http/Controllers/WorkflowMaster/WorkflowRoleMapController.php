@@ -193,6 +193,7 @@ class WorkflowRoleMapController extends Controller
             'je_comparison' => $permission->je_comparison,
             'technical_comparison' => $permission->technical_comparison,
             'can_view_technical_comparison' => $permission->can_view_technical_comparison,
+            'can_bt_da' => $permission->can_bt_da,
         ];
 
         return $data;
