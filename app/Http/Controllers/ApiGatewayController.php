@@ -66,64 +66,64 @@ class ApiGatewayController extends Controller
                     'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",
                 ]
             );
-            $files = [];
-            if (!empty($_FILES)) {
-                $mAuthorizationBll = new AuthorizationBll();
-                $files = $mAuthorizationBll->addFiles($_FILES, $response);
-            }
-            $textfields = $mAuthorizationBll->addTextFields($req, $response);
+            // $files = [];
+            // if (!empty($_FILES)) {
+            //     $mAuthorizationBll = new AuthorizationBll();
+            //     $files = $mAuthorizationBll->addFiles($_FILES, $response);
+            // }
+            // $textfields = $mAuthorizationBll->addTextFields($req, $response);
             $fileName = [];
-            // $new = [];
+            $new = [];
             foreach ($_FILES as $index => $val) {
                 array_push($fileName, $index);
             }
 
-            // foreach (collect($req->all())->toArray() as $key => $val) {
-            //     $new[$key] = $val;
-            // }
-            // $dotIndexes = $this->generateDotIndexes($_FILES);
+            foreach (collect($req->all())->toArray() as $key => $val) {
+                $new[$key] = $val;
+            }
+            $dotIndexes = $this->generateDotIndexes($_FILES);
 
-            // foreach ($dotIndexes as $val) {
-            //     $patern = "/\.name/i";
-            //     if (!preg_match($patern, $val)) {
-            //         continue;
-            //     }
-            //     $name = "";
-            //     $test = collect(explode(".", preg_replace($patern, "", $val)));
-            //     $t = $test->filter(function ($val, $index) {
-            //         return $index > 0 ? true : "";
-            //     });
-            //     $t = $t->map(function ($val) {
-            //         return "[" . $val . "]";
-            //     });
-            //     $name = (($test[0]) . implode("", $t->toArray()));
-            //     $response = $response->attach(
-            //         $name,
-            //         file_get_contents($this->getArrayValueByDotNotation($_FILES, preg_replace($patern, ".tmp_name", $val))),
-            //         $this->getArrayValueByDotNotation($_FILES, $val)
-            //     );
-            // }
-            // $textIndex = $this->generateDotIndexes($new);
-            // $new2 = [];
-            // foreach ($textIndex as $val) {
-            //     $name = "";
-            //     $test = collect(explode(".", $val));
-            //     $t = $test->filter(function ($val, $index) {
-            //         return $index > 0 ? true : "";
-            //     });
-            //     $t = $t->map(function ($val) {
-            //         return "[" . $val . "]";
-            //     });
-            //     $name = (($test[0]) . implode("", $t->toArray()));
-            //     $new2[] = [
-            //         "contents" => $this->getArrayValueByDotNotation($new, $val),
-            //         "name" => $name
-            //     ];
-            // }
+            foreach ($dotIndexes as $val) {
+                $patern = "/\.name/i";
+                if (!preg_match($patern, $val)) {
+                    continue;
+                }
+                $name = "";
+                $test = collect(explode(".", preg_replace($patern, "", $val)));
+                $t = $test->filter(function ($val, $index) {
+                    return $index > 0 ? true : "";
+                });
+                $t = $t->map(function ($val) {
+                    return "[" . $val . "]";
+                });
+                $name = (($test[0]) . implode("", $t->toArray()));
+                $response = $response->attach(
+                    $name,
+                    file_get_contents($this->getArrayValueByDotNotation($_FILES, preg_replace($patern, ".tmp_name", $val))),
+                    $this->getArrayValueByDotNotation($_FILES, $val)
+                );
+            }
+            $textIndex = $this->generateDotIndexes($new);
+            $new2 = [];
+            foreach ($textIndex as $val) {
+                $name = "";
+                $test = collect(explode(".", $val));
+                $t = $test->filter(function ($val, $index) {
+                    return $index > 0 ? true : "";
+                });
+                $t = $t->map(function ($val) {
+                    return "[" . $val . "]";
+                });
+                $name = (($test[0]) . implode("", $t->toArray()));
+                $new2[] = [
+                    "contents" => $this->getArrayValueByDotNotation($new, $val),
+                    "name" => $name
+                ];
+            }
 
             # Check if the response is valid to return in json format 
-            // $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
-           $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $textfields : $files));
+            $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $new2 : $new));
+        //    $response = $response->$method($url . $req->getRequestUri(), ($fileName ? $textfields : $files));
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
                     return json_decode($response);
