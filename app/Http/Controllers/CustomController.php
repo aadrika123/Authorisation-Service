@@ -30,8 +30,15 @@ class CustomController extends Controller
         if ($validated->fails()) {
             return validationError($validated);
         }
-        $mCustomDetail = new CustomDetail();
-        return $mCustomDetail->getCustomDetails($request);
+        try {
+
+            $mCustomDetail = new CustomDetail();
+            $customData = $mCustomDetail->getCustomDetails($request);
+
+            return responseMsg(true, "Successfully Saved", $customData);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
     }
 
     //post custom details
