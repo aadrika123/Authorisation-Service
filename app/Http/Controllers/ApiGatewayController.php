@@ -28,16 +28,13 @@ class ApiGatewayController extends Controller
             // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
             $ipAddress = getClientIpAddress();
             $method = $req->method();
-            if ($segments[1] == "trade" && strtolower($req->getMethod()) == "get") {
-            } else {
-                $req = $req->merge([
+            $req = $req->merge([
                     'auth' => authUser(),
                     'token' => $req->bearerToken(),
                     'currentAccessToken' => $req->user()->currentAccessToken(),
                     'apiToken' => $req->user()->currentAccessToken()->token,
                     'ipAddress' => $ipAddress
                 ]);
-            }
 
             #======================
             $header = [];
@@ -60,7 +57,66 @@ class ApiGatewayController extends Controller
                 $new2 = $this->inputHandeling($req);
                 
             }
+
+            # Check if the response is valid to return in json format 
+            $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
+        
+            if (isset(json_decode($response)->status)) {
+                if (json_decode($response)->status == false) {
+                    return json_decode($response);
+                }
+                return json_decode($response);
+            } else {
+                return $response;
+            }
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    public function anuthinticatedApiGateway(Request $req)
+    {
+        try {
+            // Converting environmental variables to Services
+            $baseURLs = Config::get('constants.MICROSERVICES_APIS');
+            $services = json_decode($baseURLs, true);
+            // Sending to Microservices
+            $segments = explode('/', $req->path());
+            $service = $segments[1];
+            if (!array_key_exists($service, $services))
+                throw new Exception("Service Not Available");
+
+            $url = $services[$service];
+            // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
+            $ipAddress = getClientIpAddress();
+            $method = $req->method();
             
+            $req = $req->merge([
+                'token' => $req->bearerToken(),
+                'ipAddress' => $ipAddress
+            ]);
+            #======================
+            $header = [];
+            foreach($this->generateDotIndexes(($req->headers->all())) as $key )
+            {
+                $val = explode(".",$key)[0]??"";
+                if(in_array($val,["host","accept","content-length",($_FILES)?"content-type":""]))
+                {
+                    continue;
+                }
+                $header[explode(".",$key)[0]??""]=$this->getArrayValueByDotNotation(($req->headers->all()),$key);
+            }  
+            $response = Http::withHeaders(                
+                $header 
+            );            
+            $new2 = [];           
+            if($_FILES)
+            {
+                $response = $this->fileHandeling($response);
+                $new2 = $this->inputHandeling($req);
+                
+            }
+
             # Check if the response is valid to return in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
         
