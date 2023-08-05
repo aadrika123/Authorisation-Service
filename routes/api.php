@@ -87,7 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Workflow Master CRUD operation
          Controller No : 01
      */
-    Route::controller(MasterController::class)->group(function () {
+        Route::controller(MasterController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-master/save', 'createMaster');    #API_ID=120101  | Save Workflow Master
         Route::post('user-managment/v1/crud/workflow-master/edit', 'updateMaster');    #API_ID=120102  | Edit Workflow Master 
         Route::post('user-managment/v1/crud/workflow-master/get', 'masterbyId');       #API_ID=120103  | Get Workflow Master By Id
