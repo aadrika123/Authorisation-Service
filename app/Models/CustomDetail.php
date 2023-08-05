@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Config;
 class CustomDetail extends Model
 {
     use HasFactory;
-    private $_bifuraction;
+    // private $_bifuraction;
 
-    public function __construct()
-    {
-        $this->_bifuraction = new PropertyBifurcation();
-    }
+    // public function __construct()
+    // {
+    //     $this->_bifuraction = new PropertyBifurcation();
+    // }
 
     public function getCustomDetails($request)
     {
@@ -55,7 +55,7 @@ class CustomDetail extends Model
     {
 
         $customFor = trim(strtoupper($request->customFor));
-        $path = Config::get('PropertyConstaint.CUSTOM_RELATIVE_PATH');
+        $path = Config::get('constants.CUSTOM_RELATIVE_PATH');
 
         $customDetails = new CustomDetail;
         $filename = NULL;
