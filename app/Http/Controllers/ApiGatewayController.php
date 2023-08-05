@@ -171,11 +171,14 @@ class ApiGatewayController extends Controller
         }
         return $req;
     }
-
     private function inputHandeling(Request $req)
-    {
+    {        
         $inputs =[];
-        $textIndex = $this->generateDotIndexes($req->all());
+        $new = [];  
+        foreach (collect($req->all())->toArray() as $key => $val) {
+            $new[$key] = $val;
+        }
+        $textIndex = $this->generateDotIndexes($new);
         foreach ($textIndex as $val) {
             $name = "";
             $test = collect(explode(".", $val));
@@ -187,7 +190,7 @@ class ApiGatewayController extends Controller
             });
             $name = (($test[0]) . implode("", $t->toArray()));
             $inputs[] = [
-                "contents" => $this->getArrayValueByDotNotation($req->all(), $val),
+                "contents" => $this->getArrayValueByDotNotation($new, $val),
                 "name" => $name
             ];
         }
