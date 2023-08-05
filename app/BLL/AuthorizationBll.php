@@ -88,26 +88,6 @@ class AuthorizationBll
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function generateDotIndexes(array $array, $prefix = '', $result = [])
     {
         foreach ($array as $key => $value) {
