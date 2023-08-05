@@ -6,5 +6,6 @@
  * | Created for - Symbolic Constants Used On various Functions and classes
  */
 return [
-    "MICROSERVICES_APIS" => env('MICROSERVICES_APIS')
+    "MICROSERVICES_APIS" => env('MICROSERVICES_APIS'),
+    "CUSTOM_RELATIVE_PATH" => "Uploads/Custom"
 ];

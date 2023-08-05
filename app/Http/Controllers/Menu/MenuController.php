@@ -212,7 +212,7 @@ class MenuController extends Controller
             $return['id']       = $value['id'];
             $return['parentId'] = $value['parent_id'];
             $return['path']     = $value['route'];
-            $return['icon']     = config('app.url') . '/api/getImageLink?path=' . $value['icon'];
+            $return['icon']     = config('app.url') . '/' . $value['icon'];
             $return['name']     = $value['menu_string'];
             $return['order']    = $value['serial'];
             $return['children'] = array();
