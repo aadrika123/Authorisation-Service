@@ -13,47 +13,38 @@ use Illuminate\Support\Facades\Config;
 class CustomDetail extends Model
 {
     use HasFactory;
-    // private $_bifuraction;
 
-    // public function __construct()
-    // {
-    //     $this->_bifuraction = new PropertyBifurcation();
-    // }
+    protected $guarded = [];
 
     public function getCustomDetails($request)
     {
-        try {
-            $customDetails = CustomDetail::select(
-                'id',
-                'ref_id',
-                'ref_type',
-                'relative_path',
-                'doc_name as docUrl',
-                'remarks',
-                'type',
-                'created_at as date',
-                'ref_type as customFor'
-            )
-                ->orderBy("id", 'desc')
-                ->where('ref_id', $request->applicationId)
-                ->where('ref_type', trim(strtoupper($request->customFor)))
-                ->get();
-            $customDetails = $customDetails->map(function ($val) {
-                // $path = $this->_bifuraction->readDocumentPath($val->relative_path . '/' . $val->docUrl);
-                $path = config('app.url') . '/' . $val->relative_path . '/' . $val->docUrl;
-                $val->docUrl = $path;
-                return $val;
-            });
-            return responseMsg(true, "Successfully Retrieved", $customDetails);
-        } catch (Exception $e) {
-            return response()->json($e, 400);
-        }
+        $customDetails = CustomDetail::select(
+            'id',
+            'ref_id',
+            'ref_type',
+            'relative_path',
+            'doc_name as docUrl',
+            'remarks',
+            'type',
+            'created_at as date',
+            'ref_type as customFor'
+        )
+            ->orderBy("id", 'desc')
+            ->where('ref_id', $request->applicationId)
+            ->where('ref_type', trim(strtoupper($request->customFor)))
+            ->get();
+
+        $customDetails = $customDetails->map(function ($val) {
+            $path = config('app.url') . '/' . $val->relative_path . '/' . $val->docUrl;
+            $val->docUrl = $path;
+            return $val;
+        });
+        return $customDetails;
     }
 
     //post custom details
     public function postCustomDetails($request)
     {
-
         $customFor = trim(strtoupper($request->customFor));
         $path = Config::get('constants.CUSTOM_RELATIVE_PATH');
 
@@ -62,7 +53,6 @@ class CustomDetail extends Model
 
         if ($file = $request->file('document')) {
             $filename = time() .  '.' . $file->getClientOriginalExtension();
-            // $path = storage_path('app/public/custom');
             $file->move($path, $filename);
         }
 
@@ -171,26 +161,8 @@ class CustomDetail extends Model
     }
 
     // save custom details
-    public function saveCustomDetail($request, $filename, $customDetails, $path)
+    public function saveCustomDetail($request)
     {
-        if ($request->remarks && $request->document) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_name = $filename;
-            $customDetails->remarks = $request->remarks;
-            $customDetails->relative_path = $path;
-            $customDetails->type = "both";
-        } elseif ($request->document) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_name = $filename;
-            $customDetails->relative_path = $path;
-            $customDetails->type = "file";
-        } elseif ($request->remarks) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->remarks = $request->remarks;
-            $customDetails->type = "text";
-        }
+        CustomDetail::create($request);
     }
 }

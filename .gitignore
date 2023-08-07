@@ -19,3 +19,5 @@ yarn-error.log
 /.vscode
 
 public/Uploads/User
+public/Uploads/Custom
+public/Uploads/Icon
