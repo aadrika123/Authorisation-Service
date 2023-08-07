@@ -77,11 +77,12 @@ class CustomController extends Controller
             switch ($customFor) {
                 case ('SAF'):
                     $request->merge([
-                        "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
-                        "ulbId"    => $user->ulb_id,
-                        "reftable" => 'prop_active_safs',
+                        "moduleId"  => $propertyModuleId,
+                        "filename"  => $filename,
+                        "path"      => $path,
+                        "ulbId"     => $user->ulb_id,
+                        "customFor" => $customFor,
+                        "reftable"  => 'prop_active_safs',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
                     break;
@@ -92,6 +93,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'prop_active_concessions',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -103,6 +105,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'prop_active_objections',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -114,6 +117,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'prop_active_harvestings',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -125,6 +129,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'prop_active_safs',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -136,6 +141,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'prop_active_deactivation_requests',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -147,6 +153,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'water_applications',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -158,6 +165,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'active_trade_licences',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -169,6 +177,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'adv_active_selfadvertisements',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -180,6 +189,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'adv_active_vehicles',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -191,6 +201,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'adv_active_privatelands',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -202,6 +213,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'adv_active_agencies',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -213,6 +225,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'adv_active_hoardings',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -224,6 +237,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'mar_active_banqute_halls',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -235,6 +249,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'mar_active_lodges',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -246,6 +261,7 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'mar_active_hostels',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
@@ -257,199 +273,12 @@ class CustomController extends Controller
                         "filename" => $filename,
                         "path"     => $path,
                         "ulbId"    => $user->ulb_id,
+                        "customFor" => $customFor,
                         "reftable" => 'mar_active_dharamshalas',
                     ]);
                     $this->saveCustomDetail($request, $filename, $customDetails, $path);
                     break;
             }
-
-            // if ($customFor == 'SAF') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_safs',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'PROPERTY-CONCESSION') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_concessions',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-
-            // if ($customFor == 'PROPERTY-OBJECTION') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_objections',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'PROPERTY-HARVESTING') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_harvestings',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'GBSAF') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_safs',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'PROPERTY DEACTIVATION') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'prop_active_deactivation_requests',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'WATER') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'water_applications',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'TRADE') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'SELF') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'adv_active_selfadvertisements',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'MOVABLE') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'adv_active_vehicles',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'PRIVATE') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'adv_active_privatelands',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'AGENCY') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'adv_active_agencies',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'HOARDING') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'adv_active_hoardings',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'BANQUET') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'mar_active_banqute_halls',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'LODGE') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'mar_active_lodges',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'HOSTEL') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'mar_active_hostels',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
-
-            // if ($customFor == 'DHARAMSHALA') {
-            //     $request->merge([
-            //         "moduleId" => $propertyModuleId,
-            //         "filename" => $filename,
-            //         "path"     => $path,
-            //         "ulbId"    => $user->ulb_id,
-            //         "reftable" => 'mar_active_dharamshalas',
-            //     ]);
-            //     $this->saveCustomDetail($request, $filename, $customDetails, $path);
-            // }
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {
