@@ -415,5 +415,8 @@ Route::controller(ApiGatewayController::class)->group(function () {
     Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
     Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
     Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
+    Route::post("public-transport/agent/login","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+    Route::post("public-transport/agent/logout","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+    Route::get("public-transport/ticket/verify/{id}","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
     Route::any('{any}', 'apiGatewayService')->where('any', '.*');
 });

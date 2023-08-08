@@ -51,8 +51,13 @@ class ApiGatewayController extends Controller
                 {
                     continue;
                 }
+                if(strtolower($val)=="content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()),$key)) && !($_FILES) )
+                {
+                    
+                    continue;
+                }
                 $header[explode(".",$key)[0]??""]=$this->getArrayValueByDotNotation(($req->headers->all()),$key);
-            }  
+            } 
             $response = Http::withHeaders(                
                 $header 
             );            
@@ -62,7 +67,7 @@ class ApiGatewayController extends Controller
                 $response = $this->fileHandeling($response);
                 $new2 = $this->inputHandeling($req);
                 
-            }
+            };
 
             # Check if the response is valid to return in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
