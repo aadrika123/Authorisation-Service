@@ -14,6 +14,8 @@ class CustomDetail extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function getCustomDetails($request)
     {
         $customDetails = CustomDetail::select(
@@ -159,26 +161,8 @@ class CustomDetail extends Model
     }
 
     // save custom details
-    public function saveCustomDetail($request, $filename, $customDetails, $path)
+    public function saveCustomDetail($request)
     {
-        if ($request->remarks && $request->document) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_name = $filename;
-            $customDetails->remarks = $request->remarks;
-            $customDetails->relative_path = $path;
-            $customDetails->type = "both";
-        } elseif ($request->document) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_name = $filename;
-            $customDetails->relative_path = $path;
-            $customDetails->type = "file";
-        } elseif ($request->remarks) {
-
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->remarks = $request->remarks;
-            $customDetails->type = "text";
-        }
+        CustomDetail::create($request);
     }
 }

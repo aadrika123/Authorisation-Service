@@ -58,8 +58,8 @@ class User extends Authenticatable
     public function getUserById($userId)
     {
         return User::select('users.*', 'ulb_masters.ulb_name')
-            ->where('users.id', $userId)
             ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->where('users.id', $userId)
             ->first();
     }
 

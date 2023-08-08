@@ -241,7 +241,7 @@ class CitizenController extends Controller
 
             return responseMsg(true, 'Successful Updated', "");
         } catch (Exception $e) {
-            return response()->json('Something Went Wrong', 400);
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -294,14 +294,14 @@ class CitizenController extends Controller
             $details = ActiveCitizen::find($citizenId);
 
             $details->name = $details->user_name;
-            $details->aadhar_doc = ($details->relative_path . $details->aadhar_doc);
-            $details->specially_abled_doc = ($details->relative_path . $details->specially_abled_doc);
-            $details->armed_force_doc = ($details->relative_path . $details->armed_force_doc);
-            $details->profile_photo = ($details->relative_path . $details->profile_photo);
+            $details->aadhar_doc = (config('app.url') . '/' . $details->relative_path . $details->aadhar_doc);
+            $details->specially_abled_doc = (config('app.url') . '/' . $details->relative_path . $details->specially_abled_doc);
+            $details->armed_force_doc = (config('app.url') . '/' . $details->relative_path . $details->armed_force_doc);
+            $details->profile_photo = (config('app.url') . '/' . $details->relative_path . $details->profile_photo);
 
-            return responseMsgs(true, "Citizen Details", $details, "", "01", ".ms", "POST", $request->deviceId);
+            return responseMsgs(true, "Citizen Details", $details, "", "01", responseTime(), "POST", $request->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", $request->deviceId);
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", $request->deviceId);
         }
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http;
 use App\Http\Middleware\ApiGatewayMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+use App\Http\Middleware\LogRoute;
+
 class Kernel extends HttpKernel
 {
     /**
@@ -65,5 +67,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.gateway' => ApiGatewayMiddleware::class,
+        'log.route' => LogRoute::class,
     ];
 }

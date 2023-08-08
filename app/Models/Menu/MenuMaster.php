@@ -22,9 +22,12 @@ class MenuMaster extends Model
             'menu_masters.icon',
             'menu_masters.menu_string',
             'menu_masters.serial',
-            'wf_workflows.alt_name as workflow_name'
+            'wf_workflows.alt_name as workflow_name',
+            'module_masters.module_name',
+            'module_masters.id as module_id',
         )
             ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
+            ->leftjoin('module_masters', 'module_masters.id', 'menu_masters.module_id')
             ->where('is_deleted', false)
             // ->orderByDesc("id");
             ->orderBy("menu_masters.serial");
