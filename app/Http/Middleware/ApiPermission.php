@@ -47,7 +47,9 @@ class ApiPermission
         $segments = explode('/', $request->path());
         $service = $segments[1]??"";
         if(!$request->has("moduleId"))
+        {
             $request->merge(["moduleId"=>Config::get('constants.'.(Config::get("apiPermission.".Str::upper($service))))]);
+        }
 
         $this->Redisdata();     
         $menuApicheck = $this->MeneApiCheck($request);  
