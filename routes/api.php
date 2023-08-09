@@ -445,7 +445,7 @@ Route::middleware('apiPermission')->group(function () {
 
 
         # Grievance UnAuth Api
-        // Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
         Route::post("grievance/auth/verify-otp", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
         Route::post("grievance/register-grievance", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
         Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
