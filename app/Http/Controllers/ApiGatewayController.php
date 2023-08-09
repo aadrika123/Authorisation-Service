@@ -115,6 +115,11 @@ class ApiGatewayController extends Controller
                 {
                     continue;
                 }
+                if(strtolower($val)=="content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()),$key)) && !($_FILES) )
+                {
+                    
+                    continue;
+                }
                 $header[explode(".",$key)[0]??""]=$this->getArrayValueByDotNotation(($req->headers->all()),$key);
             }  
             $response = Http::withHeaders(                
@@ -145,7 +150,7 @@ class ApiGatewayController extends Controller
     }
 
 
-    private function fileHandeling(PendingRequest $req)
+    public function fileHandeling(PendingRequest $req)
     {
         $fileName = [];
         foreach ($_FILES as $index => $val) {
@@ -176,7 +181,7 @@ class ApiGatewayController extends Controller
         }
         return $req;
     }
-    private function inputHandeling(Request $req)
+    public function inputHandeling(Request $req)
     {        
         $inputs =[];
         $new = [];  
@@ -203,7 +208,7 @@ class ApiGatewayController extends Controller
         return $inputs;
     }
 
-    private function getArrayValueByDotNotation(array $array, string $key)
+    public function getArrayValueByDotNotation(array $array, string $key)
     {
         $keys = explode('.', $key);
 
@@ -218,7 +223,7 @@ class ApiGatewayController extends Controller
         return $array;
     }
 
-    private function generateDotIndexes(array $array, $prefix = '', $result = [])
+    public function generateDotIndexes(array $array, $prefix = '', $result = [])
     {
 
         foreach ($array as $key => $value) {

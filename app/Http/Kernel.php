@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\ApiGatewayMiddleware;
+use App\Http\Middleware\ApiPermission;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 use App\Http\Middleware\LogRoute;
@@ -68,5 +69,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'api.gateway' => ApiGatewayMiddleware::class,
         'log.route' => LogRoute::class,
+        'apiPermission' => ApiPermission::class
     ];
 }
