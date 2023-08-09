@@ -433,7 +433,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 // Api Gateway Routes
 
-Route::middleware('apiPermission')->group(function () {
+Route::middleware(['apiPermission','auth:sanctum'])->group(function () {
     Route::controller(ApiGatewayController::class)->group(function () {
         // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
         Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');

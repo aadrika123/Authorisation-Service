@@ -15,7 +15,7 @@ class ApiGatewayController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['anuthinticatedApiGateway']);
+        // $this->middleware('auth:sanctum')->except(['anuthinticatedApiGateway']);
     }
     
     public function apiGatewayService(Request $req)
