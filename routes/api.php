@@ -447,13 +447,13 @@ Route::middleware('apiPermission')->group(function () {
 
 
         
-        Route::get("list-district","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("grievance/auth/req-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("grievance/auth/verify-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("get-all-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("workflow/v2/crud/ward-by-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("grievance/register-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("grievance/auth/get-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("list-district","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/req-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/verify-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("get-all-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("workflow/v2/crud/ward-by-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/register-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/get-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
 
 
 
