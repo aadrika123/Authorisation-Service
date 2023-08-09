@@ -40,6 +40,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 Route::get('me', 'AuthController@me')->middleware('log.route');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -89,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Workflow Master CRUD operation
          Controller No : 01
      */
-        Route::controller(MasterController::class)->group(function () {
+    Route::controller(MasterController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-master/save', 'createMaster');    #API_ID=120101  | Save Workflow Master
         Route::post('user-managment/v1/crud/workflow-master/edit', 'updateMaster');    #API_ID=120102  | Edit Workflow Master 
         Route::post('user-managment/v1/crud/workflow-master/get', 'masterbyId');       #API_ID=120103  | Get Workflow Master By Id
@@ -232,7 +233,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(ApiMasterController::class)->group(function () {
         # menu api map api list
-        Route::match(["get","post"],'row-api-list/{service?}/{sub_service?}', 'getRowApiList');
+        Route::match(["get", "post"], 'row-api-list/{service?}/{sub_service?}', 'getRowApiList');
         Route::post('sav-menu-api-map', 'menuApiMapStore');
         Route::post('all-menu-api-map', 'menuApiMapList');
         Route::post('menu-api-map', 'menuApiMap');
@@ -438,24 +439,16 @@ Route::middleware('apiPermission')->group(function () {
         Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
         Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
         Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-        Route::post("public-transport/agent/login","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("public-transport/agent/logout","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::get("public-transport/ticket/verify/{id}","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("public-transport/agent/login", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("public-transport/agent/logout", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::get("public-transport/ticket/verify/{id}", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
 
 
-
-
-
-        
-        Route::post("list-district","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("grievance/auth/req-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("grievance/auth/verify-otp","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("get-all-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("workflow/v2/crud/ward-by-ulb","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("grievance/register-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        Route::post("grievance/auth/get-grievance","anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-
-
+        # Grievance UnAuth Api
+        Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/verify-otp", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/register-grievance", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
 
 
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');
