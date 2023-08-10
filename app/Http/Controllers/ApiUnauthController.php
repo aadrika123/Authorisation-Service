@@ -35,13 +35,32 @@ class ApiUnauthController extends Controller
             ]);
             $method = $req->method();
             $client = new Client();
+            // =========================Test code
+            // ======================= Test Code
             $promises = [];
             $asyncMethod = in_array($method, ['POST', 'post']) ? 'postAsync' : 'getAsync';
+            // return $req->header()[''];
 
-            $promise = $client->$asyncMethod(
-                $url . $req->getRequestUri(),
-                ['json' => $req->all()]
-            ); // Create an async HTTP POST request
+
+            // You can then handle the response as needed
+            // return $responseBody = $response->getBody()->getContents();
+            if ($req->isJson()) {
+                $promise = $client->$asyncMethod(
+                    $url . $req->getRequestUri(),
+                    ['json' => $req->all()],
+                    [
+                        'headers' => $req->header()                         // Attach all headers
+                    ]
+                );
+            } else {
+                $promise = $client->$asyncMethod($url . $req->getRequestUri(), [                // for Multipart
+                    'multipart' => $this->prepareMultipartData($req),
+                    [
+                        'headers' => $req->header()                         // Attach all headers
+                    ]
+                ]);
+            }
+            // Create an async HTTP POST request
             // Wait for the promise to complete
             $promises[] = $promise;
             $responses = Promise\Utils::settle($promises)->wait();
@@ -203,5 +222,28 @@ class ApiUnauthController extends Controller
             }
         }
         return $result;
+    }
+
+    public function prepareMultipartData(Request $req)
+    {
+        $multipartData = [];
+
+        foreach ($req->all() as $key => $value) {
+            $multipartData[] = [
+                'name' => $key,
+                'contents' => $value,
+            ];
+        }
+
+        // Add files from the req
+        foreach ($req->allFiles() as $key => $file) {
+            $multipartData[] = [
+                'name' => $key,
+                'contents' => fopen($file->getPathname(), 'r'),
+                'filename' => $file->getClientOriginalName(),
+            ];
+        }
+
+        return $multipartData;
     }
 }
