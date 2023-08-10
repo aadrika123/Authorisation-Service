@@ -27,24 +27,22 @@ class WfWardUser extends Model
     public function addWardUser($req)
     {
         $createdBy = Auth()->user()->id;
-        $device = new WfWardUser;
-        $device->user_id = $req->userId;
-        $device->ward_id = $req->wardId;
-        $device->is_admin = $req->isAdmin;
-        $device->created_by = $createdBy;
-        $device->stamp_date_time = Carbon::now();
-        $device->created_at = Carbon::now();
-        $device->save();
+        $mWfWardUser = new WfWardUser;
+        $mWfWardUser->user_id = $req->userId;
+        $mWfWardUser->ward_id = $req->wardId;
+        $mWfWardUser->created_by = $createdBy;
+        $mWfWardUser->save();
     }
 
     //update ward user
     public function updateWardUser($req)
     {
-        $device = WfWardUser::find($req->id);
-        $device->user_id = $req->userId;
-        $device->ward_id = $req->wardId;
-        $device->is_admin = $req->isAdmin;
-        $device->save();
+        $mWfWardUser = WfWardUser::find($req->id);
+        $mWfWardUser->user_id      = $req->userId      ?? $mWfWardUser->user_id;
+        $mWfWardUser->ward_id      = $req->wardId      ?? $mWfWardUser->ward_id;
+        $mWfWardUser->is_admin     = $req->isAdmin     ?? $mWfWardUser->is_admin;
+        $mWfWardUser->is_suspended = $req->isSuspended ?? $mWfWardUser->is_suspended;
+        $mWfWardUser->save();
     }
 
 
@@ -56,7 +54,7 @@ class WfWardUser extends Model
             'user_id',
             'ward_id',
             'is_admin',
-            'user_name',
+            'name',
             'ward_name',
         )
             ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
@@ -70,19 +68,20 @@ class WfWardUser extends Model
     //list ward user
     public function listWardUser()
     {
+        $ulbId = authUser()->ulb_id;
         $data = WfWardUser::select(
             'wf_ward_users.id',
             'user_id',
             'ward_id',
             'is_admin',
-            'user_name',
+            'name',
             'ward_name'
         )
             ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
             ->join('users', 'users.id', 'wf_ward_users.user_id')
+            ->where('ulb_ward_masters.ulb_id', $ulbId)
             ->where('is_suspended', 'false')
-            ->orderByDesc('wf_ward_users.id')
-            ->get();
+            ->orderByDesc('wf_ward_users.id');
         return $data;
     }
 

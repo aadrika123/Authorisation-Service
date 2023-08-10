@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu\MenuRole;
 use App\Models\Menu\MenuRoleusermap;
 use Exception;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MenuRoleUserMapController extends Controller
@@ -19,10 +21,32 @@ class MenuRoleUserMapController extends Controller
         try {
             $req->validate([
                 'userId'     => 'required',
-                'menuRoleId' => 'required'
+                'menuRoleId' => 'required',
+                'permissionStatus' => 'required'
             ]);
             $mMenuRoleusermap = new MenuRoleusermap();
-            $mMenuRoleusermap->addRoleUser($req);
+            $checkExisting =  $mMenuRoleusermap->where('menu_role_id', $req->menuRoleId)
+                ->where('user_id', $req->userId)
+                ->first();
+
+            if ($req->permissionStatus == 1)
+                $isSuspended = false;
+            if ($req->permissionStatus == 0)
+                $isSuspended = true;
+
+
+            if ($checkExisting) {
+                $req->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $isSuspended
+                ]);
+                $mMenuRoleusermap->updateRoleUser($req);
+            } else {
+                $req->merge([
+                    'isSuspended' => $isSuspended,
+                ]);
+                $mMenuRoleusermap->addRoleUser($req);
+            }
 
             return responseMsgs(true, "Data Saved", "", "120901", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
@@ -35,10 +59,13 @@ class MenuRoleUserMapController extends Controller
      */
     public function updateRoleUser(Request $req)
     {
+        $validator = Validator::make($req->all(), [
+            'id' => 'required|integer'
+        ]);
+        if ($validator->fails())
+            return validationError($validator);
+
         try {
-            $req->validate([
-                'id' => 'required'
-            ]);
             $mMenuRoleusermap = new MenuRoleusermap();
             $mMenuRoleusermap->updateRoleUser($req);
 
@@ -104,11 +131,8 @@ class MenuRoleUserMapController extends Controller
     }
 
     /**
-     * created by : Ashutosh Kumar
-     * created at : 14-07-23
+     * | Roles by User Id
      */
-
-    // Roles by User Id
     public function roleByUserId(Request $req)
     {
         try {
@@ -118,10 +142,32 @@ class MenuRoleUserMapController extends Controller
             if ($validator->fails())
                 return validationError($validator);
 
-            $menuRoleUserMap = new MenuRoleusermap;
-            $data = $menuRoleUserMap->getRoleByUserId()
-                ->where('menu_roleusermaps.user_id', '=', $req->userId)
-                ->get();
+            $mMenuRoleusermap = new MenuRoleusermap;
+            $menuRole = new MenuRole();
+            $menuRoleList = collect();
+
+            $menuRoleDtl = $mMenuRoleusermap->listRoleUser()->get();
+
+            $query = "select 
+                            m.id,
+                            m.menu_role_name,
+                            mr.user_id,
+                            case 
+                                when mr.user_id is null then false
+                                else
+                                    true  
+                            end as permission_status
+
+                        from menu_roles as m
+                        left join (select * from menu_roleusermaps where user_id=$req->userId) as mr on mr.menu_role_id=m.id
+                        order by m.id";
+
+            $data = DB::select($query);
+
+            // $data = $mMenuRoleusermap->getRoleByUserId()
+            // ->where('menu_roleusermaps.user_id', '=', $req->userId)
+            // ->get();
+
             return responseMsgs(true, 'Menu Role Map By User Id', $data, "120907", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), [], "120907", "1.0", responseTime(), "POST", $req->deviceId);

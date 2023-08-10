@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 Route::get('me', 'AuthController@me')->middleware('log.route');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -88,7 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Workflow Master CRUD operation
          Controller No : 01
      */
-        Route::controller(MasterController::class)->group(function () {
+    Route::controller(MasterController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-master/save', 'createMaster');    #API_ID=120101  | Save Workflow Master
         Route::post('user-managment/v1/crud/workflow-master/edit', 'updateMaster');    #API_ID=120102  | Edit Workflow Master 
         Route::post('user-managment/v1/crud/workflow-master/get', 'masterbyId');       #API_ID=120103  | Get Workflow Master By Id
@@ -268,11 +269,12 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Ward User CRUD operation
      */
     Route::controller(WardUserController::class)->group(function () {
-        Route::post('workflow/ward-user/save', 'createWardUser');                     // Save WardUser
-        Route::post('workflow/ward-user/edit', 'updateWardUser');                     // Edit WardUser 
-        Route::post('workflow/ward-user/get', 'WardUserbyId');                       // Get WardUser By Id
-        Route::post('workflow/ward-user/list', 'getAllWardUser');                     // Get All WardUser
-        Route::post('workflow/ward-user/delete', 'deleteWardUser');                   // Delete WardUser
+        Route::post('user-managment/v1/crud/ward-user/save', 'createWardUser');       // Save WardUser
+        Route::post('user-managment/v1/crud/ward-user/edit', 'updateWardUser');       // Edit WardUser 
+        Route::post('user-managment/v1/crud/ward-user/get', 'WardUserbyId');         // Get WardUser By Id
+        Route::post('user-managment/v1/crud/ward-user/list', 'getAllWardUser');       // Get All WardUser
+        Route::post('user-managment/v1/crud/ward-user/delete', 'deleteWardUser');     // Delete WardUser
+        Route::post('user-managment/v1/crud/ward-user/by-user', 'wardByUserId');     // Ward by user id
         Route::post('workflow/ward-user/list-tc', 'tcList');
     });
 
@@ -337,7 +339,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/faq/get', 'faqbyId')->withoutMiddleware('auth:sanctum');   // Get FAQ By Id
         Route::post('user-managment/v1/crud/faq/list', 'faqList')->withoutMiddleware('auth:sanctum');  // Get All FAQ
         Route::post('user-managment/v1/crud/faq/delete', 'deletefaq');                // Delete FAQ
-
     });
 
     /**
@@ -350,6 +351,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/user/list', 'listUser');                  #_List User
         Route::post('user-managment/v1/crud/user/get', 'userById');                   #_Get User
         Route::post('user-managment/v1/crud/multiple-user/list', 'multipleUserList'); #_Get Multiple User
+        Route::post('user-managment/v1/crud/get/user-type', 'listUserType');          #_List User Type
 
 
         Route::post('change-password', 'changePass');                       // Change password with login

@@ -10,6 +10,10 @@ class MenuRoleusermap extends Model
 {
     use HasFactory;
 
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
 
     /**
      * | Create Role Map
@@ -40,8 +44,7 @@ class MenuRoleusermap extends Model
      */
     public function listRoleUser()
     {
-        $data = DB::table('menu_roleusermaps')
-            ->select('menu_roleusermaps.id', 'menu_roles.menu_role_name', 'users.name as user_name')
+        $data = MenuRoleusermap::select('menu_roleusermaps.*', 'menu_roles.menu_role_name', 'users.name as user_name')
             ->join('menu_roles', 'menu_roles.id', 'menu_roleusermaps.menu_role_id')
             ->join('users', 'users.id', 'menu_roleusermaps.user_id')
             ->where('menu_roleusermaps.is_suspended', false)
@@ -65,7 +68,7 @@ class MenuRoleusermap extends Model
      */
     public function getRoleByUserId()
     {
-        return MenuRoleusermap::select('menu_roleusermaps.id', 'menu_roleusermaps.menu_role_id', 'menu_roles.menu_role_name')
+        return MenuRoleusermap::select('menu_roleusermaps.id', 'menu_roleusermaps.menu_role_id', 'menu_roles.menu_role_name', 'menu_roles.is_suspended')
             ->join('menu_roles', 'menu_roles.id', 'menu_roleusermaps.menu_role_id')
             ->where('menu_roleusermaps.is_suspended', false)
             ->orderBy('menu_roleusermaps.id');

@@ -7,6 +7,7 @@ use App\Models\Api\ApiRole;
 use App\Models\Api\ApiRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ApiRoleUserMapController extends Controller
@@ -19,16 +20,32 @@ class ApiRoleUserMapController extends Controller
         try {
             $req->validate([
                 'userId'     => 'required',
-                'apiRoleId' => 'required'
+                'apiRoleId' => 'required',
+                'permissionStatus' => 'required'
             ]);
             $mApiRoleusermap = new ApiRoleusermap();
             $checkExisting = $mApiRoleusermap->where('user_id', $req->userId)
                 ->where('api_role_id', $req->apiRoleId)
                 ->first();
-            if ($checkExisting)
-                throw new Exception('User Already Maps to this Api Role');
 
-            $mApiRoleusermap->addRoleUser($req);
+            if ($req->permissionStatus == 0)
+                $isSuspended = true;
+
+            if ($req->permissionStatus == 1)
+                $isSuspended = false;
+
+            if ($checkExisting) {
+                $req->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $isSuspended
+                ]);
+                $mApiRoleusermap->updateRoleUser($req);
+            } else {
+                $req->merge([
+                    'isSuspended' => $isSuspended,
+                ]);
+                $mApiRoleusermap->addRoleUser($req);
+            }
 
             return responseMsgs(true, "Data Saved", "", "121301", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
@@ -128,6 +145,23 @@ class ApiRoleUserMapController extends Controller
             $data = $apiRoleUserMap->getRoleByUserId()
                 ->where('api_roleusermaps.user_id', $req->userId)
                 ->get();
+
+            $query = "select 
+                            a.id,
+                            a.api_role_name,
+                            ar.user_id,
+                            case 
+                                when ar.user_id is null then false
+                                else
+                                    true  
+                            end as permission_status
+                    
+                        from api_roles as a
+                        left join (select * from api_roleusermaps where user_id=$req->userId) as ar on ar.api_role_id=a.id
+                        order by a.id";
+
+            $data = DB::select($query);
+
             return responseMsgs(true, 'API Role Map By User Id', $data, "121306", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), [], "121306", "1.0", responseTime(), "POST", $req->deviceId);

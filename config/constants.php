@@ -14,5 +14,15 @@ return [
     "WATER_MODULE_ID"         => 2,
     "TRADE_MODULE_ID"         => 3,
     "SWM_MODULE_ID"           => 4,
-    "ADVERTISEMENT_MODULE_ID" => 5
+    "ADVERTISEMENT_MODULE_ID" => 5,
+
+
+    "USER_TYPE" => [
+        "Admin",
+        "Employee",
+        "JSK",
+        "TC",
+        "TL",
+        "Pseudo User",
+    ],
 ];

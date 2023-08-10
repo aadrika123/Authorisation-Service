@@ -15,6 +15,7 @@ use App\Traits\Auth;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -103,6 +104,7 @@ class UserController extends Controller
             $user->user_name = $firstname[0] . '.' . substr($request->mobile, 0, 3);
             $user->password = Hash::make($firstname[0] . '@' . substr($request->mobile, 7, 3));
             $user->save();
+
             $data['userName'] = $user->user_name;
             return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
             Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
@@ -110,6 +112,10 @@ class UserController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | ROle addition of ther user
+     */
 
     /**
      * | Update User Details
@@ -221,9 +227,9 @@ class UserController extends Controller
             );
             $data = User::find($req->id);
 
-            return responseMsgs(true, "User Data", $data, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "User Data", $data, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
@@ -503,5 +509,14 @@ class UserController extends Controller
             $user->update();
             DB::commit();
         }
+    }
+
+    /**
+     * | List User Type
+     */
+    public function listUserType(Request $req)
+    {
+        $userType = Config::get('constants.USER_TYPE');
+        return responseMsgs(true, "User Type", $userType);
     }
 }

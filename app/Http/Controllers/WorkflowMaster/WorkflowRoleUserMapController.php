@@ -5,7 +5,6 @@ namespace App\Http\Controllers\WorkflowMaster;
 use App\Http\Controllers\Controller;
 use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
-// use App\Repository\WorkflowMaster\Interface\iWorkflowRoleUserMapRepository;
 use Carbon\Carbon;
 use Dotenv\Validator;
 use Exception;
@@ -29,22 +28,46 @@ class WorkflowRoleUserMapController extends Controller
      */
     public function createRoleUser(Request $request)
     {
-        $createdBy = Auth()->user()->id;
+        $validated = FacadesValidator::make(
+            $request->all(),
+            [
+                'userId'     => 'required|int',
+                'wfRoleId'   => 'required|int',
+                'permissionStatus' => 'required'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
 
         try {
+            $mWfRoleUserMap = new WfRoleusermap();
             $checkExisting = WfRoleusermap::where('wf_role_id', $request->wfRoleId)
                 ->where('user_id', $request->userId)
                 ->first();
 
-            if ($checkExisting)
-                throw new Exception('This Role is already assigned to this user');
+            if ($request->permissionStatus == 1)
+                $isSuspended = false;
+
+            if ($request->permissionStatus == 0)
+                $isSuspended = true;
+
+            if ($checkExisting) {
+                $request->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $isSuspended
+                ]);
+                $mWfRoleUserMap->updateRoleUser($request);
+            } else {
+                $request->merge([
+                    'isSuspended' => $isSuspended,
+                    'createdBy' => Auth()->user()->id
+                ]);
+                $mWfRoleUserMap->addRoleUser($request);
+            }
 
             // create
-            $device = new WfRoleusermap;
-            $device->wf_role_id = $request->wfRoleId;
-            $device->user_id = $request->userId;
-            $device->created_by = $createdBy;
-            $device->save();
+
             return responseMsgs(true, "Successfully Saved", "", "120501", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120501", "01", responseTime(), $request->getMethod(), $request->deviceId);
@@ -56,8 +79,15 @@ class WorkflowRoleUserMapController extends Controller
      */
     public function updateRoleUser(Request $request)
     {
+        $validated = FacadesValidator::make(
+            $request->all(),
+            ['id'     => 'required|int']
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
         try {
-            $device = WfRoleusermap::find($request->id);
+            $device = WfRoleusermap::findorfail($request->id);
             $device->wf_role_id = $request->wfRoleId ?? $device->wf_role_id;
             $device->user_id = $request->userId ?? $device->user_id;
             $device->save();
@@ -73,10 +103,15 @@ class WorkflowRoleUserMapController extends Controller
      */
     public function roleUserbyId(Request $request)
     {
+        $validated = FacadesValidator::make(
+            $request->all(),
+            ['id'     => 'required|int']
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
         try {
-            $request->validate([
-                'id' => 'required'
-            ]);
             $mWfRoleusermap = new WfRoleusermap();
             $data = $mWfRoleusermap->getRoleUser()
                 ->where('wf_roleusermaps.id', $request->id)
@@ -111,11 +146,16 @@ class WorkflowRoleUserMapController extends Controller
      */
     public function deleteRoleUser(Request $request)
     {
+        $validated = FacadesValidator::make(
+            $request->all(),
+            ['id'     => 'required|int']
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
         try {
-            $request->validate([
-                'id' => 'required'
-            ]);
-            $data = WfRoleusermap::find($request->id);
+            $data = WfRoleusermap::findorfail($request->id);
             $data->is_suspended = true;
             $data->save();
 
@@ -163,9 +203,26 @@ class WorkflowRoleUserMapController extends Controller
             return validationError($validator);
         try {
             $WfRoleUserMap = new WfRoleusermap;
-            $data = $WfRoleUserMap->getRoleByUserId()
-                ->where('wf_roleusermaps.user_id', '=', $req->userId)
-                ->get();
+            // $data = $WfRoleUserMap->getRoleByUserId()
+            //     ->where('wf_roleusermaps.user_id', '=', $req->userId)
+            //     ->get();
+
+            $query = "select 
+                        r.id,
+                        r.role_name,
+                        wr.user_id,
+                        case 
+                            when wr.user_id is null then false
+                            else
+                                true  
+                        end as permission_status
+                
+                    from wf_roles as r
+                    left join (select * from wf_roleusermaps where user_id=$req->userId) as wr on wr.wf_role_id=r.id
+                    order by r.id";
+
+            $data = DB::select($query);
+
             return responseMsgs(true, 'Work Flow Role Map By User Id', $data, "", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), [], "", "1.0", responseTime(), "POST", $req->deviceId);
