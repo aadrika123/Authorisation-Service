@@ -25,4 +25,6 @@ return [
         "TL",
         "Pseudo User",
     ],
+    "WATER_TANKER_MODULE_ID" => 11,
+
 ];

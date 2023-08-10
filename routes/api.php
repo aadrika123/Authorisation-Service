@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\ApiRoleController;
 use App\Http\Controllers\Api\ApiRoleMapController;
 use App\Http\Controllers\Api\ApiRoleUserMapController;
 use App\Http\Controllers\ApiGatewayController;
+use App\Http\Controllers\ApiMasterController;
+use App\Http\Controllers\ApiUnauthController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\CustomController;
@@ -224,6 +226,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/api-category', 'listCategory');                       // Category List
     });
 
+    /**
+     * Api Permission Crud
+     * created By Sandeep Bara
+     * Date 08/08/2023
+     * 
+     */
+    Route::controller(ApiMasterController::class)->group(function () {
+        # menu api map api list
+        Route::match(["get", "post"], 'row-api-list/{service?}/{sub_service?}', 'getRowApiList');
+        Route::post('sav-menu-api-map', 'menuApiMapStore');
+        Route::post('all-menu-api-map', 'menuApiMapList');
+        Route::post('menu-api-map', 'menuApiMap');
+        Route::post('edit-menu-api-map', 'menuApiMapUpdate');
+
+        # user api Exclude api list
+        Route::post('sav-user-api-exclude', 'userApiExcluldeStor');
+        Route::post('all-user-api-exclude', 'userApiExcluldeList');
+        Route::post('user-api-exclude', 'userApiExclulde');
+        Route::post('edit-user-api-exclude', 'userApiExcluldeUpdate');
+    });
 
     /**
      * | API Role CRUD Operation
@@ -411,12 +433,32 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
 });
-// Api Gateway Routes
+// Api Gateway Routes for Unauth
+Route::middleware(['apiPermission'])->group(function () {
+    Route::controller(ApiUnauthController::class)->group(function () {
+        // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+        // Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
+        // Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
+        // Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
+        // Route::post("public-transport/agent/login", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        // Route::post("public-transport/agent/logout", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+        // Route::get("public-transport/ticket/verify/{id}", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
 
-Route::controller(ApiGatewayController::class)->group(function () {
-    // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
-    Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-    Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-    Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-    Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+
+        # Grievance UnAuth Api
+        Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway");
+        Route::post("grievance/auth/verify-otp", "anuthinticatedApiGateway");
+        Route::post("grievance/register-grievance", "anuthinticatedApiGateway");
+        Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway");
+
+
+        // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+    });
+});
+
+# Autherisation 
+Route::middleware(['apiPermission', 'auth:sanctum'])->group(function () {
+    Route::controller(ApiGatewayController::class)->group(function () {
+        Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+    });
 });

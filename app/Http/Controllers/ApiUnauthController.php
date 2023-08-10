@@ -10,76 +10,8 @@ use Illuminate\Support\Facades\Http;
 use App\BLL\AuthorizationBll;
 use Illuminate\Http\Client\PendingRequest;
 
-class ApiGatewayController extends Controller
+class ApiUnauthController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth:sanctum')->except(['anuthinticatedApiGateway']);
-    }
-
-    public function apiGatewayService(Request $req)
-    {
-        try {
-            // Converting environmental variables to Services
-            $baseURLs = Config::get('constants.MICROSERVICES_APIS');
-            $services = json_decode($baseURLs, true);
-            // Sending to Microservices
-            $segments = explode('/', $req->path());
-            $service = $segments[1];
-            if (!array_key_exists($service, $services))
-                throw new Exception("Service Not Available");
-
-            $url = $services[$service];
-            // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
-            $ipAddress = getClientIpAddress();
-            $method = $req->method();
-            $req = $req->merge([
-                'auth' => authUser(),
-                'token' => $req->bearerToken(),
-                'currentAccessToken' => $req->user()->currentAccessToken(),
-                'apiToken' => $req->user()->currentAccessToken()->token,
-                'ipAddress' => $ipAddress
-            ]);
-
-            #======================
-            $header = [];
-            foreach ($this->generateDotIndexes(($req->headers->all())) as $key) {
-                $val = explode(".", $key)[0] ?? "";
-                if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
-                    continue;
-                }
-                if (strtolower($val) == "content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
-
-                    continue;
-                }
-                $header[explode(".", $key)[0] ?? ""] = $this->getArrayValueByDotNotation(($req->headers->all()), $key);
-            }
-            $response = Http::withHeaders(
-                $header
-            );
-            $new2 = [];
-            if ($_FILES) {
-                $response = $this->fileHandeling($response);
-                $new2 = $this->inputHandeling($req);
-            };
-
-            # Check if the response is valid to return in json format 
-            $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
-
-            if (isset(json_decode($response)->status)) {
-                if (json_decode($response)->status == false) {
-                    return json_decode($response);
-                }
-                return json_decode($response);
-            } else {
-                return $response;
-            }
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "");
-        }
-    }
-
     public function anuthinticatedApiGateway(Request $req)
     {
         try {
@@ -139,7 +71,6 @@ class ApiGatewayController extends Controller
         }
     }
 
-
     public function fileHandeling(PendingRequest $req)
     {
         $fileName = [];
@@ -198,8 +129,11 @@ class ApiGatewayController extends Controller
         return $inputs;
     }
 
-    public function getArrayValueByDotNotation(array $array, string $key)
+    public function getArrayValueByDotNotation($array, string $key)
     {
+        if (!is_array($array)) {
+            $array = $array->toArray();
+        }
         $keys = explode('.', $key);
 
         foreach ($keys as $key) {
@@ -213,9 +147,11 @@ class ApiGatewayController extends Controller
         return $array;
     }
 
-    public function generateDotIndexes(array $array, $prefix = '', $result = [])
+    public function generateDotIndexes($array, $prefix = '', $result = [])
     {
-
+        if (!is_array($array)) {
+            $array = $array->toArray();
+        }
         foreach ($array as $key => $value) {
             $newKey = $prefix . $key;
             if (is_array($value)) {
