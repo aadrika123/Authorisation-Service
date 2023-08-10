@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiRoleMapController;
 use App\Http\Controllers\Api\ApiRoleUserMapController;
 use App\Http\Controllers\ApiGatewayController;
 use App\Http\Controllers\ApiMasterController;
+use App\Http\Controllers\ApiUnauthController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\CustomController;
@@ -433,8 +434,8 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 // Api Gateway Routes
 
-Route::middleware(['apiPermission','auth:sanctum'])->group(function () {
-    Route::controller(ApiGatewayController::class)->group(function () {
+Route::middleware(['apiPermission'])->group(function () {
+    Route::controller(ApiUnauthController::class)->group(function () {
         // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
         Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
         Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');

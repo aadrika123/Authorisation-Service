@@ -15,9 +15,9 @@ class ApiGatewayController extends Controller
 
     public function __construct()
     {
-        // $this->middleware('auth:sanctum')->except(['anuthinticatedApiGateway']);
+        $this->middleware('auth:sanctum')->except(['anuthinticatedApiGateway']);
     }
-    
+
     public function apiGatewayService(Request $req)
     {
         try {
@@ -35,43 +35,38 @@ class ApiGatewayController extends Controller
             $ipAddress = getClientIpAddress();
             $method = $req->method();
             $req = $req->merge([
-                    'auth' => authUser(),
-                    'token' => $req->bearerToken(),
-                    'currentAccessToken' => $req->user()->currentAccessToken(),
-                    'apiToken' => $req->user()->currentAccessToken()->token,
-                    'ipAddress' => $ipAddress
-                ]);
+                'auth' => authUser(),
+                'token' => $req->bearerToken(),
+                'currentAccessToken' => $req->user()->currentAccessToken(),
+                'apiToken' => $req->user()->currentAccessToken()->token,
+                'ipAddress' => $ipAddress
+            ]);
 
             #======================
             $header = [];
-            foreach($this->generateDotIndexes(($req->headers->all())) as $key )
-            {
-                $val = explode(".",$key)[0]??"";
-                if(in_array($val,["host","accept","content-length",($_FILES)?"content-type":""]))
-                {
+            foreach ($this->generateDotIndexes(($req->headers->all())) as $key) {
+                $val = explode(".", $key)[0] ?? "";
+                if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
                     continue;
                 }
-                if(strtolower($val)=="content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()),$key)) && !($_FILES) )
-                {
-                    
+                if (strtolower($val) == "content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
+
                     continue;
                 }
-                $header[explode(".",$key)[0]??""]=$this->getArrayValueByDotNotation(($req->headers->all()),$key);
-            } 
-            $response = Http::withHeaders(                
-                $header 
-            );            
-            $new2 = [];           
-            if($_FILES)
-            {
+                $header[explode(".", $key)[0] ?? ""] = $this->getArrayValueByDotNotation(($req->headers->all()), $key);
+            }
+            $response = Http::withHeaders(
+                $header
+            );
+            $new2 = [];
+            if ($_FILES) {
                 $response = $this->fileHandeling($response);
                 $new2 = $this->inputHandeling($req);
-                
             };
 
             # Check if the response is valid to return in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
-        
+
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
                     return json_decode($response);
@@ -101,41 +96,36 @@ class ApiGatewayController extends Controller
             // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
             $ipAddress = getClientIpAddress();
             $method = $req->method();
-            
+
             $req = $req->merge([
                 'token' => $req->bearerToken(),
                 'ipAddress' => $ipAddress
             ]);
             #======================
             $header = [];
-            foreach($this->generateDotIndexes(($req->headers->all())) as $key )
-            {
-                $val = explode(".",$key)[0]??"";
-                if(in_array($val,["host","accept","content-length",($_FILES)?"content-type":""]))
-                {
+            foreach ($this->generateDotIndexes(($req->headers->all())) as $key) {
+                $val = explode(".", $key)[0] ?? "";
+                if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
                     continue;
                 }
-                if(strtolower($val)=="content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()),$key)) && !($_FILES) )
-                {
-                    
+                if (strtolower($val) == "content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
+
                     continue;
                 }
-                $header[explode(".",$key)[0]??""]=$this->getArrayValueByDotNotation(($req->headers->all()),$key);
-            }  
-            $response = Http::withHeaders(                
-                $header 
-            );            
-            $new2 = [];           
-            if($_FILES)
-            {
+                $header[explode(".", $key)[0] ?? ""] = $this->getArrayValueByDotNotation(($req->headers->all()), $key);
+            }
+            $response = Http::withHeaders(
+                $header
+            );
+            $new2 = [];
+            if ($_FILES) {
                 $response = $this->fileHandeling($response);
                 $new2 = $this->inputHandeling($req);
-                
             }
 
             # Check if the response is valid to return in json format 
             $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
-        
+
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
                     return json_decode($response);
@@ -182,9 +172,9 @@ class ApiGatewayController extends Controller
         return $req;
     }
     public function inputHandeling(Request $req)
-    {        
-        $inputs =[];
-        $new = [];  
+    {
+        $inputs = [];
+        $new = [];
         foreach (collect($req->all())->toArray() as $key => $val) {
             $new[$key] = $val;
         }
