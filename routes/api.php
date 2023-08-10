@@ -432,8 +432,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
 });
-// Api Gateway Routes
-
+// Api Gateway Routes for Unauth
 Route::middleware(['apiPermission'])->group(function () {
     Route::controller(ApiUnauthController::class)->group(function () {
         // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
@@ -452,6 +451,13 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
 
 
+        // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+    });
+});
+
+# Autherisation 
+Route::middleware(['apiPermission', 'auth:sanctum'])->group(function () {
+    Route::controller(ApiGatewayController::class)->group(function () {
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');
     });
 });
