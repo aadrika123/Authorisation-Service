@@ -433,31 +433,28 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
 });
-// Api Gateway Routes for Unauth
-Route::middleware(['apiPermission'])->group(function () {
-    Route::controller(ApiUnauthController::class)->group(function () {
-        // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
-        // Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-        // Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-        // Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway')->withoutMiddleware('auth:sanctum');
-        // Route::post("public-transport/agent/login", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        // Route::post("public-transport/agent/logout", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
-        // Route::get("public-transport/ticket/verify/{id}", "anuthinticatedApiGateway")->withoutMiddleware('auth:sanctum');
+// Api Gateway Routes for Unauth middleware required= 'apiPermission',
+// Route::middleware(['apiPermission'])->group(function () {
+Route::controller(ApiUnauthController::class)->group(function () {
+    // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
+    Route::get('trade/payment-receipt/{id}/{transectionId}', 'anuthinticatedApiGateway');
+    Route::get('trade/provisional-certificate/{id}', 'anuthinticatedApiGateway');
+    Route::get('trade/license-certificate/{id}', 'anuthinticatedApiGateway');
+    Route::post("public-transport/agent/login", "anuthinticatedApiGateway");
+    Route::post("public-transport/agent/logout", "anuthinticatedApiGateway");
+    Route::get("public-transport/ticket/verify/{id}", "anuthinticatedApiGateway");
 
 
-        # Grievance UnAuth Api
-        Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway");
-        Route::post("grievance/auth/verify-otp", "anuthinticatedApiGateway");
-        Route::post("grievance/register-grievance", "anuthinticatedApiGateway");
-        Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway");
-
-
-        // Route::any('{any}', 'apiGatewayService')->where('any', '.*');
-    });
+    # Grievance UnAuth Api
+    Route::post("grievance/auth/req-otp", "anuthinticatedApiGateway");
+    Route::post("grievance/auth/verify-otp", "anuthinticatedApiGateway");
+    Route::post("grievance/register-grievance", "anuthinticatedApiGateway");
+    Route::post("grievance/auth/get-grievance", "anuthinticatedApiGateway");
 });
+// });
 
-# Autherisation 
-Route::middleware(['apiPermission', 'auth:sanctum'])->group(function () {
+# Autherisation middleware required= 'apiPermission',
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(ApiGatewayController::class)->group(function () {
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');
     });

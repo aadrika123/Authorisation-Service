@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 
 use App\BLL\AuthorizationBll;
+use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
 use Illuminate\Http\Client\PendingRequest;
 
 class ApiUnauthController extends Controller
@@ -27,45 +29,85 @@ class ApiUnauthController extends Controller
             $url = $services[$service];
             // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
             $ipAddress = getClientIpAddress();
-            $method = $req->method();
-
             $req = $req->merge([
                 'token' => $req->bearerToken(),
                 'ipAddress' => $ipAddress
             ]);
-            #======================
-            $header = [];
-            foreach ($this->generateDotIndexes(($req->headers->all())) as $key) {
-                $val = explode(".", $key)[0] ?? "";
-                if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
-                    continue;
-                }
-                if (strtolower($val) == "content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
+            $method = $req->method();
+            $client = new Client();
+            $promises = [];
+            $asyncMethod = in_array($method, ['POST', 'post']) ? 'postAsync' : 'getAsync';
 
-                    continue;
-                }
-                $header[explode(".", $key)[0] ?? ""] = $this->getArrayValueByDotNotation(($req->headers->all()), $key);
-            }
-            $response = Http::withHeaders(
-                $header
-            );
-            $new2 = [];
-            if ($_FILES) {
-                $response = $this->fileHandeling($response);
-                $new2 = $this->inputHandeling($req);
-            }
+            $promise = $client->$asyncMethod(
+                $url . $req->getRequestUri(),
+                ['json' => $req->all()]
+            ); // Create an async HTTP POST request
+            // Wait for the promise to complete
+            $promises[] = $promise;
+            $responses = Promise\Utils::settle($promises)->wait();
+            // Process the response
+            $response = $responses[0];
 
-            # Check if the response is valid to return in json format 
-            $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
-
-            if (isset(json_decode($response)->status)) {
-                if (json_decode($response)->status == false) {
-                    return json_decode($response);
-                }
-                return json_decode($response);
+            if ($response['state'] === Promise\PromiseInterface::FULFILLED) {
+                return $responseBody = $response['value']->getBody()->getContents();
+                // Process the response body as needed
             } else {
-                return $response;
+                // Handle failed requests
+                return $errorMessage = $response['reason']->getMessage();
+                // Handle the error message as needed
             }
+
+            // // Converting environmental variables to Services
+            // $baseURLs = Config::get('constants.MICROSERVICES_APIS');
+            // $services = json_decode($baseURLs, true);
+            // // Sending to Microservices
+            // $segments = explode('/', $req->path());
+            // $service = $segments[1];
+            // if (!array_key_exists($service, $services))
+            //     throw new Exception("Service Not Available");
+
+            // $url = $services[$service];
+            // // $bearerToken = (collect(($req->headers->all())['authorization'] ?? "")->first());
+            // $ipAddress = getClientIpAddress();
+            // $method = $req->method();
+
+            // $req = $req->merge([
+            //     'token' => $req->bearerToken(),
+            //     'ipAddress' => $ipAddress
+            // ]);
+            // #======================
+            // $header = [];
+            // foreach ($this->generateDotIndexes(($req->headers->all())) as $key) {
+            //     $val = explode(".", $key)[0] ?? "";
+            //     if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
+            //         continue;
+            //     }
+            //     if (strtolower($val) == "content-type" && preg_match("/multipart/i", $this->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
+
+            //         continue;
+            //     }
+            //     $header[explode(".", $key)[0] ?? ""] = $this->getArrayValueByDotNotation(($req->headers->all()), $key);
+            // }
+            // $response = Http::withHeaders(
+            //     $header
+            // );
+            // $new2 = [];
+            // if ($_FILES) {
+            //     $response = $this->fileHandeling($response);
+            //     $new2 = $this->inputHandeling($req);
+            // }
+
+            // # Check if the response is valid to return in json format 
+            // $response = $response->$method($url . $req->getRequestUri(), ($_FILES ? $new2 : $req->all()));
+
+            // if (isset(json_decode($response)->status)) {
+            //     if (json_decode($response)->status == false) {
+            //         return json_decode($response);
+            //     }
+            //     return json_decode($response);
+            // } else {
+            //     return $response;
+            // }
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
