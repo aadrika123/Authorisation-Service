@@ -41,7 +41,7 @@ class RoleController extends Controller
             //         $data->wfRoleId    = $roleId;
             //         $data->isSuspended = true;
             //         // $roleMapRequest->push($data);
-            //         //Workflow Role Mapping at the time of Role Creation.
+            //         // Workflow Role Mapping at the time of Role Creation.
             //         $mWfWorkflowrolemaps->addRoleMap($data);
             //     }
             // }

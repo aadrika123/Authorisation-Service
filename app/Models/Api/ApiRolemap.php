@@ -16,9 +16,9 @@ class ApiRolemap extends Model
     public function addRoleMap($req)
     {
         $data = new ApiRolemap;
-        $data->api_id       = $req['apiId'];
-        $data->api_role_id  = $req['apiRoleId'];
-        $data->is_suspended = $req['isSuspended'] ?? false;
+        $data->api_id       = $req->apiId;
+        $data->api_role_id  = $req->apiRoleId;
+        $data->is_suspended = $req->isSuspended ?? false;
         $data->save();
     }
 
@@ -28,8 +28,8 @@ class ApiRolemap extends Model
     public function updateRoleMap($req)
     {
         $data = ApiRolemap::find($req->id);
-        // $data->api_id       = $req->apiId ?? $data->api_id;
-        // $data->api_role_id  = $req->apiRoleId ?? $data->api_role_id;
+        $data->api_id       = $req->apiId ?? $data->api_id;
+        $data->api_role_id  = $req->apiRoleId ?? $data->api_role_id;
         $data->is_suspended = $req->isSuspended ?? $data->is_suspended;
         $data->save();
     }
@@ -42,15 +42,14 @@ class ApiRolemap extends Model
         $data = DB::table('api_rolemaps')
             ->select(
                 'api_rolemaps.id',
+                'api_rolemaps.api_id',
                 'api_rolemaps.api_role_id',
                 'api_role_name',
                 'api_masters.description',
                 'api_masters.category',
                 'api_masters.end_point',
                 'api_masters.tags',
-                'api_rolemaps.is_suspended',
-                // 'api_masters.is_suspended',
-                // 'api_masters.is_suspended',
+                'api_rolemaps.is_suspended'
 
             )
             ->leftjoin('api_masters', 'api_masters.id', 'api_rolemaps.api_id')

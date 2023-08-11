@@ -17,20 +17,32 @@ class MenuRoleMapController extends Controller
         try {
             $req->validate([
                 'menuId'     => 'required',
-                'menuRoleId' => 'required'
+                'menuRoleId' => 'required',
+                'isSuspended' => 'nullable|boolean'
+
             ]);
             $mMenuRolemap = new MenuRolemap();
             $checkExisting = $mMenuRolemap->where('menu_id', $req->menuId)
                 ->where('menu_role_id', $req->menuRoleId)
                 ->first();
 
-            if ($checkExisting)
-                throw new Exception('Menu Already Maps to Menu Role');
-            $mreqs = [
-                'menuId'     => $req->menuId,
-                'menuRoleId' => $req->menuRoleId
-            ];
-            $mMenuRolemap->addRoleMap($mreqs);
+            if ($checkExisting) {
+                $req->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $req->isSuspended
+                ]);
+                $mMenuRolemap->updateRoleMap($req);
+            } else {
+                $mMenuRolemap->addRoleMap($req);
+            }
+
+            // if ($checkExisting)
+            //     throw new Exception('Menu Already Maps to Menu Role');
+            // $mreqs = [
+            //     'menuId'     => $req->menuId,
+            //     'menuRoleId' => $req->menuRoleId
+            // ];
+            // $mMenuRolemap->addRoleMap($mreqs);
 
             return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {

@@ -8,6 +8,7 @@ use App\Models\Api\ApiRole;
 use App\Models\Api\ApiRolemap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApiRoleController extends Controller
 {
@@ -28,14 +29,14 @@ class ApiRoleController extends Controller
             $apiRoleId = $apiRole->id;
             $apis = $mApiMaster->listApi();
             // ->get();
-            foreach ($apis as $api) {
-                $data['apiId']       = $api->id;
-                $data['apiRoleId']   = $apiRoleId;
-                $data['isSuspended'] = true;
+            // foreach ($apis as $api) {
+            //     $data['apiId']       = $api->id;
+            //     $data['apiRoleId']   = $apiRoleId;
+            //     $data['isSuspended'] = true;
 
-                //API Role Mapping at the time of Role Creation.
-                $mApiRolemap->addRoleMap($data);
-            }
+            //     //API Role Mapping at the time of Role Creation.
+            //     $mApiRolemap->addRoleMap($data);
+            // }
 
             return responseMsgs(true, "Data Saved!", "", "", "02", "", "POST", "");
         } catch (Exception $e) {
@@ -124,11 +125,29 @@ class ApiRoleController extends Controller
                 'apiRoleId' => 'required'
             ]);
             $mApiRolemap = new ApiRolemap();
-            $apiRole = $mApiRolemap->roleMaps()
-                ->where('api_rolemaps.api_role_id', $req->apiRoleId)
-                ->get();
+            // $apiRole = $mApiRolemap->roleMaps()
+            //     ->where('api_rolemaps.api_role_id', $req->apiRoleId)
+            //     ->get();
 
-            return responseMsg(true, "API Role Map List", $apiRole);
+            $query = "select 
+                            a.id,
+                            a.end_point,
+                            a.description,
+                            a.category,
+                            ar.api_role_id,
+                            case 
+                                when ar.api_role_id is null then true
+                                else
+                                    false
+                            end as is_suspended
+                    
+                        from api_masters as a
+                        left join (select * from api_rolemaps where api_role_id=$req->apiRoleId) as ar on ar.api_id=a.id
+                        order by a.id";
+
+            $data = DB::select($query);
+
+            return responseMsg(true, "API Role Map List", $data);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }

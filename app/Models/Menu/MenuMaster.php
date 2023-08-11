@@ -48,16 +48,32 @@ class MenuMaster extends Model
     /**
      * | Get menu by Role Id
      */
+    // public function getMenuByRole($roleId, $moduleId)
+    // {
+    //     $a = MenuMaster::select(
+    //         'menu_masters.id',
+    //         'menu_masters.parent_id'
+    //     )
+    //         ->join('wf_rolemenus', 'wf_rolemenus.menu_id', '=', 'menu_masters.id')
+    //         ->where('menu_masters.is_deleted', false)
+    //         ->where('wf_rolemenus.status', true)
+    //         ->whereIn('wf_rolemenus.role_id', $roleId)
+    //         ->where('module_id', $moduleId)         //changes by mrinal and sam
+    //         ->orderBy("menu_masters.serial", "Asc")
+    //         ->get();
+    //     return  objToArray($a);
+    // }
+
     public function getMenuByRole($roleId, $moduleId)
     {
         $a = MenuMaster::select(
             'menu_masters.id',
             'menu_masters.parent_id'
         )
-            ->join('wf_rolemenus', 'wf_rolemenus.menu_id', '=', 'menu_masters.id')
+            ->join('menu_rolemaps', 'menu_rolemaps.menu_id', '=', 'menu_masters.id')
             ->where('menu_masters.is_deleted', false)
-            ->where('wf_rolemenus.status', true)
-            ->whereIn('wf_rolemenus.role_id', $roleId)
+            ->where('menu_rolemaps.is_suspended', false)
+            ->whereIn('menu_rolemaps.menu_role_id', $roleId)
             ->where('module_id', $moduleId)         //changes by mrinal and sam
             ->orderBy("menu_masters.serial", "Asc")
             ->get();
