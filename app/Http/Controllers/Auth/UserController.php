@@ -11,6 +11,9 @@ use App\Models\Auth\User;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
 use App\Models\Workflows\WfRoleusermap;
+use App\Pipelines\User\SearchByEmail;
+use App\Pipelines\User\SearchByMobile;
+use App\Pipelines\User\SearchByName;
 use App\Traits\Auth;
 use Carbon\Carbon;
 use Exception;
@@ -19,6 +22,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pipeline\Pipeline;
 
 use function PHPUnit\Framework\throwException;
 
@@ -174,10 +178,23 @@ class UserController extends Controller
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
                 ->where('ulb_id', $ulbId)
-                ->orderByDesc('id')
-                ->paginate($perPage);
+                ->orderBy('id');
 
-            return responseMsgs(true, "User List", $data, "", "01", ".ms", "POST", "");
+            $userList = app(Pipeline::class)
+                ->send(
+                    $data
+                )
+                ->through([
+                    SearchByName::class,
+                    SearchByEmail::class,
+                    SearchByMobile::class
+                ])
+                ->thenReturn()
+                ->paginate($perPage);
+            // ->get();
+            // ->paginate(500);
+
+            return responseMsgs(true, "User List", $userList, "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
         }
@@ -241,11 +258,21 @@ class UserController extends Controller
     {
         try {
             $request->validate(
-                ["id" => 'required']
+                [
+                    'id' => 'required',
+                    'isSuspended' => 'required|boolean'
+                ]
             );
+
             $data = User::find($request->id);
-            $data->suspended = true;
+            $data->suspended = $request->isSuspended;
             $data->save();
+
+            // if($data->suspended = true)
+            // {
+
+            // }
+
             return responseMsgs(true, "Data Deleted", '', "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");

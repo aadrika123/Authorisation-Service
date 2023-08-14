@@ -142,7 +142,7 @@ class ApiRoleController extends Controller
                             end as is_suspended
                     
                         from api_masters as a
-                        left join (select * from api_rolemaps where api_role_id=$req->apiRoleId) as ar on ar.api_id=a.id
+                        left join (select * from api_rolemaps where api_role_id=$req->apiRoleId and is_suspended=false) as ar on ar.api_id=a.id
                         order by a.id";
 
             $data = DB::select($query);

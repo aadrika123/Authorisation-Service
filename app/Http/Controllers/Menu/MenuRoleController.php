@@ -138,6 +138,7 @@ class MenuRoleController extends Controller
                             m.id,
                             m.menu_string,
                             mr.menu_role_id,
+                            module_masters.module_name,
                             case 
                                 when mr.menu_role_id is null then true
                                 else
@@ -145,7 +146,8 @@ class MenuRoleController extends Controller
                             end as is_suspended
                     
                         from menu_masters as m
-                        left join (select * from menu_rolemaps where menu_role_id=$req->menuRoleId) as mr on mr.menu_id=m.id
+                        left join (select * from menu_rolemaps where menu_role_id=$req->menuRoleId and is_suspended = false) as mr on mr.menu_id=m.id
+                        join module_masters on module_masters.id = m.module_id
                         order by m.id";
 
             $data = DB::select($query);

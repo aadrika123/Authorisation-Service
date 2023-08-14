@@ -159,7 +159,7 @@ class MenuRoleUserMapController extends Controller
                             end as permission_status
 
                         from menu_roles as m
-                        left join (select * from menu_roleusermaps where user_id=$req->userId) as mr on mr.menu_role_id=m.id
+                        left join (select * from menu_roleusermaps where user_id=$req->userId and is_suspended=false) as mr on mr.menu_role_id=m.id
                         order by m.id";
 
             $data = DB::select($query);
