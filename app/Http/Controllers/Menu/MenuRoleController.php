@@ -8,6 +8,7 @@ use App\Models\Menu\MenuRole;
 use App\Models\Menu\MenuRolemap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MenuRoleController extends Controller
 {
@@ -28,17 +29,17 @@ class MenuRoleController extends Controller
 
             $menuRoleId = $menuRole->id;
             // if ($request->moduleId) {
-            $menus = $mMenuMaster->fetchAllMenues()
-                // ->where('module_id', $request->moduleId)
-                ->get();
-            foreach ($menus as $menu) {
-                $data['menuId']      = $menu->id;
-                $data['menuRoleId']  = $menuRoleId;
-                $data['isSuspended'] = true;
+            // $menus = $mMenuMaster->fetchAllMenues()
+            //     // ->where('module_id', $request->moduleId)
+            //     ->get();
+            // foreach ($menus as $menu) {
+            //     $data['menuId']      = $menu->id;
+            //     $data['menuRoleId']  = $menuRoleId;
+            //     $data['isSuspended'] = true;
 
-                //Menu Role Mapping at the time of Role Creation.
-                $mMenuRolemap->addRoleMap($data);
-            }
+            //     //Menu Role Mapping at the time of Role Creation.
+            //     $mMenuRolemap->addRoleMap($data);
+            // }
             // }
 
             return responseMsgs(true, "Data Saved!", "", "", "02", "", "POST", "");
@@ -129,11 +130,29 @@ class MenuRoleController extends Controller
                 'menuRoleId' => 'required'
             ]);
             $mMenuRolemap = new MenuRolemap();
-            $menuRole = $mMenuRolemap->roleMaps()
-                ->where('menu_rolemaps.menu_role_id', $req->menuRoleId)
-                ->get();
+            // $menuRole = $mMenuRolemap->roleMaps()
+            //     ->where('menu_rolemaps.menu_role_id', $req->menuRoleId)
+            //     ->get();
 
-            return responseMsg(true, "Menu Role Map List", $menuRole);
+            $query = "select 
+                            m.id,
+                            m.menu_string,
+                            mr.menu_role_id,
+                            module_masters.module_name,
+                            case 
+                                when mr.menu_role_id is null then true
+                                else
+                                    false  
+                            end as is_suspended
+                    
+                        from menu_masters as m
+                        left join (select * from menu_rolemaps where menu_role_id=$req->menuRoleId and is_suspended = false) as mr on mr.menu_id=m.id
+                        join module_masters on module_masters.id = m.module_id
+                        order by m.id";
+
+            $data = DB::select($query);
+
+            return responseMsg(true, "Menu Role Map List", $data);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
