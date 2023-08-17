@@ -63,22 +63,23 @@ class ApiGatewayBll
         $promises = [];
         $asyncMethod = in_array($method, ['POST', 'post']) ? 'postAsync' : 'getAsync';
 
-        if ($req->isJson()) {
-            $promise = $client->$asyncMethod(
-                $url . $req->getRequestUri(),
-                ['json' => $req->all()],
-                [
-                    'headers' => $req->header()                         // Attach all headers
-                ]
-            );
-        } else {
+        if (isset($req->header()['content-type']) && preg_match('/multipart/i', $req->header()["content-type"][0]) && $_FILES) {
             $promise = $client->$asyncMethod($url . $req->getRequestUri(), [                // for Multipart
                 'multipart' => $this->prepareMultipartData($req),
                 [
                     'headers' => $req->header()                         // Attach all headers
                 ]
             ]);
+        } else {
+            $promise = $client->$asyncMethod(
+                $url . $req->getRequestUri(),
+                [
+                    'json' => $req->all(),
+                    'headers' => $req->header()                         // Attach all headers
+                ]
+            );
         }
+
         // Create an async HTTP POST request
         $promises[] = $promise;
         // Wait for the promise to complete
