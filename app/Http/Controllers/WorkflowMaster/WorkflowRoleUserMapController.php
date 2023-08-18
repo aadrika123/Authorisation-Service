@@ -214,11 +214,11 @@ class WorkflowRoleUserMapController extends Controller
                         case 
                             when wr.user_id is null then false
                             else
-                                true  
+                                true
                         end as permission_status
                 
                     from wf_roles as r
-                    left join (select * from wf_roleusermaps where user_id=$req->userId) as wr on wr.wf_role_id=r.id
+                    left join (select * from wf_roleusermaps where user_id=$req->userId and is_suspended=false) as wr on wr.wf_role_id=r.id
                     order by r.id";
 
             $data = DB::select($query);

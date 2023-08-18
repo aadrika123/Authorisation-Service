@@ -157,7 +157,7 @@ class ApiRoleUserMapController extends Controller
                             end as permission_status
                     
                         from api_roles as a
-                        left join (select * from api_roleusermaps where user_id=$req->userId) as ar on ar.api_role_id=a.id
+                        left join (select * from api_roleusermaps where user_id=$req->userId and is_suspended=false) as ar on ar.api_role_id=a.id
                         order by a.id";
 
             $data = DB::select($query);

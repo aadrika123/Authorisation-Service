@@ -18,20 +18,32 @@ class ApiRoleMapController extends Controller
         try {
             $req->validate([
                 'apiId'     => 'required',
-                'apiRoleId' => 'required'
+                'apiRoleId' => 'required',
+                'isSuspended' => 'nullable|boolean'
             ]);
             $mApiRolemap = new ApiRolemap();
             $checkExisting = $mApiRolemap->where('api_id', $req->apiId)
                 ->where('api_role_id', $req->apiRoleId)
                 ->first();
 
-            if ($checkExisting)
-                throw new Exception('Api Already Maps to Api Role');
-            $mreqs = [
-                'apiId'     => $req->apiId,
-                'apiRoleId' => $req->apiRoleId
-            ];
-            $mApiRolemap->addRoleMap($mreqs);
+            if ($checkExisting) {
+                $req->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $req->isSuspended
+                ]);
+                $mApiRolemap->updateRoleMap($req);
+            } else {
+                $mApiRolemap->addRoleMap($req);
+            }
+
+
+            // if ($checkExisting)
+            //     throw new Exception('Api Already Maps to Api Role');
+            // $mreqs = [
+            //     'apiId'     => $req->apiId,
+            //     'apiRoleId' => $req->apiRoleId
+            // ];
+            // $mApiRolemap->addRoleMap($mreqs);
 
             return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {

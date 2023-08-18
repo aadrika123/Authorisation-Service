@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Menu;
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
 use App\Models\Menu\MenuMaster;
+use App\Models\Menu\MenuRoleusermap;
 use App\Models\ModuleMaster;
 use App\Models\Workflows\WfRoleusermap;
 use Exception;
@@ -150,6 +151,53 @@ class MenuController extends Controller
     /**
      * | Get Menu by module 
      */
+    // public function getMenuByModuleId(Request $request)
+    // {
+    //     $validated = Validator::make(
+    //         $request->all(),
+    //         ['moduleId' => 'required']
+    //     );
+    //     if ($validated->fails()) {
+    //         return validationError($validated);
+    //     }
+    //     try {
+    //         $user = authUser();
+    //         $userId = $user->id;
+    //         $mWfRoleUserMap = new WfRoleusermap();
+    //         $ulbId = $user->ulb_id;
+
+    //         $ulbName =  User::select('ulb_name')
+    //             ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+    //             ->where('ulb_id', $ulbId)
+    //             ->where('users.id', $userId)
+    //             ->first();
+
+    //         $wfRole = $mWfRoleUserMap->getRoleDetailsByUserId($userId);
+    //         $roleId = $wfRole->pluck('roleId');
+
+    //         $mreqs = new Request([
+    //             'roleId' => $roleId,
+    //             'moduleId' => $request->moduleId
+    //         ]);
+
+    //         $treeStructure = $this->generateMenuTree($mreqs);
+    //         $menu = collect($treeStructure)['original']['data'];
+
+    //         $menuPermission['permission'] = $menu;
+    //         $menuPermission['userDetails'] = [
+    //             'userName' => $user->name,
+    //             'ulb'      => $ulbName->ulb_name ?? 'No Ulb Assigned',
+    //             'mobileNo' => $user->mobile,
+    //             'email'    => $user->email,
+    //             'imageUrl' => $user->photo_relative_path . '/' . $user->photo,
+    //             'roles' => $wfRole->pluck('roles')                            # use in case of if the user has multiple roles
+    //         ];
+    //         return responseMsgs(true, "Parent Menu!", $menuPermission, "", "", "", "POST", "");
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+    //     }
+    // }
+
     public function getMenuByModuleId(Request $request)
     {
         $validated = Validator::make(
@@ -163,6 +211,7 @@ class MenuController extends Controller
             $user = authUser();
             $userId = $user->id;
             $mWfRoleUserMap = new WfRoleusermap();
+            $mMenuRoleusermap = new MenuRoleusermap();
             $ulbId = $user->ulb_id;
 
             $ulbName =  User::select('ulb_name')
@@ -172,7 +221,13 @@ class MenuController extends Controller
                 ->first();
 
             $wfRole = $mWfRoleUserMap->getRoleDetailsByUserId($userId);
-            $roleId = $wfRole->pluck('roleId');
+            // $roleId = $wfRole->pluck('roleId');
+
+            $menuRole = $mMenuRoleusermap->getRoleByUserId()
+                ->where('menu_roleusermaps.user_id', $userId)
+                ->get();
+
+            $roleId = $menuRole->pluck('menu_role_id');
 
             $mreqs = new Request([
                 'roleId' => $roleId,
