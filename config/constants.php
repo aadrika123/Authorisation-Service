@@ -6,8 +6,9 @@
  * | Created for - Symbolic Constants Used On various Functions and classes
  */
 return [
-    "MICROSERVICES_APIS" => env('MICROSERVICES_APIS'),
+    "MICROSERVICES_APIS"   => env('MICROSERVICES_APIS'),
     "CUSTOM_RELATIVE_PATH" => "Uploads/Custom",
+    "DOC_URL"              => env('DOC_URL'),
 
     #_Module Constants
     "PROPERTY_MODULE_ID"      => 1,
@@ -15,6 +16,7 @@ return [
     "TRADE_MODULE_ID"         => 3,
     "SWM_MODULE_ID"           => 4,
     "ADVERTISEMENT_MODULE_ID" => 5,
+    "WATER_TANKER_MODULE_ID"  => 11,
 
 
     "USER_TYPE" => [
@@ -25,6 +27,5 @@ return [
         "TL",
         "Pseudo User",
     ],
-    "WATER_TANKER_MODULE_ID" => 11,
 
 ];

@@ -79,6 +79,10 @@ Route::controller(WorkflowMapController::class)->group(function () {
     Route::post('workflow/v2/crud/ward-by-ulb', 'getWardByUlb');        #_Ward Without Login
 });
 
+Route::controller(ThirdPartyController::class)->group(function () {
+    Route::post('user/send-otp', 'sendOtp');
+    Route::post('user/verify-otp', "verifyOtp");
+});
 
 /**
  * | Protected Routes
@@ -405,10 +409,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
     });
 
-    Route::controller(ThirdPartyController::class)->group(function () {
-        Route::post('user/send-otp', 'sendOtp');
-        Route::post('user/verify-otp', "verifyOtp");
-    });
+
 
     /**
      * | for custom details

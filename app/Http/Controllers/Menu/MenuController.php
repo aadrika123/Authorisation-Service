@@ -10,6 +10,7 @@ use App\Models\ModuleMaster;
 use App\Models\Workflows\WfRoleusermap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
 class MenuController extends Controller
@@ -258,16 +259,17 @@ class MenuController extends Controller
      */
     public function generateMenuTree($request)
     {
+        $docUrl = Config::get('constants.DOC_URL');
         $mMenuMaster = new MenuMaster();
         $mMenues = $mMenuMaster->fetchAllMenues()
             ->get();
 
-        $data = collect($mMenues)->map(function ($value, $key) {
+        $data = collect($mMenues)->map(function ($value, $key) use ($docUrl) {
             $return = array();
             $return['id']       = $value['id'];
             $return['parentId'] = $value['parent_id'];
             $return['path']     = $value['route'];
-            $return['icon']     = config('app.url') . '/' . $value['icon'];
+            $return['icon']     = $docUrl . '/' . $value['icon'];
             $return['name']     = $value['menu_string'];
             $return['order']    = $value['serial'];
             $return['children'] = array();
