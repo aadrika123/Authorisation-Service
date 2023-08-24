@@ -75,13 +75,10 @@ class ApiGatewayBll
                 $url . $req->getRequestUri(),
                 [
                     'json' => $req->all(),
-                    'headers' => $req->header()                         // Attach all headers
+                    // 'headers' => $req->header()                         // Attach all headers
                 ]
             );
         }
-
-        return $promise;
-
         // Create an async HTTP POST request
         $promises[] = $promise;
         // Wait for the promise to complete
