@@ -48,8 +48,6 @@ class ApiGatewayBll
             'ipAddress' => $ipAddress
         ];
 
-        return $req->authRequired;
-
         if ($req->authRequired) {                           // Auth Required fields
             $authFields = array_merge([
                 'auth' => authUser(),
@@ -58,6 +56,8 @@ class ApiGatewayBll
                 'apiToken' => $req->user()->currentAccessToken()->token
             ]);
         }
+
+        return $authFields;
 
         $req = $req->merge($authFields);                    // Merging authenticated fields
 
