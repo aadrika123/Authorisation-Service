@@ -57,11 +57,7 @@ class ApiGatewayBll
             ]);
         }
 
-        // return $authFields;
-
         $req = $req->merge($authFields);                    // Merging authenticated fields
-
-        return $req;
 
         $method = $req->method();
         $promises = [];
@@ -83,6 +79,8 @@ class ApiGatewayBll
                 ]
             );
         }
+
+        return $promise;
 
         // Create an async HTTP POST request
         $promises[] = $promise;
