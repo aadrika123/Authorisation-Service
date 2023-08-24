@@ -75,7 +75,9 @@ class ApiGatewayBll
                 $url . $req->getRequestUri(),
                 [
                     'json' => $req->all(),
-                    // 'headers' => $req->header()                         // Attach all headers
+                    [
+                        'headers' => $req->header()                         // Attach all headers
+                    ]
                 ]
             );
         }
