@@ -48,7 +48,7 @@ class ApiGatewayBll
             'ipAddress' => $ipAddress
         ];
 
-        return $authFields;
+        return $req->authRequired;
 
         if ($req->authRequired) {                           // Auth Required fields
             $authFields = array_merge([
