@@ -57,9 +57,11 @@ class ApiGatewayBll
             ]);
         }
 
-        return $authFields;
+        // return $authFields;
 
         $req = $req->merge($authFields);                    // Merging authenticated fields
+
+        return $req;
 
         $method = $req->method();
         $promises = [];
