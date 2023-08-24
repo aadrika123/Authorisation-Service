@@ -20,7 +20,6 @@ class ApiGatewayController extends Controller
 
     public function apiGatewayService(Request $req)
     {
-        return $req->all();
         try {
             $req->merge(['authRequired' => true]);
             $apiGatewayBll = new ApiGatewayBll;
