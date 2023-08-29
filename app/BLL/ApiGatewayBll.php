@@ -89,12 +89,13 @@ class ApiGatewayBll
         $response = $responses[0];
 
         // return ($req['auth']);
-        if ($response['state'] === Promise\PromiseInterface::FULFILLED)
+        if ($response['state'] === Promise\PromiseInterface::FULFILLED) {
             $apiResponse = $response['value']->getBody()->getContents();    // Process the response body as needed
-        else
+            return json_decode($apiResponse, true);
+        } else {
             $apiResponse = $response['reason']->getMessage();            // Handle the error message as needed
-
-        return json_decode($apiResponse, true);
+            return $apiResponse;
+        }
     }
 
 
