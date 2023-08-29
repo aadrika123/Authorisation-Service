@@ -15,7 +15,7 @@ class ApiGatewayController extends Controller
      * | Author-Anshu Kumar
      * | Created On-11-08-2023 
      * | Created for the un authenticated apis
-     * | Status-Closed
+     * | Status - Closed
      */
 
     public function apiGatewayService(Request $req)
