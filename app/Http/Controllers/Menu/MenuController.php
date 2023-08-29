@@ -47,7 +47,8 @@ class MenuController extends Controller
                 'serial'       => 'nullable|int',
                 'parentSerial' => 'nullable|int',
                 'route'        => 'nullable',
-                'delete'       => 'nullable|boolean'
+                'delete'       => 'nullable|boolean',
+                'workflowId'   => 'nullable|int',
             ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->edit($request);
