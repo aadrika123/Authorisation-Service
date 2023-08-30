@@ -69,7 +69,7 @@ class CitizenController extends Controller
                 'relative_path' => $imageRelativePath . '/',
             ]);
 
-        if ($request->photo) {
+        if ($request->photo != "null" ?? null) {
             $filename = 'photo';
             $document = $request->photo;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
@@ -80,7 +80,7 @@ class CitizenController extends Controller
                 ]);
         }
 
-        if ($request->aadharDoc) {
+        if ($request->aadharDoc != "null" ?? null) {
             $filename = 'aadharDoc';
             $document = $request->aadharDoc;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
