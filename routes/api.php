@@ -43,6 +43,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/**
+ * | Landing Page API
+ */
+Route::controller(LandingPageController::class)->group(function () {
+    Route::post('landing-page/list-scheme-type', 'getListSchemeType');
+    Route::post('landing-page/add-scheme', 'addScheme');
+    Route::post('landing-page/list-all-scheme', 'listAllScheme');
+    Route::post('landing-page/delete-scheme', 'deleteScheme');
+    Route::post('landing-page/edit-scheme', 'editScheme');
+    Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme');
+});
+
 Route::get('me', 'AuthController@me')->middleware('log.route');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -85,17 +97,6 @@ Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/verify-otp', "verifyOtp");
 });
 
-/**
- * | Landing Page API
- */
-Route::controller(LandingPageController::class)->group(function () {
-    Route::post('landing-page/list-scheme-type', 'getListSchemeType');
-    Route::post('landing-page/add-scheme', 'addScheme');
-    Route::post('landing-page/list-all-scheme', 'listAllScheme');
-    Route::post('landing-page/delete-scheme', 'deleteScheme');
-    Route::post('landing-page/edit-scheme', 'editScheme');
-    Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme');
-});
 /**
  * | Protected Routes
  * | Module Id = 12 
