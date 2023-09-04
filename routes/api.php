@@ -47,12 +47,12 @@ use Illuminate\Support\Facades\Route;
  * | Landing Page API
  */
 Route::controller(LandingPageController::class)->group(function () {
-    Route::post('landing-page/list-scheme-type', 'getListSchemeType')->withoutMiddleware('auth:sanctum');
-    Route::post('landing-page/add-scheme', 'addScheme')->withoutMiddleware('auth:sanctum');
-    Route::post('landing-page/list-all-scheme', 'listAllScheme')->withoutMiddleware('auth:sanctum');
-    Route::post('landing-page/delete-scheme', 'deleteScheme')->withoutMiddleware('auth:sanctum');
-    Route::post('landing-page/edit-scheme', 'editScheme')->withoutMiddleware('auth:sanctum');
-    Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme')->withoutMiddleware('auth:sanctum');
+    Route::post('landing-page/list-scheme-type', 'getListSchemeType');
+    Route::post('landing-page/add-scheme', 'addScheme');
+    Route::post('landing-page/list-all-scheme', 'listAllScheme');
+    Route::post('landing-page/delete-scheme', 'deleteScheme');
+    Route::post('landing-page/edit-scheme', 'editScheme');
+    Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme');
 });
 
 Route::get('me', 'AuthController@me')->middleware('log.route');
