@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\CustomController;
 use App\Http\Controllers\Faq\FaqController;
+use App\Http\Controllers\Landingpage\LandingPageController;
 use App\Http\Controllers\Menu\MenuController;
 use App\Http\Controllers\Menu\MenuRoleController;
 use App\Http\Controllers\Menu\MenuRoleMapController;
@@ -41,6 +42,18 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+/**
+ * | Landing Page API
+ */
+Route::controller(LandingPageController::class)->group(function () {
+    Route::post('landing-page/list-scheme-type', 'getListSchemeType');
+    Route::post('landing-page/add-scheme', 'addScheme');
+    Route::post('landing-page/list-all-scheme', 'listAllScheme');
+    Route::post('landing-page/delete-scheme', 'deleteScheme');
+    Route::post('landing-page/edit-scheme', 'editScheme');
+    Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme');
+});
 
 Route::get('me', 'AuthController@me')->middleware('log.route');
 
