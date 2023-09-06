@@ -20,6 +20,13 @@ class ModuleMaster extends Model
             ->orderby('id')
             ->get();
     }
+    public function moduleListv2()
+    {
+        return ModuleMaster::where('is_suspended', false)
+            ->can_view('can_view',true)
+            ->orderby('id')
+            ->get();
+    }
 
     public function duesApi()
     {
