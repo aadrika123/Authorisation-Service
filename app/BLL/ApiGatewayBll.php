@@ -53,7 +53,8 @@ class ApiGatewayBll
                 'auth' => authUser(),
                 'token' => $req->bearerToken(),
                 'currentAccessToken' => $req->user()->currentAccessToken(),
-                'apiToken' => $req->user()->currentAccessToken()->token
+                'apiToken' => $req->user()->currentAccessToken()->token,
+                'ipAddress' => $ipAddress
             ]);
         }
 
