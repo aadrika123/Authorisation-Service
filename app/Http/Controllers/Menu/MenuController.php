@@ -138,6 +138,22 @@ class MenuController extends Controller
         }
     }
 
+
+    /**
+     * | Module List 
+        | V2
+     */
+    public function moduleListV2(Request $request)
+    {
+        try {
+            $mModuleMaster = new ModuleMaster();
+            $data = $mModuleMaster->moduleListv2();
+            return responseMsgs(true, "List of Module!", $data, "", "02", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+        }
+    }
+
     public function listParentSerial()
     {
         try {

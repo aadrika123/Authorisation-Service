@@ -419,14 +419,15 @@ class UserController extends Controller
         $userId = $user->id;
         $ulbId = $user->ulb_id;
         $userType = $user->user_type;
-        $mMirrorUserNotification = new MirrorUserNotification();
+        // $mMirrorUserNotification = new MirrorUserNotification();
+        $mUserNotification = new UserNotification();
         if ($userType == 'Citizen') {
-            $data = $mMirrorUserNotification->notificationByUserId()
+            $data = $mUserNotification->notificationByUserId()
                 ->where('citizen_id', $userId)
                 ->get();
             $notification = collect($data)->groupBy('category');
         } else
-            $notification =  $mMirrorUserNotification->notificationByUserId($userId)
+            $notification =  $mUserNotification->notificationByUserId($userId)
                 ->where('user_id', $userId)
                 ->where('ulb_id', $ulbId)
                 ->get();

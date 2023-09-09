@@ -22,21 +22,24 @@ class CitizenController extends Controller
      */
     public function citizenRegister(Request $request)
     {
-        $request->validate([
-            'name'     => 'required',
-            'mobile'   => 'required|numeric|digits:10',
-            'password' => [
-                'required',
-                'min:6',
-                'max:255',
-                'regex:/[a-z]/',      // must contain at least one lowercase letter
-                'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                'regex:/[0-9]/',      // must contain at least one digit
-                'regex:/[@$!%*#?&]/'  // must contain a special character
-            ],
-        ]);
-
         try {
+            $request->validate([
+                'name'     => 'required',
+                'mobile'   => 'required|numeric|digits:10',             
+                "photo"=>"required|mimes:jpeg,png,jpgf",
+                "aadharDoc"=>"nullable|mimes:pdf,jpeg,png,jpg",
+                "speciallyAbledDoc"=> ($request->isSpeciallyAbled ? "required" : "nullable")."|mimes:pdf,jpeg,png,jpg",
+                "armedForceDoc"=> ($request->armedForceDoc ? "required" : "nullable")."|mimes:pdf,jpeg,png,jpg"    ,
+                'password' => [
+                    'required',
+                    'min:6',
+                    'max:255',
+                    'regex:/[a-z]/',      // must contain at least one lowercase letter
+                    'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                    'regex:/[0-9]/',      // must contain at least one digit
+                    'regex:/[@$!%*#?&]/'  // must contain a special character
+                ],       
+            ]);
 
             DB::beginTransaction();
             $mCitizen = new ActiveCitizen();
@@ -52,8 +55,8 @@ class CitizenController extends Controller
 
             return responseMsg(true, "Succesfully Registered", "");
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
             DB::rollBack();
+            return responseMsg(false, $e->getMessage(), "");
         }
     }
 
@@ -69,7 +72,7 @@ class CitizenController extends Controller
                 'relative_path' => $imageRelativePath . '/',
             ]);
 
-        if ($request->photo) {
+        if ($request->photo != "null" ?? null) {
             $filename = 'photo';
             $document = $request->photo;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
@@ -80,7 +83,7 @@ class CitizenController extends Controller
                 ]);
         }
 
-        if ($request->aadharDoc) {
+        if ($request->aadharDoc != "null" ?? null) {
             $filename = 'aadharDoc';
             $document = $request->aadharDoc;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
