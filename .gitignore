@@ -18,6 +18,7 @@ yarn-error.log
 /.idea
 /.vscode
 
+public/Uploads/
 public/Uploads/User
 public/Uploads/Custom
 public/Uploads/Icon
