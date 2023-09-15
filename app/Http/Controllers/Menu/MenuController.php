@@ -148,6 +148,7 @@ class MenuController extends Controller
         try {
             $mModuleMaster = new ModuleMaster();
             $data = $mModuleMaster->moduleListv2();
+
             return responseMsgs(true, "List of Module!", $data, "", "02", "", "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
