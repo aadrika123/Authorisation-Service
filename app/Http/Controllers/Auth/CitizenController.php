@@ -25,11 +25,11 @@ class CitizenController extends Controller
         try {
             $request->validate([
                 'name'     => 'required',
-                'mobile'   => 'required|numeric|digits:10',             
-                "photo"=>"required|mimes:jpeg,png,jpgf",
-                "aadharDoc"=>"nullable|mimes:pdf,jpeg,png,jpg",
-                "speciallyAbledDoc"=> ($request->isSpeciallyAbled ? "required" : "nullable")."|mimes:pdf,jpeg,png,jpg",
-                "armedForceDoc"=> ($request->armedForceDoc ? "required" : "nullable")."|mimes:pdf,jpeg,png,jpg"    ,
+                'mobile'   => 'required|numeric|digits:10',
+                "photo" => "required|mimes:jpeg,png,jpgf",
+                "aadharDoc" => "nullable|mimes:pdf,jpeg,png,jpg",
+                "speciallyAbledDoc" => ($request->isSpeciallyAbled ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
+                "armedForceDoc" => ($request->armedForceDoc ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
                 'password' => [
                     'required',
                     'min:6',
@@ -38,7 +38,7 @@ class CitizenController extends Controller
                     'regex:/[A-Z]/',      // must contain at least one uppercase letter
                     'regex:/[0-9]/',      // must contain at least one digit
                     'regex:/[@$!%*#?&]/'  // must contain a special character
-                ],       
+                ],
             ]);
 
             DB::beginTransaction();
@@ -83,7 +83,7 @@ class CitizenController extends Controller
                 ]);
         }
 
-        if ($request->aadharDoc != "null" ?? null) {
+        if (isset($request->aadharDoc) != "null" ?? null) {
             $filename = 'aadharDoc';
             $document = $request->aadharDoc;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
