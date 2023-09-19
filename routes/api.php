@@ -190,6 +190,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/menu/get', 'getMenuById');
         Route::post('user-managment/v1/crud/menu/list', 'menuList');
         Route::post('user-managment/v1/crud/module/list', 'moduleList')->withoutMiddleware('auth:sanctum');
+        Route::post('user-managment/v2/crud/module/list', 'moduleListV2')->withoutMiddleware('auth:sanctum');
         Route::post('user-managment/v1/crud/menu/list-parent-serial', 'listParentSerial');
 
         Route::post('menu-roles/update-menu-by-role', 'updateMenuByRole');
