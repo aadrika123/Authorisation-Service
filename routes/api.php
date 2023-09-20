@@ -472,7 +472,7 @@ Route::middleware(['apiPermission'])->group(function () {
         # Grievance UnAuth Api
         Route::post("grievance/auth/req-otp", "unAuthApis");
         Route::post("grievance/auth/verify-otp", "unAuthApis");
-        Route::post("grievance/register-grievance", "unAuthApis");
+        // Route::post("grievance/register-grievance", "unAuthApis");
         Route::post("grievance/auth/get-grievance", "unAuthApis");
 
         # Pet registration
