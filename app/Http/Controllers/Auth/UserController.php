@@ -433,9 +433,9 @@ class UserController extends Controller
                 ->get();
 
         if (collect($notification)->isEmpty())
-            return responseMsgs(true, "No Current Notification", '', "010108", "1.0", "", "POST", "");
+            return responseMsgs(true, "No Current Notification", [], "010108", "1.0", responseTime(), "POST", "");
 
-        return responseMsgs(true, "Your Notificationn", remove_null($notification), "010108", "1.0", "", "POST", "");
+        return responseMsgs(true, "Your Notificationn", remove_null($notification), "010108", "1.0", responseTime(), "POST", "");
     }
 
     /**
