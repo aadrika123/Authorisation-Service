@@ -479,7 +479,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("pet/get-master-data", "unAuthApis");
 
         # Water Tanker UnAuth Api
-        Route::match(["get", 'post'], "water-tanker/get-payment-details-by-pay-id/{tranId}", "unAuthApis");
+        Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
     });
 });
 
