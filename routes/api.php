@@ -481,7 +481,7 @@ Route::middleware(['apiPermission'])->group(function () {
         # Water Tanker UnAuth Api
         Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
         # Septic Tank UnAuth Api
-        Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
+        Route::match(["get", 'post'], "septic-tanker/get-septic-tanker-reciept/{tranId}", "unAuthApis");
     });
 });
 
