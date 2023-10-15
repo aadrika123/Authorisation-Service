@@ -142,7 +142,7 @@ class WardUserController extends Controller
             'wardId' => 'nullable',
         ]);
         try {
-            $ulbId =  authUser()->ulb_id;
+            $ulbId = $req->ulbId ?? authUser()->ulb_id;
             $TC = ['TC', 'TL'];
 
             $data = User::select(

@@ -473,11 +473,16 @@ Route::middleware(['apiPermission'])->group(function () {
         # Grievance UnAuth Api
         Route::post("grievance/auth/req-otp", "unAuthApis");
         Route::post("grievance/auth/verify-otp", "unAuthApis");
-        Route::post("grievance/register-grievance", "unAuthApis");
+        // Route::post("grievance/register-grievance", "unAuthApis");
         Route::post("grievance/auth/get-grievance", "unAuthApis");
 
         # Pet registration
         Route::post("pet/get-master-data", "unAuthApis");
+
+        # Water Tanker UnAuth Api
+        Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
+        # Septic Tank UnAuth Api
+        Route::match(["get", 'post'], "septic-tanker/get-septic-tanker-reciept/{tranId}", "unAuthApis");
     });
 });
 
