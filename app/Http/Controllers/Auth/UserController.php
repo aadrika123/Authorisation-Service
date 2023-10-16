@@ -191,8 +191,6 @@ class UserController extends Controller
                 ])
                 ->thenReturn()
                 ->paginate($perPage);
-            // ->get();
-            // ->paginate(500);
 
             return responseMsgs(true, "User List", $userList, "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
