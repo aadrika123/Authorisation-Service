@@ -188,6 +188,7 @@ trait Workflow
         )
             ->join('wf_workflowrolemaps', 'wf_workflowrolemaps.wf_role_id', 'wf_roleusermaps.wf_role_id')
             ->where('user_id', $userId)
+            ->where('wf_roleusermaps.is_suspended', false)
             ->where('wf_workflowrolemaps.workflow_id', $request->workflowId)
             ->first();
         // dd(DB::getQueryLog());

@@ -417,6 +417,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('add-user-notification', 'addNotification');
         Route::post('delete-user-notification', 'deactivateNotification');
         Route::post('hash-password', 'hashPassword');
+        Route::post('user/password-reset', 'resetPassword');
     });
 
     // Citizen Register
