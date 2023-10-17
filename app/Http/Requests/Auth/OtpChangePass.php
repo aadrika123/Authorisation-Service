@@ -39,8 +39,19 @@ class OtpChangePass extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    // protected function failedValidation(Validator $validator)
+    // {
+    //     throw new HttpResponseException(response()->json($validator->errors(), 422));
+    // }
+     /**
+     * | Error Message
+     */
+    public function failedValidation(Validator $validator)
     {
-        throw new HttpResponseException(response()->json($validator->errors(), 422));
+        throw new HttpResponseException(response()->json([
+            'success'   => false,
+            'message'   => 'Validation errors',
+            'data'      => $validator->errors()
+        ], 422),);
     }
 }
