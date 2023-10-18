@@ -483,6 +483,10 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
         # Septic Tank UnAuth Api
         Route::match(["get", 'post'], "septic-tanker/get-septic-tanker-reciept/{tranId}", "unAuthApis");
+        # Advertisement UnAuth Api
+        Route::match(["get", 'post'], "advert/get-payment-reciept/{tranId}/{workflowId}", "unAuthApis");
+        # Juidco Dashboard UnAuth Api
+        Route::match(["get", 'post'], "property/reports/mpl", "unAuthApis");
     });
 });
 
