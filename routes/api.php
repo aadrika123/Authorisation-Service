@@ -365,6 +365,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
         Route::post('list-ulb-by-district', 'districtWiseUlb');
         Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
+        Route::post('v2/get-newward-by-oldward', 'getNewWardByOldWard')->withoutMiddleware('auth:sanctum');
     });
 
     /**
@@ -487,6 +488,11 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "advert/get-payment-reciept/{tranId}/{workflowId}", "unAuthApis");
         # Juidco Dashboard UnAuth Api
         Route::match(["get", 'post'], "property/reports/mpl", "unAuthApis");
+        # Property UnAuth Api
+        Route::match(["get", 'post'], "property/saf/master-saf", "unAuthApis");
+        Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
+        Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
+        // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
     });
 });
 

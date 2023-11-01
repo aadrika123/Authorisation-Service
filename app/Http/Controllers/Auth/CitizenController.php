@@ -26,7 +26,7 @@ class CitizenController extends Controller
             $request->validate([
                 'name'     => 'required',
                 'mobile'   => 'required|numeric|digits:10',
-                "photo" => "required|mimes:jpeg,png,jpgf",
+                "photo"    => "nullable|mimes:jpeg,png,jpg",
                 "aadharDoc" => "nullable|mimes:pdf,jpeg,png,jpg",
                 "speciallyAbledDoc" => ($request->isSpeciallyAbled ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
                 "armedForceDoc" => ($request->armedForceDoc ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
@@ -72,7 +72,7 @@ class CitizenController extends Controller
                 'relative_path' => $imageRelativePath . '/',
             ]);
 
-        if ($request->photo != "null" ?? null) {
+        if ($request->photo) {
             $filename = 'photo';
             $document = $request->photo;
             $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
@@ -83,38 +83,38 @@ class CitizenController extends Controller
                 ]);
         }
 
-        if (isset($request->aadharDoc) != "null" ?? null) {
-            $filename = 'aadharDoc';
-            $document = $request->aadharDoc;
-            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+        // if ($request->aadharDoc) {
+        //     $filename = 'aadharDoc';
+        //     $document = $request->aadharDoc;
+        //     $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
 
-            ActiveCitizen::where('id', $id)
-                ->update([
-                    'aadhar_doc' => $imageName,
-                ]);
-        }
+        //     ActiveCitizen::where('id', $id)
+        //         ->update([
+        //             'aadhar_doc' => $imageName,
+        //         ]);
+        // }
 
-        if ($request->speciallyAbledDoc) {
-            $filename = 'speciallyAbled';
-            $document = $request->speciallyAbledDoc;
-            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+        // if ($request->speciallyAbledDoc) {
+        //     $filename = 'speciallyAbled';
+        //     $document = $request->speciallyAbledDoc;
+        //     $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
 
-            ActiveCitizen::where('id', $id)
-                ->update([
-                    'specially_abled_doc' => $imageName,
-                ]);
-        }
+        //     ActiveCitizen::where('id', $id)
+        //         ->update([
+        //             'specially_abled_doc' => $imageName,
+        //         ]);
+        // }
 
-        if ($request->armedForceDoc) {
-            $filename = 'armedForce';
-            $document = $request->armedForceDoc;
-            $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
+        // if ($request->armedForceDoc) {
+        //     $filename = 'armedForce';
+        //     $document = $request->armedForceDoc;
+        //     $imageName = $docUpload->upload($filename, $document, $imageRelativePath);
 
-            ActiveCitizen::where('id', $id)
-                ->update([
-                    'armed_force_doc' => $imageName,
-                ]);
-        }
+        //     ActiveCitizen::where('id', $id)
+        //         ->update([
+        //             'armed_force_doc' => $imageName,
+        //         ]);
+        // }
     }
 
     /**
