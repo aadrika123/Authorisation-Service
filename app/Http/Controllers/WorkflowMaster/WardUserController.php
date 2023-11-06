@@ -150,6 +150,7 @@ class WardUserController extends Controller
                 'name as user_name',
                 'user_type',
             )
+                ->where('users.suspended', false)
                 ->where('ulb_id', $ulbId)
                 ->whereIN('user_type', $TC)
                 ->get();
@@ -161,6 +162,7 @@ class WardUserController extends Controller
                     'user_type',
                 )
                     ->join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
+                    ->where('users.suspended', false)
                     ->where('ulb_id', $ulbId)
                     ->where('ward_id', $req->wardId)
                     ->whereIN('user_type', $TC)
