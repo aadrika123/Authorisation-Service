@@ -489,7 +489,7 @@ Route::middleware(['apiPermission'])->group(function () {
         # Juidco Dashboard UnAuth Api
         Route::match(["get", 'post'], "property/reports/mpl", "unAuthApis");
         # Property UnAuth Api
-        Route::match(["get", 'post'], "property/saf/master-saf", "unAuthApis");
+        Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
         // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
