@@ -10,6 +10,7 @@ use App\Http\Controllers\ApiUnauthController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\CustomController;
+use App\Http\Controllers\EpramaanController;
 use App\Http\Controllers\Faq\FaqController;
 use App\Http\Controllers\Landingpage\LandingPageController;
 use App\Http\Controllers\Menu\MenuController;
@@ -95,6 +96,14 @@ Route::controller(WorkflowMapController::class)->group(function () {
 Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/send-otp', 'sendOtp');
     Route::post('user/verify-otp', "verifyOtp");
+});
+
+
+/**
+ * | E-Pramaan
+ */
+Route::controller(EpramaanController::class)->group(function () {
+    Route::post('e-pramaan/login', 'loginEpramaan');
 });
 
 /**
