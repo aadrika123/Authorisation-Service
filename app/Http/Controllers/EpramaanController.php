@@ -41,8 +41,8 @@ class EpramaanController extends Controller
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
         $scope = 'openid';
-        // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
-        $redirect_uri = 'http://192.168.0.159:3003/citizen/login/e-pramaan';
+        $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
+        // $redirect_uri = 'http://192.168.0.159:3003/citizen/login/e-pramaan';
         $response_type = 'code';
         $code_challenge_method = 'S256';
         $serviceId = '100001031';
