@@ -80,7 +80,6 @@ class EpramaanController extends Controller
         $apiHmac = base64_encode($apiHmac);
         $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
 
-        return $finalUrl;
         return responseMsgs(true, "Success", $finalUrl, "", "01", responseTime(), "POST", "");
     }
 
