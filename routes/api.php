@@ -104,6 +104,7 @@ Route::controller(ThirdPartyController::class)->group(function () {
  */
 Route::controller(EpramaanController::class)->group(function () {
     Route::post('e-pramaan/login', 'loginEpramaan');
+    Route::post('e-pramaan/dashboard', 'dashboardEpramaan');
 });
 
 /**

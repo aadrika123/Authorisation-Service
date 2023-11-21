@@ -34,14 +34,14 @@ class EpramaanController extends Controller
 {
 
     /**
-     * 
+     * | Login with e-pramaan
      */
     public function loginEpramaan()
     {
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
         $scope = 'openid';
-        $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/landingDashboard';
+        $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do';
         $response_type = 'code';
         $code_challenge_method = 'S256';
         $serviceId = '100001031';
@@ -79,5 +79,12 @@ class EpramaanController extends Controller
         $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
 
         return responseMsgs(true, "Success", $finalUrl, "", "01", responseTime(), "POST", "");
+    }
+
+    /**
+     * | Dashboard
+     */
+    public function FunctionName(): z
+    {
     }
 }
