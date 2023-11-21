@@ -42,10 +42,11 @@ class EpramaanController extends Controller
         setcookie("nonce_c", "", time() - 3600, "/");
         $scope = 'openid';
         $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
-        // $redirect_uri = 'http://192.168.0.159:3003/citizen/login/e-pramaan';
+        // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
         $response_type = 'code';
         $code_challenge_method = 'S256';
-        $serviceId = '100001031';
+        // $serviceId = '100001031';100001033
+        $serviceId = '100001033';
         $aeskey = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';
         $request_uri = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
         $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
@@ -79,13 +80,14 @@ class EpramaanController extends Controller
         $apiHmac = base64_encode($apiHmac);
         $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
 
+        return $finalUrl;
         return responseMsgs(true, "Success", $finalUrl, "", "01", responseTime(), "POST", "");
     }
 
     /**
      * | Dashboard
      */
-    public function FunctionName(): z
+    public function FunctionName()
     {
     }
 }
