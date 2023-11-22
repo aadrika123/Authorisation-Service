@@ -25,6 +25,7 @@ use Jose\Component\Encryption\JWELoader;
 use Jose\Component\Signature\Algorithm\RS256;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Jose\Component\Signature\Serializer\CompactSerializer as SignatureCompactSerializer;
 use Jose\Component\Signature\Algorithm\HS256;
 use Jose\Component\Signature\JWSLoader;
 use Jose\Component\KeyManagement\JWKFactory;
@@ -108,7 +109,7 @@ class EpramaanController extends Controller
                 //CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_SSL_VERIFYPEER => 0,
-                CURLOPT_CUSTOMREQUEST  => 'POST',
+                CURLOPT_CUSTOMREQUEST  => 'GET',
                 CURLOPT_POSTFIELDS     => '{
 					"code"          : ["' . $code . '"],
 					"grant_type"    : ["' . $grant_type . '"],
@@ -125,8 +126,6 @@ class EpramaanController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl);
-        // dd($response);
-        //print_r($response); exit();
 
         //---------processing token-decrypt--------------
         // The key encryption algorithm manager with the A256KW algorithm.
@@ -183,14 +182,14 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            'D:\epramaan.crt', // The path where the certificate has been stored
+            'D:\\epramaan.crt', // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
             ]
         );
 
         $serializerManager = new JWSSerializerManager([
-            new CompactSerializer(),
+            new SignatureCompactSerializer(),
         ]);
 
         $jws = $serializerManager->unserialize($decryptedtoken);
@@ -214,9 +213,5 @@ class EpramaanController extends Controller
         $url = strtr($b64, '+/', '-_');
         // Remove padding character from the end of line and return the Base64URL result
         return rtrim($url, '=');
-    }
-
-    public function verify()
-    {
     }
 }
