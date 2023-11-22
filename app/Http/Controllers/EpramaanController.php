@@ -10,14 +10,14 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
  ** Use following packages for E-parmaan
  **/
 
-use Jose\Component\Encryption\JWEDecrypterFactory;
+use Jose\Component\Core\JWK;
 use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Encryption\JWEDecrypterFactory;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\A256KW;
 use Jose\Component\Encryption\Algorithm\ContentEncryption\A256GCM;
 use Jose\Component\Encryption\Compression\CompressionMethodManager;
 use Jose\Component\Encryption\Compression\Deflate;
 use Jose\Component\Encryption\JWEBuilder;
-use Jose\Component\Core\JWK;
 use Jose\Component\Encryption\Serializer\JWESerializerManager;
 use Jose\Component\Encryption\Serializer\CompactSerializer;
 use Jose\Component\Encryption\JWEDecrypter;
@@ -25,10 +25,9 @@ use Jose\Component\Encryption\JWELoader;
 use Jose\Component\Signature\Algorithm\RS256;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
-//use Jose\Component\Signature\Serializer\CompactSerializer;
-use Jose\Component\KeyManagement\JWKFactory;
 use Jose\Component\Signature\Algorithm\HS256;
 use Jose\Component\Signature\JWSLoader;
+use Jose\Component\KeyManagement\JWKFactory;
 use RuntimeException;
 
 class EpramaanController extends Controller
@@ -83,13 +82,13 @@ class EpramaanController extends Controller
         $data['url']           = $finalUrl;
         $data['nonce']         = $nonce;
         $data['code_verifier'] = $code_verifier;
-        return responseMsgs(true, "Success", $finalUrl, "", "01", responseTime(), "POST", "");
+        return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
     }
 
     /**
      * | Dashboard
      */
-    public function dashboard(Request $req)
+    public function dashboardEpramaan(Request $req)
     {
         $code          = $req->code;
         $nonce         = $req->nonce;
@@ -160,9 +159,9 @@ class EpramaanController extends Controller
         $serializerManager = new JWESerializerManager([
             new CompactSerializer(),
         ]);
-        return $response;
-        print_r($response);
-        exit();
+        // return $response;
+        // print_r($response);
+        // exit();
         // load the token.
         $jwe = $serializerManager->unserialize($response);
         //decrypt the token
@@ -189,7 +188,32 @@ class EpramaanController extends Controller
                 'use' => 'sig', // Additional parameters
             ]
         );
-        //$serializerManager = new JWSSerializerManager(
+
+        $serializerManager = new JWSSerializerManager([
+            new CompactSerializer(),
+        ]);
+
+        $jws = $serializerManager->unserialize($decryptedtoken);
+        $isVerified = $jwsVerifier->verifyWithKey($jws, $key, 0);
+
+        $jwsLoader = new JWSLoader(
+            $serializerManager,
+            $jwsVerifier,
+            null
+        );
+
+        $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
+        return  $payload = $jws->getPayload();
+    }
+
+    public function base64url_encode($data)
+    {
+        // encode $data to Base64 string
+        $b64 = base64_encode($data);
+        // Convert Base64 to Base64URL by replacing “+” with “-” and “/” with “_”
+        $url = strtr($b64, '+/', '-_');
+        // Remove padding character from the end of line and return the Base64URL result
+        return rtrim($url, '=');
     }
 
     public function verify()
