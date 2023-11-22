@@ -109,7 +109,7 @@ class EpramaanController extends Controller
                 //CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_SSL_VERIFYPEER => 0,
-                CURLOPT_CUSTOMREQUEST  => 'GET',
+                CURLOPT_CUSTOMREQUEST  => 'POST',
                 CURLOPT_POSTFIELDS     => '{
 					"code"          : ["' . $code . '"],
 					"grant_type"    : ["' . $grant_type . '"],
@@ -205,6 +205,9 @@ class EpramaanController extends Controller
         return  $payload = $jws->getPayload();
     }
 
+    /**
+     * |
+     */
     public function base64url_encode($data)
     {
         // encode $data to Base64 string
