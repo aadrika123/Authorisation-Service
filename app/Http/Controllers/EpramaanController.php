@@ -44,9 +44,9 @@ class EpramaanController extends Controller
         $scope = 'openid';
         // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
         $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+        $serviceId = '100001033';
         $response_type = 'code';
         $code_challenge_method = 'S256';
-        $serviceId = '100001033';
         $aeskey = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';
         $request_uri = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
         $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
@@ -95,10 +95,10 @@ class EpramaanController extends Controller
         $nonce         = $req->nonce;
         $code_verifier = $req->codeVerifier;
         $epramaanTokenRequestUrl = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
+        $redirectionURI = 'http://site2.aadrikainfomedia.in/citizen'; //sso success Url as given while registration
         $serviceId = '100001033';
         $grant_type = 'authorization_code';
         $scope = 'openid';
-        $redirectionURI = 'http://site2.aadrikainfomedia.in/citizen'; //sso success Url as given while registration
 
         $curl = curl_init();
         curl_setopt_array(
@@ -182,7 +182,7 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            'D:\\epramaan.crt', // The path where the certificate has been stored
+            'home\\certificate\\epramaan.crt', // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
             ]
