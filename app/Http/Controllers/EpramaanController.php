@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\File;
 
 /**
  ** Use following packages for E-parmaan
@@ -182,7 +183,7 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            '/epramaan.crt', // The path where the certificate has been stored
+            file_get_contents(base_path('epramaan.crt')), // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
             ]
