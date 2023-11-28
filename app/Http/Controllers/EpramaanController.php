@@ -92,7 +92,6 @@ class EpramaanController extends Controller
      */
     public function dashboardEpramaan(Request $req)
     {
-        return getcwd() . '\epramaan.crt';
         $code          = $req->code;
         $nonce         = $req->nonce;
         $code_verifier = $req->codeVerifier;
