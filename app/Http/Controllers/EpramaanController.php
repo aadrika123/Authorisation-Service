@@ -92,6 +92,7 @@ class EpramaanController extends Controller
      */
     public function dashboardEpramaan(Request $req)
     {
+        return getcwd() . '\epramaan.crt';
         $code          = $req->code;
         $nonce         = $req->nonce;
         $code_verifier = $req->codeVerifier;
@@ -183,7 +184,8 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            '/var/www/html/Authorisation-Service/storage/app/public/epramaan.crt', // The path where the certificate has been stored
+            getcwd() . '\epramaan.crt',
+            // '/var/www/html/Authorisation-Service/storage/app/public/epramaan.crt', // The path where the certificate has been stored
             // 'D:\epramaan.crt', // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
