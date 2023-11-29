@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActionMaster;
+use App\Models\Auth\ActiveCitizen;
+use App\Models\EpramaanLogin;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -38,20 +42,67 @@ class EpramaanController extends Controller
     /**
      * | Login with e-pramaan
      */
-    public function loginEpramaan()
+    public function loginEpramaan(Request $req)
     {
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
-        $scope = 'openid';
+        $type  = $req->type;
+        // $serviceId    = '100001031';
         // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
-        $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
-        $serviceId = '100001033';
-        $response_type = 'code';
-        $code_challenge_method = 'S256';
-        $aeskey = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';
-        $request_uri = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-        $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
+        switch ($type) {
+            case 'citizen':
+                $serviceId    = '100001033';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                break;
+
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/agency/login/e-pramaan';
+                break;
+
+            default:
+                $serviceId    = '100001033';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                break;
+        }
+
+        $scope                 = 'openid';
+        $response_type         = 'code';
+        $code_challenge_method = 'S256';
+        $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';
+        $url                   = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        $request_uri           = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
         $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
 
@@ -70,9 +121,7 @@ class EpramaanController extends Controller
 
         //code challenge
         $challenge_bytes = hash("sha256", $code_verifier, true);
-
-        $code_challenge = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
-
+        $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
 
         $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
 
@@ -92,14 +141,62 @@ class EpramaanController extends Controller
      */
     public function dashboardEpramaan(Request $req)
     {
+        $type          = $req->type;
         $code          = $req->code;
         $nonce         = $req->nonce;
         $code_verifier = $req->codeVerifier;
+        $scope         = 'openid';
+        $grant_type    = 'authorization_code';
         $epramaanTokenRequestUrl = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
-        $redirectionURI = 'http://site2.aadrikainfomedia.in/citizen'; //sso success Url as given while registration
-        $serviceId = '100001033';
-        $grant_type = 'authorization_code';
-        $scope = 'openid';
+        // $serviceId      = '100001033';
+        // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen'; //sso success Url as given while registration
+
+        switch ($type) {
+            case 'citizen':
+                $serviceId    = '100001033';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                break;
+
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/agency/login/e-pramaan';
+                break;
+
+            default:
+                $serviceId    = '100001033';
+                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                break;
+        }
 
         $curl = curl_init();
         curl_setopt_array(
@@ -115,7 +212,7 @@ class EpramaanController extends Controller
 					"code"          : ["' . $code . '"],
 					"grant_type"    : ["' . $grant_type . '"],
 					"scope"         : ["' . $scope . '"],
-					"redirect_uri"  : ["' . $redirectionURI . '"],
+					"redirect_uri"  : ["' . $redirect_uri . '"],
 					"request_uri"   : ["' . $epramaanTokenRequestUrl . '"],
 					"code_verifier" : ["' . $code_verifier . '"],
 					"client_id"     : ["' . $serviceId . '"]}',
@@ -183,9 +280,9 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            getcwd() . '/epramaan.crt',
+            // getcwd() . '/epramaan.crt',
             // '/var/www/html/Authorisation-Service/storage/app/public/epramaan.crt', // The path where the certificate has been stored
-            // 'D:\epramaan.crt', // The path where the certificate has been stored
+            'D:\epramaan.crt', // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
             ]
@@ -205,7 +302,66 @@ class EpramaanController extends Controller
         );
 
         $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
-        return  $payload = $jws->getPayload();
+        $payload = $jws->getPayload();
+        $payload = json_decode($payload);
+        $mEpramaanLogin = new EpramaanLogin();
+        $epReqs = [
+            "unique_user_id"    => $payload->sub,
+            "single_signon_id"  => $payload->sso_id,
+            "token_identifier"  => $payload->jti,
+            "token_issue_time"  => Carbon::createFromTimestamp($payload->iat),
+            "token_expiry_time" => Carbon::createFromTimestamp($payload->exp),
+            "service_id"        => $payload->aud,
+            "session_id"        => $payload->session_id,
+            "name"              => $payload->name ?? "",
+            "email"             => $payload->email ?? "",
+            "mobile"            => $payload->mobile_number ?? "",
+            "dob"               => $payload->dob ?? "",
+            "gender"            => $payload->gender ?? "",
+            "house"             => $payload->house ?? "",
+            "locality"          => $payload->locality ?? "",
+            "pincode"           => $payload->pincode ?? "",
+            "district"          => $payload->district ?? "",
+            "state"             => $payload->state ?? "",
+            "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
+            "user_name"         => $payload->user_name ?? "",
+            "respose_json"      => json_encode($payload),
+        ];
+        $epramaanDtl = $mEpramaanLogin->store($epReqs);
+
+        if ($type = 'citizen') {
+            $mActiveCitizen = new ActiveCitizen();
+            $citizenInfo = $mActiveCitizen->getCitizenByUniqueId($payload->sub);
+
+            if (!$citizenInfo) {
+                #_save citizen data
+                $saveReqs = [
+                    "user_name"         => $payload->name ?? "",
+                    "mobile"            => $payload->mobile_number ?? "",
+                    "email"             => $payload->email ?? "",
+                    "gender"            => $payload->gender ?? "",
+                    "dob"               => $payload->dob ?? "",
+                    "unique_user_id"    => $payload->sub,
+                    "token_identifier"  => $payload->jti,
+                    "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
+                ];
+                $citizenInfo =  $mActiveCitizen->citizenRegistration($saveReqs);
+            }
+
+            #_update token
+            $token = $citizenInfo->createToken('my-app-token')->plainTextToken;
+            $citizenInfo->remember_token = $token;
+            $citizenInfo->save();
+
+            #_login details
+            $userDetails['id']        = $citizenInfo->id;
+            $userDetails['userName']  = $citizenInfo->user_name;
+            $userDetails['mobile']    = $citizenInfo->mobile;
+            $userDetails['userType']  = $citizenInfo->user_type;
+            $userDetails['user_type'] = $citizenInfo->user_type;
+            $userDetails['token']     = $token;
+            return responseMsgs(true, "Login Successfully", $userDetails, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
     }
 
     /**

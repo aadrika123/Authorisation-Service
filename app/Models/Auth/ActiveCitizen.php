@@ -2,6 +2,7 @@
 
 namespace App\Models\Auth;
 
+use App\Models\ActionMaster;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -13,6 +14,7 @@ class ActiveCitizen extends Model
     use HasFactory;
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $guarded = [];
     protected $hidden = [
         'password',
         'remember_token',
@@ -58,5 +60,22 @@ class ActiveCitizen extends Model
             $citizenInfo->save();
             return $token;
         }
+    }
+
+    /**
+     * | get citizen detail by unique id
+     */
+    public function getCitizenByUniqueId($uniqueId)
+    {
+        $data = ActiveCitizen::where('unique_user_id', $uniqueId)
+            ->where('is_suspended', false)
+            ->first();
+        return $data;
+    }
+
+    public function citizenRegistration($request)
+    {
+        $data = ActiveCitizen::create($request);
+        return $data;
     }
 }
