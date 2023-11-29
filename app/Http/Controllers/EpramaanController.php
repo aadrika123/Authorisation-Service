@@ -303,6 +303,7 @@ class EpramaanController extends Controller
 
         $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
         $payload = $jws->getPayload();
+        // $payload = '{"sub":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","pwd_auth_status":"true","gender":"M","iss":"ePramaan","session_id":"b670d78a-1234-45b1-953d-87ea5d3459c9","sso_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","loginMode":"CITIZEN","aud":"100001033","unique_user_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","dob":"26\/04\/1998","name":"Mrinal","exp":1701347884,"mobile_number":"8797770238","iat":1701261484,"jti":"b670d78a-1234-45b1-953d-87ea5d3459c9","username":"mrinal9911"}';
         $payload = json_decode($payload);
         $mEpramaanLogin = new EpramaanLogin();
         $epReqs = [
@@ -316,7 +317,7 @@ class EpramaanController extends Controller
             "name"              => $payload->name ?? "",
             "email"             => $payload->email ?? "",
             "mobile"            => $payload->mobile_number ?? "",
-            "dob"               => Carbon::createFromFormat($payload->dob) ?? "",
+            "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
             "gender"            => $payload->gender ?? "",
             "house"             => $payload->house ?? "",
             "locality"          => $payload->locality ?? "",
@@ -340,7 +341,7 @@ class EpramaanController extends Controller
                     "mobile"            => $payload->mobile_number ?? "",
                     "email"             => $payload->email ?? "",
                     "gender"            => $payload->gender ?? "",
-                    "dob"               => Carbon::createFromFormat($payload->dob) ?? "",
+                    "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
                     "unique_user_id"    => $payload->sub,
                     "token_identifier"  => $payload->jti,
                     "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
