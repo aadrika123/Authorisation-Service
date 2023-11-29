@@ -344,6 +344,7 @@ class EpramaanController extends Controller
                     "unique_user_id"    => $payload->sub,
                     "token_identifier"  => $payload->jti,
                     "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
+                    "user_type"         => "Citizen",
                 ];
                 $citizenInfo =  $mActiveCitizen->citizenRegistration($saveReqs);
             }
