@@ -280,9 +280,9 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            // getcwd() . '/epramaan.crt',
+            getcwd() . '/epramaan.crt',
             // '/var/www/html/Authorisation-Service/storage/app/public/epramaan.crt', // The path where the certificate has been stored
-            'D:\epramaan.crt', // The path where the certificate has been stored
+            // 'D:\epramaan.crt', // The path where the certificate has been stored
             [
                 'use' => 'sig', // Additional parameters
             ]
