@@ -2,7 +2,6 @@
 
 namespace App\Models\Auth;
 
-use App\Models\ActionMaster;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
