@@ -52,7 +52,7 @@ class EpramaanController extends Controller
 
         switch ($type) {
             case 'citizen':
-                $serviceId    = '100001033';
+                $serviceId    = '100001043';
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
 
@@ -153,7 +153,7 @@ class EpramaanController extends Controller
 
         switch ($type) {
             case 'citizen':
-                $serviceId    = '100001033';
+                $serviceId    = '100001043';
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
 
