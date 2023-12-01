@@ -502,7 +502,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
-        // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
+        Route::post("property/independent/get-holding-dues", "unAuthApis");
+        Route::post("property/independent/generate-prop-orderid", "unAuthApis");
     });
 });
 
