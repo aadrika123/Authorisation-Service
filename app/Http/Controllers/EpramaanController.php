@@ -47,12 +47,11 @@ class EpramaanController extends Controller
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
         $type  = $req->type;
-        // $serviceId    = '100001031';
-        // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/authResponseConsumer.do'; //it is working
 
         switch ($type) {
             case 'citizen':
-                $serviceId    = '100001033';
+                // $serviceId    = '100001033';    #_staging
+                $serviceId    = '100001332';    #_production
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
 
@@ -92,7 +91,8 @@ class EpramaanController extends Controller
                 break;
 
             default:
-                $serviceId    = '100001033';
+                // $serviceId    = '100001033';    #_staging
+                $serviceId    = '100001332';    #_production
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
         }
@@ -100,9 +100,10 @@ class EpramaanController extends Controller
         $scope                 = 'openid';
         $response_type         = 'code';
         $code_challenge_method = 'S256';
-        $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';
-        $url                   = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-        $request_uri           = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
+        $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
+        $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
         $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
 
@@ -147,13 +148,12 @@ class EpramaanController extends Controller
         $code_verifier = $req->codeVerifier;
         $scope         = 'openid';
         $grant_type    = 'authorization_code';
-        $epramaanTokenRequestUrl = 'https://epstg.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
-        // $serviceId      = '100001033';
-        // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen'; //sso success Url as given while registration
+        $epramaanTokenRequestUrl = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
 
         switch ($type) {
             case 'citizen':
-                $serviceId    = '100001033';
+                // $serviceId    = '100001033';    #_staging
+                $serviceId    = '100001332';    #_production
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
 
@@ -193,7 +193,8 @@ class EpramaanController extends Controller
                 break;
 
             default:
-                $serviceId    = '100001033';
+                // $serviceId    = '100001033';    #_staging
+                $serviceId    = '100001332';    #_production
                 $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
                 break;
         }
@@ -280,7 +281,8 @@ class EpramaanController extends Controller
         // JWS Verifier.
         $jwsVerifier = new JWSVerifier($algorithmManager);
         $key = JWKFactory::createFromCertificateFile(
-            getcwd() . '/epramaan.crt',
+            getcwd() . '/epramaanprod2016.cer',
+            // getcwd() . '/epramaan.crt',      #_staging
             // '/var/www/html/Authorisation-Service/storage/app/public/epramaan.crt', // The path where the certificate has been stored
             // 'D:\epramaan.crt', // The path where the certificate has been stored
             [
