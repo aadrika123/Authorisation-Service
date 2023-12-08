@@ -499,6 +499,8 @@ Route::middleware(['apiPermission'])->group(function () {
         # Juidco Dashboard UnAuth Api
         Route::post("property/reports/mpl", "unAuthApis");
         Route::post("property/reports/mpl2", "unAuthApis");
+        Route::post("property/map/level1", "unAuthApis");
+        Route::post("property/map/level2", "unAuthApis");
         # Property UnAuth Api
         Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
