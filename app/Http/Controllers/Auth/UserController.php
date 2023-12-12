@@ -67,6 +67,15 @@ class UserController extends Controller
                     $values = $value['roles'];
                     return $values;
                 });
+                if(!$req->type && $this->checkMobileUserRole($menuRoleDetails))
+                {
+                    throw new Exception("mobile user not login as wed user");
+                }
+                if($req->type && !$this->checkMobileUserRole($menuRoleDetails))
+                {
+                    throw new Exception("wed user not login as user mobile");
+                }
+
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
                 $data['userDetails']['role'] = $role;
@@ -77,6 +86,18 @@ class UserController extends Controller
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
+    }
+
+    private function checkMobileUserRole($menuRoleDetails)
+    {
+    foreach ($menuRoleDetails as $role) {
+        if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR') {
+
+            return true;
+        }
+      
+    }
+    return false;
     }
 
     /**

@@ -65,7 +65,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
  * | User Register & Login
  */
 Route::controller(UserController::class)->group(function () {
-    Route::post('login', 'loginAuth');
+    Route::post('login', 'loginAuth');                                                        #API_ID = 4161
     Route::post('register', 'store');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
@@ -492,6 +492,9 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
+        Route::post('property/location', 'unAuthApis');
+        Route::post('property/location/ward-list', 'unAuthApis');
+
         // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
     });
 });
