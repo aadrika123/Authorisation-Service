@@ -212,8 +212,6 @@ class UserController extends Controller
                 ])
                 ->thenReturn()
                 ->paginate($perPage);
-            // ->get();
-            // ->paginate(500);
 
             return responseMsgs(true, "User List", $userList, "", "01", ".ms", "POST", "");
         } catch (Exception $e) {
@@ -571,7 +569,7 @@ class UserController extends Controller
 
     public function resetPassword(Request $req)
     {
-        $validated = Validator::make($req->all(),[
+        $validated = Validator::make($req->all(), [
             'userId' => 'required|digits_between:1,9223372036854775807',
             'newPassword' => [
                 'nullable',
@@ -586,42 +584,38 @@ class UserController extends Controller
         if ($validated->fails()) {
             return validationError($validated);
         }
-        try{
+        try {
             $id = auth()->user()->id;
-            $Muser = User::find($id);  
-            $respons = $this->getUser($req,$id)  ;
+            $Muser = User::find($id);
+            $respons = $this->getUser($req, $id);
             $respons = json_decode(json_encode($respons), true);
             if (!$respons["original"]["status"]) {
                 throw new Exception("Unabel To Find Your Role Dtl");
-            }   
-            $RoleDtl = collect($respons["original"]["data"]);  
-            if(!in_array(strtoupper($RoleDtl["role_name"]) ,["ADMIN","SUPER ADMIN"]))
-            {
+            }
+            $RoleDtl = collect($respons["original"]["data"]);
+            if (!in_array(strtoupper($RoleDtl["role_name"]), ["ADMIN", "SUPER ADMIN"])) {
                 throw new Exception("You Are Not Authorized For This Action");
             }
-            $user = User::find($id); 
+            $user = User::find($id);
             if (!$user) {
-                throw new Exception ("Data Not Found");                
+                throw new Exception("Data Not Found");
             }
-            $name = Str::upper((substr($user->name, 0, 4))); 
-            $mobi = $user->mobile?substr($user->mobile, 6, 4):"1234";            
-            if(!$req->newPassword)
-            {
-                $req->request->add(["newPassword"=>($name."@".$mobi)]);
+            $name = Str::upper((substr($user->name, 0, 4)));
+            $mobi = $user->mobile ? substr($user->mobile, 6, 4) : "1234";
+            if (!$req->newPassword) {
+                $req->request->add(["newPassword" => ($name . "@" . $mobi)]);
             }
             // dd(request()->ip(),request()->path(),request()->header('User-Agent'),$req->all(),$user);
             DB::beginTransaction();
-                $user->tokens->each(function ($token, $key) {
-                    $token->expires_at = Carbon::now();
-                    $token->save();
-                });
-                $user->password = Hash::make($req->newPassword);
-                $user->save();  
+            $user->tokens->each(function ($token, $key) {
+                $token->expires_at = Carbon::now();
+                $token->save();
+            });
+            $user->password = Hash::make($req->newPassword);
+            $user->save();
             DB::commit();
-            return   responseMsgs(true, "Password Reset Successfully", remove_null($RoleDtl));  
-        }
-        catch(Exception $e)
-        {
+            return   responseMsgs(true, "Password Reset Successfully", remove_null($RoleDtl));
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
     }

@@ -18,6 +18,7 @@ class UlbController extends Controller
     public function getAllUlb()
     {
         $ulb = UlbMaster::orderBy('ulb_name')
+            ->where('active_status', true)
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }

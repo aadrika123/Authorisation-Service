@@ -10,6 +10,7 @@ use App\Http\Controllers\ApiUnauthController;
 use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Auth\CitizenController;
 use App\Http\Controllers\CustomController;
+use App\Http\Controllers\EpramaanController;
 use App\Http\Controllers\Faq\FaqController;
 use App\Http\Controllers\Landingpage\LandingPageController;
 use App\Http\Controllers\Menu\MenuController;
@@ -95,6 +96,15 @@ Route::controller(WorkflowMapController::class)->group(function () {
 Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/send-otp', 'sendOtp');
     Route::post('user/verify-otp', "verifyOtp");
+});
+
+
+/**
+ * | E-Pramaan
+ */
+Route::controller(EpramaanController::class)->group(function () {
+    Route::post('e-pramaan/login', 'loginEpramaan');
+    Route::post('e-pramaan/dashboard', 'dashboardEpramaan');
 });
 
 /**
@@ -487,15 +497,21 @@ Route::middleware(['apiPermission'])->group(function () {
         # Advertisement UnAuth Api
         Route::match(["get", 'post'], "advert/get-payment-reciept/{tranId}/{workflowId}", "unAuthApis");
         # Juidco Dashboard UnAuth Api
-        Route::match(["get", 'post'], "property/reports/mpl", "unAuthApis");
+        Route::post("property/reports/mpl", "unAuthApis");
+        Route::post("property/reports/mpl2", "unAuthApis");
+        Route::post("property/map/level1", "unAuthApis");
+        Route::post("property/map/level2", "unAuthApis");
         # Property UnAuth Api
-        Route::match(["get", 'post'], "property/saf/master-saf", "unAuthApis");
+        Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
         Route::post('property/location', 'unAuthApis');
         Route::post('property/location/ward-list', 'unAuthApis');
 
         // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
+        Route::post("property/independent/get-holding-dues", "unAuthApis");
+        Route::post("property/independent/generate-prop-orderid", "unAuthApis");
+        Route::post("property/saf/independent/generate-order-id", "unAuthApis");
     });
 });
 
