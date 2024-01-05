@@ -252,9 +252,8 @@ class CitizenController extends Controller
     public function changeCitizenPass(ChangePassRequest $request)
     {
         try {
-            // $id = auth()->user()->id;
-            $citizen = ActiveCitizen::where('mobile', $request->mobileNo)
-                ->firstOrFail();
+            $id = auth()->user()->id;
+            $citizen = ActiveCitizen::where('id', $id)->firstOrFail();
             $validPassword = Hash::check($request->password, $citizen->password);
             if ($validPassword) {
 
