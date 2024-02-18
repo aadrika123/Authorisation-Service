@@ -631,36 +631,23 @@ class UserController extends Controller
     }
 
 
-    public function userDtls(Request $req)
+    public function citizenDtls(Request $req)
     {
         try {
             $mWfRoleusermap = new WfRoleusermap();
-            $user = Auth()->user();
-            $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+            $citizen = Auth()->user();
+            // $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
             // if (empty(collect($menuRoleDetails)->first())) {
             //     throw new Exception('User has No Roles!');
             // }
-            $role = collect($menuRoleDetails)->map(function ($value, $key) {
-                $values = $value['roles'];
-                return $values;
-            });
-            $permittedWards = UlbWardMaster::select("ulb_ward_masters.id", "ulb_ward_masters.ward_name")
-                ->join("wf_ward_users", "wf_ward_users.ward_id", "ulb_ward_masters.id")
-                ->where("wf_ward_users.is_suspended", false)
-                ->where("ulb_ward_masters.status", 1)
-                ->where("wf_ward_users.user_id", $user->id)
-                ->get()->map(function ($val) {
-                    preg_match_all('/([0-9]+|[a-zA-Z]+)/', $val->ward_name, $matches);
-                    $val->char = $matches[0][0] ?? "";
-                    $val->ints = $matches[0][1] ?? null;
-                    return $val;
-                });
+            $role = $citizen->user_type;
+            $permittedWards = [];
             // $permittedWards = collect($permittedWards)->sortBy(function ($item) {
             //     // Extract the numeric part from the "ward_name"
             //     preg_match('/\d+/', $item->ward_name, $matches);
             //     return (int) ($matches[0] ?? "");
             // })->values();
-            $permittedWards = collect($permittedWards->sortBy(["char", "ints"]))->values();
+
             // $includeMenu = $this->_UserMenuMobileInclude->metaDtls()
             //     ->where("user_menu_mobile_includes.user_id", $user->id)
             //     ->where("user_menu_mobile_includes.is_active", true)
@@ -722,8 +709,8 @@ class UserController extends Controller
                 $routList->push($rout);
             }
 
-            $data['userDetails'] = $user;
-            $data['userDetails']["imgFullPath"] = trim($user->photo_relative_path . "/" . $user->photo, "/");
+            $data['userDetails'] = $citizen;
+            $data['userDetails']["imgFullPath"] = trim($citizen->relative_path . "/" . $citizen->profile_photo, "/");
             $data['userDetails']['role'] = $role;
             $data["routes"] = $routList;
             $data["permittedWard"] = $permittedWards;
