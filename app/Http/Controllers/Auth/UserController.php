@@ -79,11 +79,11 @@ class UserController extends Controller
                 });
                 if(!$req->type && $this->checkMobileUserRole($menuRoleDetails))
                 {
-                    throw new Exception("mobile user not login as wed user");
+                    throw new Exception("Mobile user not login as web user");
                 }
                 if($req->type && !$this->checkMobileUserRole($menuRoleDetails))
                 {
-                    throw new Exception("wed user not login as user mobile");
+                    throw new Exception("Web user not login as user mobile");
                 }
 
                 $data['token'] = $token;
