@@ -498,6 +498,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "advert/get-payment-reciept/{tranId}/{workflowId}", "unAuthApis");
         # Juidco Dashboard UnAuth Api
         Route::post("property/reports/mpl", "unAuthApis");
+        Route::post("property/'report/ulb-list", "unAuthApis");
         Route::post("property/reports/mpl2", "unAuthApis");
         Route::post("property/map/level1", "unAuthApis");
         Route::post("property/map/level2", "unAuthApis");
