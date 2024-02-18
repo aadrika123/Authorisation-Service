@@ -69,6 +69,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('login', 'loginAuth');                                                        #API_ID = 4161
     Route::post('register', 'store');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
+    Route::post('get-user-dtl', 'userDtls')->middleware('auth:sanctum');
 });
 
 /**
