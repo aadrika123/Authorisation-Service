@@ -8,8 +8,10 @@ use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
 use App\Models\Auth\User;
+use App\Models\ModuleMaster;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
+use App\Models\UlbWardMaster;
 use App\Models\Workflows\WfRoleusermap;
 use App\Pipelines\User\SearchByEmail;
 use App\Pipelines\User\SearchByMobile;
@@ -30,9 +32,17 @@ class UserController extends Controller
 {
     use Auth;
     private $_mUser;
+    private $_MenuMobileMaster;
+    private $_UserMenuMobileExclude;
+    private $_UserMenuMobileInclude;
+    private $_ModuleMaster;
     public function __construct()
     {
         $this->_mUser = new User();
+        $this->_ModuleMaster = new ModuleMaster(); 
+        // $this->_MenuMobileMaster = new MenuMobileMaster();
+        // $this->_UserMenuMobileExclude   = new UserMenuMobileExclude();
+        // $this->_UserMenuMobileInclude   = new UserMenuMobileInclude();
     }
 
     /**
@@ -617,6 +627,109 @@ class UserController extends Controller
             return   responseMsgs(true, "Password Reset Successfully", remove_null($RoleDtl));
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+
+    public function userDtls(Request $req)
+    {
+        try {
+            $mWfRoleusermap = new WfRoleusermap();
+            $user = Auth()->user();
+            $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+            // if (empty(collect($menuRoleDetails)->first())) {
+            //     throw new Exception('User has No Roles!');
+            // }
+            $role = collect($menuRoleDetails)->map(function ($value, $key) {
+                $values = $value['roles'];
+                return $values;
+            });
+            $permittedWards = UlbWardMaster::select("ulb_ward_masters.id", "ulb_ward_masters.ward_name")
+                ->join("wf_ward_users", "wf_ward_users.ward_id", "ulb_ward_masters.id")
+                ->where("wf_ward_users.is_suspended", false)
+                ->where("ulb_ward_masters.status", 1)
+                ->where("wf_ward_users.user_id", $user->id)
+                ->get()->map(function ($val) {
+                    preg_match_all('/([0-9]+|[a-zA-Z]+)/', $val->ward_name, $matches);
+                    $val->char = $matches[0][0] ?? "";
+                    $val->ints = $matches[0][1] ?? null;
+                    return $val;
+                });
+            // $permittedWards = collect($permittedWards)->sortBy(function ($item) {
+            //     // Extract the numeric part from the "ward_name"
+            //     preg_match('/\d+/', $item->ward_name, $matches);
+            //     return (int) ($matches[0] ?? "");
+            // })->values();
+            $permittedWards = collect($permittedWards->sortBy(["char", "ints"]))->values();
+            $includeMenu = $this->_UserMenuMobileInclude->metaDtls()
+                ->where("user_menu_mobile_includes.user_id", $user->id)
+                ->where("user_menu_mobile_includes.is_active", true)
+                ->get();
+            $excludeMenu = $this->_UserMenuMobileExclude->metaDtls()
+                ->where("user_menu_mobile_excludes.user_id", $user->id)
+                ->where("user_menu_mobile_excludes.is_active", true)
+                ->get();
+            $userIncludeMenu = $this->_UserMenuMobileInclude->unionDataWithRoleMenu()
+                ->where("user_menu_mobile_includes.user_id", $user->id)
+                ->where("user_menu_mobile_includes.is_active", true)
+                ->get();
+            DB::enablequerylog();
+            $menuList = $this->_MenuMobileMaster->metaDtls()
+                ->where("menu_mobile_masters.is_active", true)
+                ->where(function ($query) {
+                    $query->OrWhere("menu_mobile_role_maps.is_active", true)
+                        ->orWhereNull("menu_mobile_role_maps.is_active");
+                })
+                ->WhereIn("menu_mobile_role_maps.role_id", ($menuRoleDetails)->pluck("roleId"));
+            if ($includeMenu->isNotEmpty()) {
+                $menuList = $menuList->WhereNotIn("menu_mobile_masters.id", ($includeMenu)->pluck("menu_id"));
+            }
+
+            DB::enableQueryLog();
+            $menuList = collect(($menuList->get())->toArray());
+            foreach ($userIncludeMenu->toArray() as $val) {
+                $menuList->push($val);
+            }
+            $menuList = collect($menuList->whereNotIn("id", ($excludeMenu)->pluck("menu_id"))->toArray());
+            $menuList = $menuList->map(function ($val) {
+
+                return
+                    [
+                        "id"        =>  $val["id"],
+                        "role_id"   =>  $val["role_id"],
+                        "role_name" =>  $val["role_name"],
+                        "parent_id" =>  $val["parent_id"],
+                        "module_id" =>  $val["module_id"],
+                        "serial"    =>  $val["serial"],
+                        "menu_string" =>  $val["menu_string"],
+                        "route"      =>  $val["route"],
+                        "icon"       =>  $val["icon"],
+                        "is_sidebar" =>  $val["is_sidebar"],
+                        "is_menu"    =>  $val["is_menu"],
+                        "create"     =>  $val["create"],
+                        "read"       =>  $val["read"],
+                        "update"     =>  $val["update"],
+                        "delete"     =>  $val["delete"],
+                        "module_name" =>  $val["module_name"],
+                    ];
+            });
+
+            $module = $this->_ModuleMaster->select("id", "module_name")->where("is_suspended", false)->OrderBy("id", "ASC")->get();
+            $routList = collect();
+            foreach ($module as $val) {
+                $rout["layout"] = $val->module_name;
+                $rout["pages"] = $menuList->where("module_id", $val->id)->sortBy("serial")->values();
+                $routList->push($rout);
+            }
+
+            $data['userDetails'] = $user;
+            $data['userDetails']["imgFullPath"] = trim($user->photo_relative_path . "/" . $user->photo, "/");
+            $data['userDetails']['role'] = $role;
+            $data["routes"] = $routList;
+            $data["permittedWard"] = $permittedWards;
+            return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", 010101, "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 }
