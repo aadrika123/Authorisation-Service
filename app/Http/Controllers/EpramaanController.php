@@ -51,49 +51,51 @@ class EpramaanController extends Controller
         switch ($type) {
             case 'citizen':
                 // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';         #_previous url of service id 100001332
                 $serviceId    = '100001332';    #_production
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
             case 'property':
                 $serviceId    = '100001034';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/property/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/property/login/e-pramaan';
                 break;
 
             case 'water':
                 $serviceId    = '100001035';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/water/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/water/login/e-pramaan';
                 break;
 
             case 'trade':
                 $serviceId    = '100001036';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/trade/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/trade/login/e-pramaan';
                 break;
 
             case 'advertisement':
                 $serviceId    = '100001037';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/advertisement/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/advertisement/login/e-pramaan';
                 break;
 
             case 'pet':
                 $serviceId    = '100001038';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/pet/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/pet/login/e-pramaan';
                 break;
 
             case 'marriage':
                 $serviceId    = '100001039';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/marriage/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/marriage/login/e-pramaan';
                 break;
 
             case 'agency':
                 $serviceId    = '100001041';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/agency/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/agency/login/e-pramaan';
                 break;
 
             default:
                 // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';         #_previous url of service id 100001332
                 $serviceId    = '100001332';    #_production
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
         }
 
@@ -154,48 +156,48 @@ class EpramaanController extends Controller
             case 'citizen':
                 // $serviceId    = '100001033';    #_staging
                 $serviceId    = '100001332';    #_production
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
             case 'property':
                 $serviceId    = '100001034';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/property/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/property/login/e-pramaan';
                 break;
 
             case 'water':
                 $serviceId    = '100001035';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/water/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/water/login/e-pramaan';
                 break;
 
             case 'trade':
                 $serviceId    = '100001036';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/trade/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/trade/login/e-pramaan';
                 break;
 
             case 'advertisement':
                 $serviceId    = '100001037';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/advertisement/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/advertisement/login/e-pramaan';
                 break;
 
             case 'pet':
                 $serviceId    = '100001038';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/pet/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/pet/login/e-pramaan';
                 break;
 
             case 'marriage':
                 $serviceId    = '100001039';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/marriage/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/marriage/login/e-pramaan';
                 break;
 
             case 'agency':
                 $serviceId    = '100001041';
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/agency/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/agency/login/e-pramaan';
                 break;
 
             default:
                 // $serviceId    = '100001033';    #_staging
                 $serviceId    = '100001332';    #_production
-                $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
         }
 
