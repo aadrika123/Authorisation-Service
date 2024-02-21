@@ -57,7 +57,7 @@ class EpramaanController extends Controller
                 break;
 
             case 'mobile':
-                $serviceId    = '100001359';
+                $serviceId    = '100001360';
                 $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                 break;
 
@@ -166,7 +166,7 @@ class EpramaanController extends Controller
                 break;
 
             case 'mobile':
-                $serviceId    = '100001359';
+                $serviceId    = '100001360';
                 $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                 break;
 
