@@ -56,6 +56,11 @@ class EpramaanController extends Controller
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
+            case 'mobile':
+                $serviceId    = '100001359';
+                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                break;
+
             case 'property':
                 $serviceId    = '100001034';
                 $redirect_uri = 'https://jharkhandegovernance.com/property/login/e-pramaan';
@@ -158,6 +163,11 @@ class EpramaanController extends Controller
                 // $serviceId    = '100001033';    #_staging
                 $serviceId    = '100001332';    #_production
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+
+            case 'mobile':
+                $serviceId    = '100001359';
+                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                 break;
 
             case 'property':
