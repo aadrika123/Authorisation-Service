@@ -514,6 +514,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/independent/get-holding-dues", "unAuthApis");
         Route::post("property/independent/generate-prop-orderid", "unAuthApis");
         Route::post("property/saf/independent/generate-order-id", "unAuthApis");
+        Route::post("property/prop-payment-receipt", "unAuthApis");
 
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
