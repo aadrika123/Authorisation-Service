@@ -521,6 +521,9 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("marriage/save-tran-dtl", "unAuthApis");
         Route::post("marriage/payment-receipt", "unAuthApis");
 
+        #_Payment
+        Route::post("payment/verify-payment-status", "unAuthApis");
+
     });
 });
 
