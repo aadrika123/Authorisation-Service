@@ -22,4 +22,11 @@ class MCity extends Model
             ->where("ulb_masters.id", $ulbId)
             ->first();
     }
+    public function addZone($req)
+    {
+        $data = new MCity;
+        $data->city = $req->zone;
+        $data->ulb_id = $req->ulbId;
+        $data->save();
+    }
 }

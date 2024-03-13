@@ -30,6 +30,7 @@ use App\Http\Controllers\UlbController;
 use App\Http\Controllers\WcController;
 use App\Http\Controllers\WorkflowMaster\WorkflowMap;
 use App\Http\Controllers\WorkflowMaster\WorkflowMapController;
+use App\Http\Controllers\ZoneMasterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,11 @@ Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
+    Route::post('add-district', 'addDistrict');   
+    Route::post('update-districtBy-Id', 'updateDistrict');   
+    Route::post('delete-district', 'deleteDistrict');   
+
+
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
@@ -446,7 +452,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
     });
 
-
+    Route::controller(ZoneMasterController::class)->group(function () {
+        Route::post('create-zone', 'createZone');
+        Route::post('get-zone', 'getZone');
+        Route::post('delete-zone', 'deleteZone');
+    });
 
     /**
      * | for custom details

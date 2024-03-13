@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DistrictMaster;
 use App\Models\MCity;
 use App\Models\UlbMaster;
 use App\Models\UlbNewWardmap;
@@ -43,6 +44,23 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+    #create
+    public function createZone(Request $request)
+    {
+        try {
+            $request->validate([
+                "cityName" => "required",
+                "stateId" => "required"
+            ]);
+            $create = new MCity();
+            $create->addZone($request);
+
+            return responseMsgs(true, "Add Zone", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+
 
     /**
      * | list of ulb by district code
@@ -72,6 +90,7 @@ class UlbController extends Controller
     public function districtList(Request $req)
     {
         $districtList = DB::table('district_masters')
+            ->where('status',true)
             ->orderBy('district_code')
             ->get();
 
@@ -96,5 +115,57 @@ class UlbController extends Controller
             ->get();;
 
         return responseMsg(true, "Data Retrived", remove_null($newWard));
+    }
+    // add district 
+    public function addDistrict(Request $request)
+    {
+        try {
+            $mDistrictMaster = new DistrictMaster();
+            $metarequest = [
+                "district_code" => $request->districtCode,
+                "distric_name"  => $request->districtName,
+                "label"        =>  $request->label,
+                "state_id"      => $request->stateId
+            ];
+            $data = $mDistrictMaster->addDistrict($request);
+            return responseMsgs(true, "", remove_null($data), "Succesfully Add", "01", ".ms", "POST");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), $e->getFile(), "", "01", ".ms", "POST",);
+        }
+    }
+    /*
+     * |edit agencgy details
+     */
+    public function updateDistrict(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "id"  => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => false, 'message' => $validator->errors()];
+        }
+        try {
+            $districtId = $request->id;
+            $mDistrictMaster = new DistrictMaster();
+            DB::beginTransaction();
+            $mDistrictMaster->updatesDistrictDtl($request,$districtId);
+            DB::commit();
+            return responseMsgs(true, "Update District  !!",  "050501", "1.0", responseTime(), 'POST', $request->deviceId ?? "");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(true, $e->getMessage(), "", "050501", "1.0", "", "POST", $request->deviceId ?? "");
+        }
+    }
+    //delete master
+    public function deleteDistrict(Request $req)
+    {
+        try {
+            $delete = new DistrictMaster();
+            $delete->deleteDistrict($req);
+
+            return responseMsgs(true, "", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
     }
 }
