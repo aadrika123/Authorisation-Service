@@ -45,7 +45,7 @@ class UlbController extends Controller
         }
     }
     #create
-    public function createZone(Request $request)
+    public function createCity(Request $request)
     {
         try {
             $request->validate([
@@ -53,13 +53,26 @@ class UlbController extends Controller
                 "stateId" => "required"
             ]);
             $create = new MCity();
-            $create->addZone($request);
+            $create->createCity($request);
 
-            return responseMsgs(true, "Add Zone", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+            return responseMsgs(true, "Add City", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
+    #active and inactive city
+    public function enableOrDesable(Request $req)
+    {
+        try {
+            $delete = new MCity();
+            $delete->activeOrDeatcive($req);
+
+            return responseMsgs(true, "Data delete", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
 
 
     /**
@@ -90,7 +103,7 @@ class UlbController extends Controller
     public function districtList(Request $req)
     {
         $districtList = DB::table('district_masters')
-            ->where('status',true)
+            ->where('status', true)
             ->orderBy('district_code')
             ->get();
 
@@ -148,7 +161,7 @@ class UlbController extends Controller
             $districtId = $request->id;
             $mDistrictMaster = new DistrictMaster();
             DB::beginTransaction();
-            $mDistrictMaster->updatesDistrictDtl($request,$districtId);
+            $mDistrictMaster->updatesDistrictDtl($request, $districtId);
             DB::commit();
             return responseMsgs(true, "Update District  !!",  "050501", "1.0", responseTime(), 'POST', $request->deviceId ?? "");
         } catch (Exception $e) {

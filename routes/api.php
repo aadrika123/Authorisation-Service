@@ -92,6 +92,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('add-district', 'addDistrict');   
     Route::post('update-districtBy-Id', 'updateDistrict');   
     Route::post('delete-district', 'deleteDistrict');   
+    Route::post('create-city', 'createCity');   
+    Route::post('city/enable-disable', 'enableOrDesable');   
 
 
 });
