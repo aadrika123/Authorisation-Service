@@ -21,7 +21,83 @@ class LandingPageController extends Controller
         $list = $mSchemeType->listSchemeTypes();
         return responseMsg(true, 'Scheme List', $list);
     }
-
+    /**
+     * add scheme type
+     */
+    public function addSchemeType(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'type' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return responseMsgs(false, $validator->errors(), "", "050511", "1.0", "", "POST", $req->deviceId ?? "");
+            }
+            $mScheme = new SchemeType();
+            $status = $mScheme->addSchemeType($req);                                                 //<--------------- Model function to store 
+            return responseMsgs(true, "Successfully Added", ['Details' => $status], 055102, "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
+        }
+    }
+    #update scheme type
+    public function updateSchemeType(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                "id"   => 'required',
+                'type' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return responseMsgs(false, $validator->errors(), "", "050511", "1.0", "", "POST", $req->deviceId ?? "");
+            }
+            $mScheme = new SchemeType();
+            $status = $mScheme->updateSchemeType($req);                                                 //<--------------- Model function to store 
+            return responseMsgs(true, "Successfully updated", ['Details' => $status], 055102, "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
+        }
+    }
+    #get scheme type by id 
+    public function getSchemeTypeById(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                "id"   => 'required',
+            ]);
+            if ($validator->fails()) {
+                return responseMsgs(false, $validator->errors(), "", "050511", "1.0", "", "POST", $req->deviceId ?? "");
+            }
+            $mScheme = new SchemeType();
+            $data = $mScheme->getSchemeTypeByid($req);                                                 //<--------------- Model function to store 
+            return responseMsgs(true, "Data get ", ['Details' => $data], 055102, "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
+        }
+    }
+     #get  
+     public function getSchemetype(){
+        $data= SchemeType::select('id','type','status as is_suspended')
+        ->get();
+        return responseMsgs(true, "", remove_null($data));
+}
+    // public function updateSchemeType(Request $req)
+    // {
+    //     try {
+    //         $validator = Validator::make($req->all(), [
+    //             "id"   => 'required',
+    //             'type' => 'required',
+    //         ]);
+    //         if ($validator->fails()) {
+    //             return responseMsgs(false, $validator->errors(), "", "050511", "1.0", "", "POST", $req->deviceId ?? "");
+    //         }
+    //         $mScheme = new SchemeType();
+    //         $status = $mScheme->updateSchemeType($req);                                                 //<--------------- Model function to store 
+    //         return responseMsgs(true, "Successfully updated", ['Details' => $status], 055102, "1.0", responseTime(), "POST", $req->deviceId);
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
+    //     }
+    // }
     /**
      * | Add Scheme
      */

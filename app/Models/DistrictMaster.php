@@ -35,25 +35,27 @@ class DistrictMaster extends Model
         $district->update();
         return $district->id;
     }
-     /**
+
+    /**
      * Delete district
      */
-   /**
- * Delete district
- */
-public function deleteDistrict($req)
-{
-    $data = DistrictMaster::find($req->id);
+    public function deleteDistrict($req)
+    {
+        $data = DistrictMaster::find($req->id);
 
-    if ($req->status == 1) {
-        // If status is 1, set status to true (active)
-        $data->status = true;
-    } else {
-        // If status is not 1, set status to false (inactive)
-        $data->status = false;
+        if ($req->status == 1) {
+            // If status is 1, set status to true (active)
+            $data->status = true;
+        } else {
+            // If status is not 1, set status to false (inactive)
+            $data->status = false;
+        }
+        // Save the changes to the database
+        $data->save();
     }
-    // Save the changes to the database
-    $data->save();
+    #get district
+    public function getDistrictdtl(){
+        return DistrictMaster::select('id','district_code','district_name','status as is_suspended')
+        ->get();
 }
-
 }

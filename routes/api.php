@@ -55,6 +55,11 @@ Route::controller(LandingPageController::class)->group(function () {
     Route::post('landing-page/delete-scheme', 'deleteScheme');
     Route::post('landing-page/edit-scheme', 'editScheme');
     Route::post('landing-page/list-type-wise-scheme', 'listTypeWiseScheme');
+    Route::post('add-scheme-type', 'addSchemeType');                                               //march
+    Route::post('update-scheme-type', 'updateSchemeType');                                         //march
+    Route::post('get-scheme-type-by-id', 'getSchemeTypeById');                                     //march
+    Route::post('scheme-type-delete', 'deleteShemeType');                                          //march
+    Route::post('get-scheme-type', 'getSchemetype');                                          //march
 });
 
 Route::get('me', 'AuthController@me')->middleware('log.route');
@@ -89,14 +94,13 @@ Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
-    Route::post('add-district', 'addDistrict');   
-    Route::post('update-districtBy-Id', 'updateDistrict');   
-    Route::post('delete-district', 'deleteDistrict');   
-    Route::post('create-city', 'createCity');   
-    Route::post('city/enable-disable', 'enableOrDesable');   
-
-
-});
+    Route::post('add-district', 'addDistrict');                                                //march
+    Route::post('update-districtBy-Id', 'updateDistrict');                                     //march
+    Route::post('delete-district', 'deleteDistrict');                                         //march
+    Route::post('get-district', 'getDistrictdtl');                                            //march
+    Route::post('create-city', 'createCity');                                                 //march
+    Route::post('city/enable-disable', 'enableOrDesable');                                   //march
+}); 
 
 Route::controller(WorkflowMapController::class)->group(function () {
     Route::post('workflow/v2/crud/ward-by-ulb', 'getWardByUlb');        #_Ward Without Login
@@ -453,11 +457,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(PermissionController::class)->group(function () {
         Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
     });
-
+         //march
     Route::controller(ZoneMasterController::class)->group(function () {
         Route::post('create-zone', 'createZone');
         Route::post('get-zone', 'getZone');
         Route::post('delete-zone', 'deleteZone');
+        Route::post('create-IdGeneration', 'createParam');                                                       // create Id Generation param
+        Route::post('Id-generation-param-update', 'updateParam');                                                       // create Id Generation param
+
     });
 
     /**
@@ -528,14 +535,13 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/saf/independent/generate-order-id", "unAuthApis");
         Route::post("property/prop-payment-receipt", "unAuthApis");
         Route::post("property/saf/list-apartment", "unAuthApis");
-        
+
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
         Route::post("marriage/payment-receipt", "unAuthApis");
 
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
-
     });
 });
 

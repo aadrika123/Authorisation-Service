@@ -20,7 +20,9 @@ class ZoneMaster extends Model
     public function listOfZone($ulbId)
     {
         $data = ZoneMaster::select(
-            'zone_masters.*',
+            'zone_masters.zone',
+            'zone_masters.ulb_id',
+            'status as is_suspended',
             'ulb_masters.ulb_name'
         )
             ->join('ulb_masters', 'ulb_masters.id', 'zone_masters.ulb_id')

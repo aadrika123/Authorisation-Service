@@ -181,4 +181,10 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+    #get district 
+    public function getDistrictdtl(){
+        $data= DistrictMaster::select('id','district_code','district_name','status as is_suspended')
+        ->get();
+        return responseMsgs(true, "", remove_null($data));
+}
 }
