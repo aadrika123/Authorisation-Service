@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Models\UlbMaster;
 
 class MCity extends Model
 {
@@ -14,15 +15,15 @@ class MCity extends Model
      * | Get City and State by Ulb Id
      */
     public function getCityStateByUlb($ulbId)
-    {
-        return DB::table("ulb_masters")
-            ->select("ulb_masters.*", "c.city_name", "s.name")
-            ->join("m_cities as c", 'c.id', '=', 'ulb_masters.city_id')
-            ->join("m_states as s", "s.id", '=', 'c.state_id')
-            ->where('m_cities.status',1)
-            ->where("ulb_masters.id", $ulbId)
-            ->first();
-    }
+{
+    return UlbMaster::select("ulb_masters.*", "c.city_name", "s.name")
+        ->join("m_cities as c", 'c.id', '=', 'ulb_masters.city_id')
+        ->join("m_states as s", "s.id", '=', 'c.state_id')
+        ->where('c.status', 1)
+        ->where("ulb_masters.id", $ulbId)
+        ->first();
+}
+
     public function createCity($req)
     {
         $data = new MCity;
