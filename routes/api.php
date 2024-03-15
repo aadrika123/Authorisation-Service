@@ -92,6 +92,8 @@ Route::controller(CitizenController::class)->group(function () {
  */
 Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
+    Route::post('create-ulb-master', 'createUlbmaster');
+    Route::post('ulb-master-delete', 'deactiveUlbById');                                        //15/2024
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
     Route::post('add-district', 'addDistrict');                                                //march
@@ -100,7 +102,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('get-district', 'getDistrictdtl');                                            //march
     Route::post('create-city', 'createCity');                                                 //march
     Route::post('city/enable-disable', 'enableOrDesable');                                   //march
-}); 
+    Route::post('update-city-by-id', 'updateCity');                                          //15/24
+});
 
 Route::controller(WorkflowMapController::class)->group(function () {
     Route::post('workflow/v2/crud/ward-by-ulb', 'getWardByUlb');        #_Ward Without Login
@@ -296,6 +299,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('all-user-api-exclude', 'userApiExcluldeList');
         Route::post('user-api-exclude', 'userApiExclulde');
         Route::post('edit-user-api-exclude', 'userApiExcluldeUpdate');
+
+        # zone crud operation 
+        Route::post('create-zone', 'createZone');
+        Route::post('get-zone', 'getZone');
+        Route::post('delete-zone', 'deleteZone');
+        Route::post('update-zone', 'updateZone');                                                        //15/2024
+        Route::post('create-IdGeneration', 'createParam');                                                       // create Id Generation param
+        Route::post('Id-generation-param-update', 'updateParam');                                                       // create Id Generation param
+
     });
 
     /**
@@ -456,15 +468,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(PermissionController::class)->group(function () {
         Route::post('permissions/get-user-permission', 'getUserPermission');                        // 01
-    });
-         //march
-    Route::controller(ZoneMasterController::class)->group(function () {
-        Route::post('create-zone', 'createZone');
-        Route::post('get-zone', 'getZone');
-        Route::post('delete-zone', 'deleteZone');
-        Route::post('create-IdGeneration', 'createParam');                                                       // create Id Generation param
-        Route::post('Id-generation-param-update', 'updateParam');                                                       // create Id Generation param
-
     });
 
     /**
