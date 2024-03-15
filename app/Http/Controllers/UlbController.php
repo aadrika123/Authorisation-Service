@@ -23,6 +23,33 @@ class UlbController extends Controller
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
+    /**
+     * |active or deactive ulb_masters by id
+     */
+    public function deactiveUlbById(Request $req)
+    {
+        try {
+            $delete = new UlbMaster();
+            $delete->deactiveUlb($req);
+
+            return responseMsgs(true, "", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    /**
+     * |add ulb masters
+     */
+    public function createUlbmaster(Request $req)
+    {
+        try {
+            $create = new UlbMaster();
+            $ulb = $create->addUlbMaster($req);
+            return responseMsgs(true, "", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 
 
     /**
@@ -72,9 +99,25 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
-
-
-
+    /**
+     * |update city 
+     */
+    public function updateCity(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            "id"  => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => false, 'message' => $validator->errors()];
+        }
+        try {
+            $mCity = new MCity();
+            $update = $mCity->updateCityById($req);
+            return responseMsgs(true, "Data updated", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
     /**
      * | list of ulb by district code
      */
@@ -182,9 +225,10 @@ class UlbController extends Controller
         }
     }
     #get district 
-    public function getDistrictdtl(){
-        $data= DistrictMaster::select('id','district_code','district_name','status as is_suspended')
-        ->get();
+    public function getDistrictdtl()
+    {
+        $data = DistrictMaster::select('id', 'district_code', 'district_name', 'status as is_suspended')
+            ->get();
         return responseMsgs(true, "", remove_null($data));
-}
+    }
 }

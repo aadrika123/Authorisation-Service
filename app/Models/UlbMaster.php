@@ -17,4 +17,42 @@ class UlbMaster extends Model
         return UlbMaster::where('district_code', $districtCode)
             ->get();
     }
+    /**
+     * |deactive or active ulb
+     */
+    public function deactiveUlb($req)
+    {
+
+        $data = UlbMaster::find($req->id);
+
+        if ($req->status == 1) {
+            $data->active_status = true;
+        } else {
+            $data->active_status = false;
+        }
+        // Save the changes to the database
+        $data->save();
+    }
+    /**
+     * |add ulb master
+     */
+    public function addUlbMaster($req)
+    {
+        $data = new UlbMaster();
+        $data->ulb_name = $req->ulb_name;
+        $data->ulb_type = $req->city_id;
+        $data->remarks = $req->remarks;
+        $data->department_id = $req->stateId;
+        $data->district_code = $req->district_code;
+        $data->category = $req->category;
+        $data->code = $req->code;
+        $data->short_name = $req->short_name;
+        $data->state_id = $req->state_id;
+        $data->district_id = $req->district_id;
+        $data->association_with = $req->association_with;
+        $data->latitude = $req->latitude;
+        $data->save();
+
+        return $data->id;
+    }
 }

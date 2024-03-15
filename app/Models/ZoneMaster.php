@@ -46,4 +46,12 @@ class ZoneMaster extends Model
         }
         $data->save();
     }
+    #update zone
+    public function updateZoneById($req)
+    {
+        $data = ZoneMaster::find($req->id);
+        $data->zone = $req->zone;
+        $data->ulb_id = $req->ulbId;
+        $data->save();
+    }
 }
