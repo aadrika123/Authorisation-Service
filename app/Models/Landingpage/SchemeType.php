@@ -39,4 +39,18 @@ class SchemeType extends Model
       ->where('id',$req->id)
       ->get();
     }
+    #active or inactive
+    public function activeOrDeatcive($req)
+    {
+        $data = SchemeType::find($req->id);
+
+        if ($req->status == 1) {
+           
+            $data->status = 1;
+        } else {
+            
+            $data->status = 0;
+        }
+        $data->save();
+    }
 }

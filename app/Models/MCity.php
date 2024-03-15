@@ -46,11 +46,27 @@ class MCity extends Model
         $data->save();
     }
     #update city
-    public function updateCityById($req)
+    public function getaAllData()
     {
-        $data = MCity::find($req->id);
-        $data->city_name = $req->cityName;
-        $data->state_id = $req->stateId;
-        $data->save();
+        return self::select(
+            'id',
+            'city_name',
+            'status as is_suspended'
+
+        )
+        ->where('status',1)
+        ->get();
+    }
+    #get data by id
+    public function getDataByIdDtls($request)
+    {
+        return self::select(
+            'id',
+            'city_name',
+            'status as is_suspended'
+        )
+            ->where('status', 1)
+            ->where('id', $request->id)
+            ->get();
     }
 }

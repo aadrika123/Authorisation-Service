@@ -101,6 +101,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('delete-district', 'deleteDistrict');                                         //march
     Route::post('get-district', 'getDistrictdtl');                                            //march
     Route::post('create-city', 'createCity');                                                 //march
+    Route::post('get-city', 'getCity');                                                     //march
+    Route::post('get-by-Id-city', 'getByIdCiTy');                                                     //march
     Route::post('city/enable-disable', 'enableOrDesable');                                   //march
     Route::post('update-city-by-id', 'updateCity');                                          //15/24
 });

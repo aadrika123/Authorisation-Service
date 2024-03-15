@@ -71,7 +71,37 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
-    #create
+     #get all city data
+    public function getCity(Request $req)
+    {
+        try {
+            $mCity = new MCity();
+            $data = $mCity->getaAllData();
+            return responseMsgs(true, "", remove_null($data));
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+     #get data by id 
+     public function getByIdCiTy(Request $request)
+     {
+         $validated = Validator::make(
+             $request->all(),
+             [
+                 "id" => 'required'
+             ]
+         );
+         if ($validated->fails())
+             return validationError($validated);
+         try {
+             $mCity = new MCity();
+             $data = $mCity->getDataByIdDtls($request);
+             return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+         } catch (Exception $e) {
+             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+         }
+     }
+    #create city
     public function createCity(Request $request)
     {
         try {

@@ -75,12 +75,25 @@ class LandingPageController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
         }
     }
-     #get  
-     public function getSchemetype(){
-        $data= SchemeType::select('id','type','status as is_suspended')
-        ->get();
+    #get  
+    public function getSchemetype()
+    {
+        $data = SchemeType::select('id', 'type', 'status as is_suspended')
+            ->get();
         return responseMsgs(true, "", remove_null($data));
-}
+    }
+    #active and inactive schemetype
+    public function deleteShemeType(Request $req)
+    {
+        try {
+            $delete = new SchemeType();
+            $delete->activeOrDeatcive($req);
+
+            return responseMsgs(true, "Data delete", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
     // public function updateSchemeType(Request $req)
     // {
     //     try {
@@ -177,14 +190,15 @@ class LandingPageController extends Controller
             $scheme->scheme_type_id = $req->schemeTypeId;
             $scheme->content = $req->content;
             $scheme->link = $req->link;
-            $scheme->save();                                                             
+            $scheme->save();
             return responseMsgs(true, "Scheme Updated Successfully !!!", '', 055102, "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
         }
     }
 
-    public function listTypeWiseScheme(Request $req){
+    public function listTypeWiseScheme(Request $req)
+    {
         try {
             $mScheme = new Scheme();
             $list = $mScheme->listAllScheme()->get();
