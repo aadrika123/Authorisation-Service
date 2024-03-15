@@ -39,7 +39,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->_mUser = new User();
-        $this->_ModuleMaster = new ModuleMaster(); 
+        $this->_ModuleMaster = new ModuleMaster();
         // $this->_MenuMobileMaster = new MenuMobileMaster();
         // $this->_UserMenuMobileExclude   = new UserMenuMobileExclude();
         // $this->_UserMenuMobileInclude   = new UserMenuMobileInclude();
@@ -77,12 +77,10 @@ class UserController extends Controller
                     $values = $value['roles'];
                     return $values;
                 });
-                if(!$req->type && $this->checkMobileUserRole($menuRoleDetails))
-                {
+                if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Mobile user not login as web user");
                 }
-                if($req->type && !$this->checkMobileUserRole($menuRoleDetails))
-                {
+                if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Web user not login as user mobile");
                 }
 
@@ -100,14 +98,13 @@ class UserController extends Controller
 
     private function checkMobileUserRole($menuRoleDetails)
     {
-    foreach ($menuRoleDetails as $role) {
-        if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR') {
+        foreach ($menuRoleDetails as $role) {
+            if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR') {
 
-            return true;
+                return true;
+            }
         }
-      
-    }
-    return false;
+        return false;
     }
 
     /**
@@ -323,7 +320,9 @@ class UserController extends Controller
 
                 $user->password = Hash::make($request->newPassword);
                 $user->save();
-
+                $token = $request->user()->currentAccessToken();
+                $token->expires_at = Carbon::now();
+                $token->save();
                 return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", ".ms", "POST", $request->deviceId);
             }
             throw new Exception("Old Password dosen't Match!");
