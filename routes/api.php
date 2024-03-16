@@ -91,11 +91,13 @@ Route::controller(CitizenController::class)->group(function () {
  * | 
  */
 Route::controller(UlbController::class)->group(function () {
-    Route::get('get-all-ulb', 'getAllUlb');
+    Route::post('get-all-ulb', 'getAllUlb');
+    Route::post('ulb-active-deactive', 'actdeactulb');
     Route::post('create-ulb-master', 'createUlbmaster');
     Route::post('ulb-master-delete', 'deactiveUlbById');                                        //15/2024
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
+    Route::post('get-all-state', 'getAllState');
     Route::post('add-district', 'addDistrict');                                                //march
     Route::post('update-districtBy-Id', 'updateDistrict');                                     //march
     Route::post('delete-district', 'deleteDistrict');                                         //march

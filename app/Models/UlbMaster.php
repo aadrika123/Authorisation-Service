@@ -17,6 +17,13 @@ class UlbMaster extends Model
         return UlbMaster::where('district_code', $districtCode)
             ->get();
     }
+    #get all ulb
+    public function getAll()
+    {
+        return UlbMaster::select('id', 'ulb_name', 'active_status as is_suspended')
+            ->where('active_status', true)
+            ->get();
+    }
     /**
      * |deactive or active ulb
      */

@@ -19,10 +19,12 @@ class UlbController extends Controller
     public function getAllUlb()
     {
         $ulb = UlbMaster::orderBy('ulb_name')
-            ->where('active_status', true)
+            // ->where('active_status', true)
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
+    # active or deactive ulb master 
+
     /**
      * |active or deactive ulb_masters by id
      */
@@ -71,7 +73,7 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
-     #get all city data
+    #get all city data
     public function getCity(Request $req)
     {
         try {
@@ -82,25 +84,25 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
-     #get data by id 
-     public function getByIdCiTy(Request $request)
-     {
-         $validated = Validator::make(
-             $request->all(),
-             [
-                 "id" => 'required'
-             ]
-         );
-         if ($validated->fails())
-             return validationError($validated);
-         try {
-             $mCity = new MCity();
-             $data = $mCity->getDataByIdDtls($request);
-             return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         }
-     }
+    #get data by id 
+    public function getByIdCiTy(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mCity = new MCity();
+            $data = $mCity->getDataByIdDtls($request);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
     #create city
     public function createCity(Request $request)
     {
@@ -258,6 +260,15 @@ class UlbController extends Controller
     public function getDistrictdtl()
     {
         $data = DistrictMaster::select('id', 'district_code', 'district_name', 'status as is_suspended')
+            ->get();
+        return responseMsgs(true, "", remove_null($data));
+    }
+    /**
+     * |STATE
+     */
+    public function getAllState(Request $req)
+    {
+        $data = DB::table('m_state')
             ->get();
         return responseMsgs(true, "", remove_null($data));
     }
