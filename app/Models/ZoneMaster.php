@@ -85,6 +85,6 @@ class ZoneMaster extends Model
             ->join('ulb_masters','ulb_masters.id','zone_masters.ulb_id')
              ->where('zone_masters.status', 1)
              ->where('zone_masters.id', $request->id)
-             ->get();
+             ->first();
      }
 }
