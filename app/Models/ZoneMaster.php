@@ -20,6 +20,7 @@ class ZoneMaster extends Model
     public function listOfZone($ulbId)
     {
         $data = ZoneMaster::select(
+            'zone_masters.id',
             'zone_masters.zone',
             'zone_masters.ulb_id',
             'status as is_suspended',
@@ -54,4 +55,18 @@ class ZoneMaster extends Model
         $data->ulb_id = $req->ulbId;
         $data->save();
     }
+     #get data by id
+     public function getDataByIdDtls($request)
+     {
+         return self::select(
+             'zone_masters.id',
+             'zone',
+             'ulb_masters.ulb_name',
+             'zone_masters.status as is_suspended'
+         )
+            ->join('ulb_masters','ulb_masters.id','zone_masters.ulb_id')
+             ->where('zone_masters.status', 1)
+             ->where('zone_masters.id', $request->id)
+             ->get();
+     }
 }

@@ -28,22 +28,19 @@ class ApiMasterController extends Controller
 
     # Menu-Api-map curde 
 
-    
+
     public function getRowApiList(Request $request)
     {
         try {
-            if(!$request->service)
-            {
+            if (!$request->service) {
                 return $this->selfRowApiList();
             }
             // $request->header() ="api/property/row-api-list";
             return $this->anuthinticatedApiGateway($request);
             return (new ApiGatewayController())->apiGatewayService($request);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
-        
     }
 
     private function anuthinticatedApiGateway(Request $req)
@@ -56,48 +53,43 @@ class ApiMasterController extends Controller
             // Sending to Microservices
             $segments = explode('/', $req->path());
             $service = $segments[2];
-            $module = $segments[3]??"";
+            $module = $segments[3] ?? "";
             if (!array_key_exists($service, $services))
                 throw new Exception("Service Not Available");
 
-            $url = $services[$service].("/".$segments[0]."/".$segments[1]."/$module");
+            $url = $services[$service] . ("/" . $segments[0] . "/" . $segments[1] . "/$module");
             $ipAddress = getClientIpAddress();
             $method = $req->method();
-            
+
             $req = $req->merge([
                 'token' => $req->bearerToken(),
                 'ipAddress' => $ipAddress
             ]);
             #======================
             $header = [];
-            foreach($ApiGatewayController->generateDotIndexes(($req->headers->all())) as $key )
-            {
-                $val = explode(".",$key)[0]??"";
-                if(in_array($val,["host","accept","content-length",($_FILES)?"content-type":""]))
-                {
+            foreach ($ApiGatewayController->generateDotIndexes(($req->headers->all())) as $key) {
+                $val = explode(".", $key)[0] ?? "";
+                if (in_array($val, ["host", "accept", "content-length", ($_FILES) ? "content-type" : ""])) {
                     continue;
                 }
-                if(strtolower($val)=="content-type" && preg_match("/multipart/i", $ApiGatewayController->getArrayValueByDotNotation(($req->headers->all()),$key)) && !($_FILES) )
-                {
-                    
+                if (strtolower($val) == "content-type" && preg_match("/multipart/i", $ApiGatewayController->getArrayValueByDotNotation(($req->headers->all()), $key)) && !($_FILES)) {
+
                     continue;
                 }
-                $header[explode(".",$key)[0]??""]=$ApiGatewayController->getArrayValueByDotNotation(($req->headers->all()),$key);
-            }  
-            $response = Http::withHeaders(                
-                $header 
-            );            
-            $new2 = [];           
-            if($_FILES)
-            {
+                $header[explode(".", $key)[0] ?? ""] = $ApiGatewayController->getArrayValueByDotNotation(($req->headers->all()), $key);
+            }
+            $response = Http::withHeaders(
+                $header
+            );
+            $new2 = [];
+            if ($_FILES) {
                 $response = $this->fileHandeling($response);
                 $new2 = $this->inputHandeling($req);
-                
             }
 
             # Check if the response is valid to return in json format 
-            $response = $response->$method($url , ($_FILES ? $new2 : $req->all()));
-        
+            $response = $response->$method($url, ($_FILES ? $new2 : $req->all()));
+
             if (isset(json_decode($response)->status)) {
                 if (json_decode($response)->status == false) {
                     return json_decode($response);
@@ -113,11 +105,11 @@ class ApiMasterController extends Controller
 
     private function selfRowApiList()
     {
-        try{
-            $routes = collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {  
+        try {
+            $routes = collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
                 return [
-                    'Prefix'=>explode("/",$route->getPrefix())[0]??"",
-                    'Module'=>explode("/",$route->getPrefix())[1]??"",
+                    'Prefix' => explode("/", $route->getPrefix())[0] ?? "",
+                    'Module' => explode("/", $route->getPrefix())[1] ?? "",
                     'Method' => implode('|', $route->methods()),
                     'URI' => $route->uri(),
                     'Name' => $route->getName(),
@@ -125,88 +117,79 @@ class ApiMasterController extends Controller
                     'Middleware' => implode(', ', $route->gatherMiddleware()),
                 ];
             });
-        
-            $routes =  $routes->where("Prefix","api")->values();
 
-            return responseMsgs(true,"data Fetched",remove_null($routes));
-        }
-        catch(Exception $e)
-        {
-            return responseMsgs(false,"data Not Fetched","");
+            $routes =  $routes->where("Prefix", "api")->values();
+
+            return responseMsgs(true, "data Fetched", remove_null($routes));
+        } catch (Exception $e) {
+            return responseMsgs(false, "data Not Fetched", "");
         }
     }
 
     public function menuApiMapStore(Request $request)
     {
-        try{  
+        try {
 
             $rules["menuMstrId"] = "required|digits_between:1,9223372036854775807";
-            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";             
-            $rules["roleId"] = "required|digits_between:1,9223372036854775807";       
+            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";
+            $rules["roleId"] = "required|digits_between:1,9223372036854775807";
             $validator = Validator::make($request->all(), $rules,);
-            if ($validator->fails()) 
-            {
+            if ($validator->fails()) {
                 return responseMsgs(false, $validator->errors(), $request->all());
             }
             $menuApiMap = new MenuApiMap();
-            $testData = $menuApiMap->where("menu_mstr_id",$request->menuMstrId)
-                        ->where("api_mstr_id",$request->apiMstrId)
-                        ->where("role_id",$request->roleId)
-                        ->orderBy("id","DESC")        
-                        ->first();
+            $testData = $menuApiMap->where("menu_mstr_id", $request->menuMstrId)
+                ->where("api_mstr_id", $request->apiMstrId)
+                ->where("role_id", $request->roleId)
+                ->orderBy("id", "DESC")
+                ->first();
 
             $sms = "SuccessFully Api Maped";
-            if(!$testData)
-            {
+            if (!$testData) {
                 $menuApiMap->menu_mstr_id = $request->menuMstrId;
                 $menuApiMap->api_mstr_id = $request->apiMstrId;
                 $menuApiMap->role_id = $request->roleId;
                 $menuApiMap->save();
             }
-            if($testData)
-            {
+            if ($testData) {
                 $sms = "SuccessFully Api Maped Updated";
                 $testData->update();
             }
-            return responseMsgs(true, $sms,"" );
-        }
-        catch(Exception $e)
-        {
+            return responseMsgs(true, $sms, "");
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), $request->all());
         }
-    
     }
 
     public function menuApiMapList(Request $request)
     {
-        try{
+        try {
             $menuApiMap = new MenuApiMap();
-            $list = $menuApiMap->select("menu_api_maps.*",
-                                        "menu_masters.menu_string",
-                                        "menu_masters.module_id",
-                                        "module_masters.module_name",
-                                        "api_masters.end_point",
-                                        "api_masters.category",
-                                        "api_masters.description",
-                                        "wf_roles.role_name",
-                    )
-                    ->join("menu_masters","menu_masters.id","menu_api_maps.menu_mstr_id")
-                    ->join("api_masters","api_masters.id","menu_api_maps.api_mstr_id")
-                    ->join("wf_roles","wf_roles.id","menu_api_maps.role_id")
-                    ->leftjoin("module_masters","module_masters.id","menu_masters.module_id")
-                    ->orderBy("menu_mstr_id")
-                    ->get();
-            return responseMsg(true,["heard"=>"Menu Api Map List"],remove_null($list));
-        }
-        catch(Exception $e)
-        {
-            return responseMsg(false,$e->getMessage(),[]);
+            $list = $menuApiMap->select(
+                "menu_api_maps.*",
+                "menu_masters.menu_string",
+                "menu_masters.module_id",
+                "module_masters.module_name",
+                "api_masters.end_point",
+                "api_masters.category",
+                "api_masters.description",
+                "wf_roles.role_name",
+            )
+                ->join("menu_masters", "menu_masters.id", "menu_api_maps.menu_mstr_id")
+                ->join("api_masters", "api_masters.id", "menu_api_maps.api_mstr_id")
+                ->join("wf_roles", "wf_roles.id", "menu_api_maps.role_id")
+                ->leftjoin("module_masters", "module_masters.id", "menu_masters.module_id")
+                ->orderBy("menu_mstr_id")
+                ->get();
+            return responseMsg(true, ["heard" => "Menu Api Map List"], remove_null($list));
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), []);
         }
     }
 
     public function menuApiMap(Request $request)
     {
-        try{
+        try {
             $request->validate(
                 [
                     "id" => "required|digits_between:1,9223372036854775807",
@@ -214,77 +197,68 @@ class ApiMasterController extends Controller
             );
             $menuApiMap = new MenuApiMap();
             $menuApiMapData   = $menuApiMap->select(
-                                "menu_api_maps.*",
-                                "menu_masters.menu_string",
-                                "menu_masters.module_id",
-                                "module_masters.module_name",
-                                "api_masters.end_point",
-                                "api_masters.category",
-                                "api_masters.description",
-                                "wf_roles.role_name",
-                                )
-                                ->join("menu_masters","menu_masters.id","menu_api_maps.menu_mstr_id")
-                                ->join("api_masters","api_masters.id","menu_api_maps.api_mstr_id")
-                                ->join("wf_roles","wf_roles.id","menu_api_maps.role_id")
-                                ->leftjoin("module_masters","module_masters.id","menu_masters.module_id")                                
-                                ->find($request->id);
-            if(!$menuApiMapData)
-            {
-                  throw new Exception("Data Not Found");   
+                "menu_api_maps.*",
+                "menu_masters.menu_string",
+                "menu_masters.module_id",
+                "module_masters.module_name",
+                "api_masters.end_point",
+                "api_masters.category",
+                "api_masters.description",
+                "wf_roles.role_name",
+            )
+                ->join("menu_masters", "menu_masters.id", "menu_api_maps.menu_mstr_id")
+                ->join("api_masters", "api_masters.id", "menu_api_maps.api_mstr_id")
+                ->join("wf_roles", "wf_roles.id", "menu_api_maps.role_id")
+                ->leftjoin("module_masters", "module_masters.id", "menu_masters.module_id")
+                ->find($request->id);
+            if (!$menuApiMapData) {
+                throw new Exception("Data Not Found");
             }
-            return responseMsg(true,["heard"=>"Menu Api Map Detail"],remove_null($menuApiMapData));
+            return responseMsg(true, ["heard" => "Menu Api Map Detail"], remove_null($menuApiMapData));
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), $request->all());
         }
-        catch(Exception $e)
-        {
-            return responseMsg(false,$e->getMessage(),$request->all());
-        }
-        
     }
 
     public function menuApiMapUpdate(Request $request)
     {
-        try{    
-            $rules["id"]         = "required|digits_between:1,9223372036854775807";   
+        try {
+            $rules["id"]         = "required|digits_between:1,9223372036854775807";
             $rules["menuMstrId"] = "required|digits_between:1,9223372036854775807";
-            $rules["apiMstrId"]  = "required|digits_between:1,9223372036854775807"; 
-            $rules["roleId"] = "required|digits_between:1,9223372036854775807"; 
-            $rules["status"]     =     "nullable|in:0,1" ;      
+            $rules["apiMstrId"]  = "required|digits_between:1,9223372036854775807";
+            $rules["roleId"] = "required|digits_between:1,9223372036854775807";
+            $rules["status"]     =     "nullable|in:0,1";
             $validator = Validator::make($request->all(), $rules,);
-            if ($validator->fails()) 
-            {
+            if ($validator->fails()) {
                 return responseMsgs(false, $validator->errors(), $request->all());
             }
             $menuApiMap = new MenuApiMap();
             $testData = $menuApiMap->find($request->id);
             $sms = "SuccessFully Api Maped";
-            if(!$testData)
-            {
-                    throw new Exception("Data Not Found");   
+            if (!$testData) {
+                throw new Exception("Data Not Found");
             }
 
-            DB::beginTransaction();    
+            DB::beginTransaction();
             #update data
-            $sms="Updated Recode";
+            $sms = "Updated Recode";
             $testData->menu_mstr_id = $request->menuMstrId;
             $testData->api_mstr_id = $request->apiMstrId;
             $testData->role_id = $request->roleId;
-            if(isset($request->status))
-            {
-                switch($request->status)
-                {
-                    case 0 : $testData->status   = 0;
-                            break;
-                    case 1  : $testData->status  = 1;
-                            break;
+            if (isset($request->status)) {
+                switch ($request->status) {
+                    case 0:
+                        $testData->status   = 0;
+                        break;
+                    case 1:
+                        $testData->status  = 1;
+                        break;
                 }
-
             }
             $testData->update();
             DB::commit();
-            return responseMsgs(true, $sms,"" );
-        }
-        catch(Exception $e)
-        {
+            return responseMsgs(true, $sms, "");
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), $request->all());
         }
     }
@@ -292,79 +266,72 @@ class ApiMasterController extends Controller
     #===========User-Api-Exclude Crude=================
     public function userApiExcluldeStor(Request $request)
     {
-        try{  
+        try {
 
             $rules["userId"] = "required|digits_between:1,9223372036854775807";
-            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";   
-            $rules["moduleId"] = "nullable|digits_between:1,9223372036854775807";       
+            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";
+            $rules["moduleId"] = "nullable|digits_between:1,9223372036854775807";
             $validator = Validator::make($request->all(), $rules,);
-            if ($validator->fails()) 
-            {
+            if ($validator->fails()) {
                 return responseMsgs(false, $validator->errors(), $request->all());
             }
             $menuApiMap = new UserApiExclude();
-            $testData = $menuApiMap->where("user_id",$request->userId)
-                        ->where("api_mstr_id",$request->apiMstrId);
-            if($request->moduleId)
-            {
-                $testData = $testData->where("module_id",$request->moduleId);
-            }                        
-            $testData = $testData->orderBy("id","DESC")        
-                        ->first();
+            $testData = $menuApiMap->where("user_id", $request->userId)
+                ->where("api_mstr_id", $request->apiMstrId);
+            if ($request->moduleId) {
+                $testData = $testData->where("module_id", $request->moduleId);
+            }
+            $testData = $testData->orderBy("id", "DESC")
+                ->first();
 
             $sms = "SuccessFully Api Excluded";
-            if(!$testData)
-            {
+            if (!$testData) {
                 $menuApiMap->user_id = $request->userId;
                 $menuApiMap->api_mstr_id = $request->apiMstrId;
                 $menuApiMap->module_id = $request->moduleId;
                 $menuApiMap->save();
             }
-            if($testData)
-            {
+            if ($testData) {
                 $sms = "SuccessFully Api Excluded Updated";
                 $testData->update();
             }
-            return responseMsgs(true, $sms,"" );
-        }
-        catch(Exception $e)
-        {
+            return responseMsgs(true, $sms, "");
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), $request->all());
         }
     }
 
     public function userApiExcluldeList(Request $request)
     {
-        try{
+        try {
             $menuApiMap = new UserApiExclude();
-            $list = $menuApiMap->select("user_api_excludes.*",
-                                        "module_masters.module_name",
-                                        "api_masters.end_point",
-                                        "api_masters.category",
-                                        "api_masters.description",
-                                        "users.user_name",
-                                        "users.mobile",
-                                        "users.name",
-                                        "users.user_code",
-                    )
-                    ->join("api_masters","api_masters.id","user_api_excludes.api_mstr_id")
-                    ->join("users","users.id","user_api_excludes.user_id")
-                    ->leftjoin("module_masters","module_masters.id","user_api_excludes.module_id")
-                    ->orderBy("user_api_excludes.user_id")
-                    ->orderBy("user_api_excludes.module_id")
-                    ->orderBy("user_api_excludes.id")
-                    ->get();
-            return responseMsg(true,["heard"=>"User Api Excluded List"],remove_null($list));
-        }
-        catch(Exception $e)
-        {
-            return responseMsg(false,$e->getMessage(),[]);
+            $list = $menuApiMap->select(
+                "user_api_excludes.*",
+                "module_masters.module_name",
+                "api_masters.end_point",
+                "api_masters.category",
+                "api_masters.description",
+                "users.user_name",
+                "users.mobile",
+                "users.name",
+                "users.user_code",
+            )
+                ->join("api_masters", "api_masters.id", "user_api_excludes.api_mstr_id")
+                ->join("users", "users.id", "user_api_excludes.user_id")
+                ->leftjoin("module_masters", "module_masters.id", "user_api_excludes.module_id")
+                ->orderBy("user_api_excludes.user_id")
+                ->orderBy("user_api_excludes.module_id")
+                ->orderBy("user_api_excludes.id")
+                ->get();
+            return responseMsg(true, ["heard" => "User Api Excluded List"], remove_null($list));
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), []);
         }
     }
 
     public function userApiExclulde(Request $request)
     {
-        try{
+        try {
             $request->validate(
                 [
                     "id" => "required|digits_between:1,9223372036854775807",
@@ -372,173 +339,181 @@ class ApiMasterController extends Controller
             );
             $menuApiMap = new UserApiExclude();
             $menuApiMapData   = $menuApiMap->select(
-                                "user_api_excludes.*",
-                                "module_masters.module_name",
-                                "api_masters.end_point",
-                                "api_masters.category",
-                                "api_masters.description",
-                                "users.user_name",
-                                "users.mobile",
-                                "users.name",
-                                "users.user_code",
-                                )
-                                ->join("api_masters","api_masters.id","user_api_excludes.api_mstr_id")
-                                ->join("users","users.id","user_api_excludes.user_id")
-                                ->leftjoin("module_masters","module_masters.id","user_api_excludes.module_id")
-                                ->find($request->id);
-            if(!$menuApiMapData)
-            {
-                  throw new Exception("Data Not Found");   
+                "user_api_excludes.*",
+                "module_masters.module_name",
+                "api_masters.end_point",
+                "api_masters.category",
+                "api_masters.description",
+                "users.user_name",
+                "users.mobile",
+                "users.name",
+                "users.user_code",
+            )
+                ->join("api_masters", "api_masters.id", "user_api_excludes.api_mstr_id")
+                ->join("users", "users.id", "user_api_excludes.user_id")
+                ->leftjoin("module_masters", "module_masters.id", "user_api_excludes.module_id")
+                ->find($request->id);
+            if (!$menuApiMapData) {
+                throw new Exception("Data Not Found");
             }
-            return responseMsg(true,["heard"=>"User Api Exclude Detail"],remove_null($menuApiMapData));
+            return responseMsg(true, ["heard" => "User Api Exclude Detail"], remove_null($menuApiMapData));
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), $request->all());
         }
-        catch(Exception $e)
-        {
-            return responseMsg(false,$e->getMessage(),$request->all());
-        }
-        
     }
 
     public function userApiExcluldeUpdate(Request $request)
     {
-        try{    
-            $rules["id"]         = "required|digits_between:1,9223372036854775807";   
+        try {
+            $rules["id"]         = "required|digits_between:1,9223372036854775807";
             $rules["userId"] = "required|digits_between:1,9223372036854775807";
-            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";   
-            $rules["moduleId"] = "nullable|digits_between:1,9223372036854775807";   
-            $rules["status"]     =     "nullable|in:0,1" ;      
+            $rules["apiMstrId"] = "required|digits_between:1,9223372036854775807";
+            $rules["moduleId"] = "nullable|digits_between:1,9223372036854775807";
+            $rules["status"]     =     "nullable|in:0,1";
             $validator = Validator::make($request->all(), $rules,);
-            if ($validator->fails()) 
-            {
+            if ($validator->fails()) {
                 return responseMsgs(false, $validator->errors(), $request->all());
             }
             $menuApiMap = new UserApiExclude();
             $testData = $menuApiMap->find($request->id);
             $sms = "SuccessFully Api Maped";
-            if(!$testData)
-            {
-                    throw new Exception("Data Not Found");   
+            if (!$testData) {
+                throw new Exception("Data Not Found");
             }
 
-            DB::beginTransaction();    
+            DB::beginTransaction();
             #update data
-            $sms="Updated Recode";
+            $sms = "Updated Recode";
             $testData->user_id = $request->userId;
             $testData->api_mstr_id = $request->apiMstrId;
             $testData->module_id = $request->moduleId;
-            if(isset($request->status))
-            {
-                switch($request->status)
-                {
-                    case 0 : $testData->status   = 0;
-                            break;
-                    case 1  : $testData->status  = 1;
-                            break;
+            if (isset($request->status)) {
+                switch ($request->status) {
+                    case 0:
+                        $testData->status   = 0;
+                        break;
+                    case 1:
+                        $testData->status  = 1;
+                        break;
                 }
-
             }
             $testData->update();
             DB::commit();
-            return responseMsgs(true, $sms,"" );
-        }
-        catch(Exception $e)
-        {
+            return responseMsgs(true, $sms, "");
+        } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), $request->all());
         }
     }
     #=======================ZONE TABLE CRUD OPERATION ==============================#
-     #create
-     public function createZone(Request $request)
-     {   
-             $request->validate([
-                 "zone" => "required",
-                 "ulbId" => "required"
-             ]);
-             try {
-             $create = new ZoneMaster();
-             $create->addZone($request);
- 
-             return responseMsgs(true, "Add Zone", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         }
-     }
- 
-     //all master list
-     public function getZone(Request $req)
-     {
-         try {
-             $ulbId = authUser()->ulb_id;
-             $list = new ZoneMaster();
-             $Zone = $list->listOfZone($ulbId);
- 
-             return responseMsgs(true, "All Workflow List", $Zone, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         }
-     }
-     //delete master
-     public function deleteZone(Request $req)
-     {
-         try {
-             $delete = new ZoneMaster();
-             $delete->deleteWorkflow($req);
- 
-             return responseMsgs(true, "Data Deleted", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         }
-     }
-     #update zone 
-     public function updateZone(Request $req)
-     {
-         $validator = Validator::make($req->all(), [
-             "id"  => 'required'
-         ]);
-         if ($validator->fails()) {
-             return ['status' => false, 'message' => $validator->errors()];
-         }
-         try {
-             $mZoneMaster = new ZoneMaster();
-             $updated = $mZoneMaster->updateZoneById($req);
-             return responseMsgs(true, "Data updates", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-         }
-     }
-     #=====================================CRUD FOR ID GENERATTION PARAM============================#
-     #CREATE ID GENERATION PARAM
- 
-     public function createParam(Request $request)
-     {
-         try {
-             $request->validate([
-                 "stingVal" => "required",
-                 "intVal" => "required"
-             ]);
-             $create = new IdGenerationParam();
-             $create->addParam($request);
-             return responseMsgs(true, "Add Id Generation Param ", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         }
-     }
-     #update
-     public function updateParam(Request $request)
-     {
-         try {
-             $request->validate([
-                 "id"       => "required",
-                 "stingVal" => "required",
-                 "intVal" => "required"
-             ]);
-             $create = new IdGenerationParam();
-             $create->updateParamId($request);
-             return responseMsgs(true, "Add Id Generation Param ", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         } catch (Exception $e) {
-             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-         }
-     }
- 
+    #create
+    public function createZone(Request $request)
+    {
+        $request->validate([
+            "zone" => "required",
+            "ulbId" => "required"
+        ]);
+        try {
+            $create = new ZoneMaster();
+            $create->addZone($request);
 
+            return responseMsgs(true, "Add Zone", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+
+    //all master list
+    public function getZone(Request $req)
+    {
+        try {
+            $ulbId = authUser()->ulb_id;
+            $list = new ZoneMaster();
+            $Zone = $list->listOfZone($ulbId);
+
+            return responseMsgs(true, "All Workflow List", $Zone, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    //delete master
+    public function deleteZone(Request $req)
+    {
+        try {
+            $delete = new ZoneMaster();
+            $delete->deleteWorkflow($req);
+
+            return responseMsgs(true, "Data Deleted", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #update zone 
+    public function updateZone(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            "id"  => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => false, 'message' => $validator->errors()];
+        }
+        try {
+            $mZoneMaster = new ZoneMaster();
+            $updated = $mZoneMaster->updateZoneById($req);
+            return responseMsgs(true, "Data updates", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #get zone by id
+    public function getZoneById(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mCity = new ZoneMaster();
+            $data = $mCity->getDataByIdDtls($req);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #=====================================CRUD FOR ID GENERATTION PARAM============================#
+    #CREATE ID GENERATION PARAM
+
+    public function createParam(Request $request)
+    {
+        try {
+            $request->validate([
+                "stingVal" => "required",
+                "intVal" => "required"
+            ]);
+            $create = new IdGenerationParam();
+            $create->addParam($request);
+            return responseMsgs(true, "Add Id Generation Param ", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+    #update
+    public function updateParam(Request $request)
+    {
+        try {
+            $request->validate([
+                "id"       => "required",
+                "stingVal" => "required",
+                "intVal" => "required"
+            ]);
+            $create = new IdGenerationParam();
+            $create->updateParamId($request);
+            return responseMsgs(true, "Add Id Generation Param ", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
 }

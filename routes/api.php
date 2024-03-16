@@ -92,7 +92,6 @@ Route::controller(CitizenController::class)->group(function () {
  */
 Route::controller(UlbController::class)->group(function () {
     Route::post('get-all-ulb', 'getAllUlb');
-    Route::post('ulb-active-deactive', 'actdeactulb');
     Route::post('create-ulb-master', 'createUlbmaster');
     Route::post('ulb-master-delete', 'deactiveUlbById');                                        //15/2024
     Route::post('list-district', 'districtList');
@@ -309,6 +308,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('get-zone', 'getZone');
         Route::post('delete-zone', 'deleteZone');
         Route::post('update-zone', 'updateZone');                                                        //15/2024
+        Route::post('get-zone-by-id', 'getZoneById');                                                        //15/2024
         Route::post('create-IdGeneration', 'createParam');                                                       // create Id Generation param
         Route::post('Id-generation-param-update', 'updateParam');                                                       // create Id Generation param
 

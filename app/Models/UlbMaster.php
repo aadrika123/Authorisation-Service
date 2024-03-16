@@ -46,8 +46,8 @@ class UlbMaster extends Model
     public function addUlbMaster($req)
     {
         $data = new UlbMaster();
-        $data->ulb_name = $req->ulb_name;
-        $data->ulb_type = $req->city_id;
+        $data->ulb_name = $req->ulbName;
+        $data->ulb_type = $req->ulbType;
         $data->remarks = $req->remarks;
         $data->department_id = $req->stateId;
         $data->district_code = $req->district_code;

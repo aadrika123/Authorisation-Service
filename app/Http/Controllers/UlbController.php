@@ -23,8 +23,7 @@ class UlbController extends Controller
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
-    # active or deactive ulb master 
-
+   
     /**
      * |active or deactive ulb_masters by id
      */
