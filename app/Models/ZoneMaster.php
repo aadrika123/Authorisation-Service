@@ -77,6 +77,7 @@ class ZoneMaster extends Model
      {
          return self::select(
              'zone_masters.id',
+             'zone_masters.ulb_id',
              'zone',
              'ulb_masters.ulb_name',
              'zone_masters.status as is_suspended'
