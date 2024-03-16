@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\MicroServices\DocUpload;
 use App\Models\DistrictMaster;
 use App\Models\MCity;
 use App\Models\UlbMaster;
@@ -23,7 +24,7 @@ class UlbController extends Controller
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
-   
+
     /**
      * |active or deactive ulb_masters by id
      */
@@ -45,14 +46,51 @@ class UlbController extends Controller
     {
         try {
             $create = new UlbMaster();
-            $ulb = $create->addUlbMaster($req);
-            return responseMsgs(true, "", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            $ulbId = $create->addUlbMaster($req);
+            return responseMsgs(true, "", $ulbId, "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
-
-
+    # get ulb master by id 
+    public function getulbById(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mCity = new UlbMaster();
+            $data = $mCity->getDataByIdDtls($request);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+    /**
+     * |update ulb master
+     */
+    public function updateUlbId(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            "id"  => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => false, 'message' => $validator->errors()];
+        }
+        try {
+            $mCity = new UlbMaster();
+            $update = $mCity->updateUlbById($req);
+            return responseMsgs(true, "Data updated", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #===========================crud for city table============================#
     /**
      * | Get City State by Ulb Id
      */

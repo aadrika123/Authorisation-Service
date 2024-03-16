@@ -15,14 +15,14 @@ class MCity extends Model
      * | Get City and State by Ulb Id
      */
     public function getCityStateByUlb($ulbId)
-{
-    return UlbMaster::select("ulb_masters.*", "c.city_name", "s.name")
-        ->join("m_cities as c", 'c.id', '=', 'ulb_masters.city_id')
-        ->join("m_states as s", "s.id", '=', 'c.state_id')
-        ->where('c.status', 1)
-        ->where("ulb_masters.id", $ulbId)
-        ->first();
-}
+    {
+        return UlbMaster::select("ulb_masters.*", "c.city_name", "s.name")
+            ->join("m_cities as c", 'c.id', '=', 'ulb_masters.city_id')
+            ->join("m_states as s", "s.id", '=', 'c.state_id')
+            ->where('c.status', 1)
+            ->where("ulb_masters.id", $ulbId)
+            ->first();
+    }
 
     public function createCity($req)
     {
@@ -54,8 +54,8 @@ class MCity extends Model
             'status as is_suspended'
 
         )
-        ->where('status',1)
-        ->get();
+            ->where('status', 1)
+            ->get();
     }
     #get data by id
     public function getDataByIdDtls($request)
@@ -65,8 +65,15 @@ class MCity extends Model
             'city_name',
             'status as is_suspended'
         )
-            ->where('status', 1)
             ->where('id', $request->id)
-            ->get();
+            ->first();
+    }
+    #update
+    public function updateCityById($req)
+    {
+        $data = MCity::find($req->id);
+        $data->city_name = $req->cityName;
+        $data->state_id = $req->stateId;
+        $data->save();
     }
 }

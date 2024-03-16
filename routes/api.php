@@ -93,7 +93,9 @@ Route::controller(CitizenController::class)->group(function () {
 Route::controller(UlbController::class)->group(function () {
     Route::post('get-all-ulb', 'getAllUlb');
     Route::post('create-ulb-master', 'createUlbmaster');
-    Route::post('ulb-master-delete', 'deactiveUlbById');                                        //15/2024
+    Route::post('ulb-master-delete', 'deactiveUlbById');                                          //15/2024
+    Route::post('get-ulb-by-id', 'getulbById');                                                    //15/2024
+    Route::post('update-ulb-by-id', 'updateUlbId');                                                //15/2024
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
     Route::post('get-all-state', 'getAllState');

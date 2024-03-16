@@ -37,7 +37,7 @@ class SchemeType extends Model
       return self::select('id','type','status as is_suspended')
       ->where('status','1')
       ->where('id',$req->id)
-      ->get();
+      ->first();
     }
     #active or inactive
     public function activeOrDeatcive($req)
