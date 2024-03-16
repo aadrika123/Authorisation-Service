@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\IdGenerationParam;
 use Illuminate\Http\Request;
 use App\Models\MenuApiMap;
+use App\Models\UlbWardMaster;
 use App\Models\UserApiExclude;
 use App\Models\ZoneMaster;
 use Exception;
@@ -513,6 +514,82 @@ class ApiMasterController extends Controller
             return responseMsgs(true, "Add Id Generation Param ", "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+
+    #========================================crud for ulb ward masters=========================#
+    # CREATE ulb ward masters 
+    public function createUlbWard(Request $request)
+    {
+        try {
+            $request->validate([
+                "ulbId" => "required",
+                "wardNumber" => "required"
+            ]);
+            $create = new UlbWardMaster();
+            $create->addUlbWard($request);
+            return responseMsgs(true, "Add  Data ", $create, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+    //all master list
+    public function getAllUlbWard(Request $req)
+    {
+        try {
+            // $ulbId = authUser()->ulb_id;
+            $mUlbWard = new UlbWardMaster();
+            $list = $mUlbWard->getALL();
+            return responseMsgs(true, "All  List", $list, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    //enable or disable  master
+    public function deleteUlbWard(Request $req)
+    {
+        try {
+            $mUlbWard = new UlbWardMaster();
+            $message = $mUlbWard->activeDeactive($req);
+            return responseMsgs(true, $message, "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #update ulb ward master 
+    public function updateUlbWard(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            "id"  => 'required'
+        ]);
+        if ($validator->fails()) {
+            return ['status' => false, 'message' => $validator->errors()];
+        }
+        try {
+            $mUlbWard = new UlbWardMaster();
+            $updated = $mUlbWard->updateZoneById($req);
+            return responseMsgs(true, "Data updates", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    #get zone by id
+    public function getById(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mUlbWard = new UlbWardMaster();
+            $data = $mUlbWard->getDataByIdDtls($req);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }

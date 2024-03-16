@@ -108,6 +108,7 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('get-by-Id-city', 'getByIdCiTy');                                                     //march
     Route::post('city/enable-disable', 'enableOrDesable');                                   //march
     Route::post('update-city-by-id', 'updateCity');                                          //15/24
+    #=====Crud 
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
@@ -314,6 +315,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('create-IdGeneration', 'createParam');                                                       // create Id Generation param
         Route::post('Id-generation-param-update', 'updateParam');                                                       // create Id Generation param
 
+        # crud for ulb_ward_masters
+        Route::post('create-ulb_ward_masters', 'createUlbWard');
+        Route::post('get-all-ulb-ward', 'getAllUlbWard');
+        Route::post('delete-ulb_ward_masters', 'deleteUlbWard');
+        Route::post('update-ulb_ward_masters', 'updateUlbWard');
+        Route::post('get-by-id-ulb_ward_masters', 'getById');
     });
 
     /**
