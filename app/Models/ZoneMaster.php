@@ -17,7 +17,24 @@ class ZoneMaster extends Model
         $data->save();
     }
     //All workflow list
-    public function listOfZone($ulbId)
+    // public function listOfZone($ulbId)
+    // {
+    //     $data = ZoneMaster::select(
+    //         'zone_masters.id',
+    //         'zone_masters.zone',
+    //         'zone_masters.ulb_id',
+    //         'status as is_suspended',
+    //         'ulb_masters.ulb_name'
+    //     )
+    //         ->join('ulb_masters', 'ulb_masters.id', 'zone_masters.ulb_id')
+    //         ->where('zone_masters.status', true)
+    //         ->where('zone_masters.ulb_id', $ulbId)
+    //         ->orderByDesc('zone_masters.id')
+    //         ->get();
+    //     return $data;
+    // }
+    //All workflow list
+    public function getZone()
     {
         $data = ZoneMaster::select(
             'zone_masters.id',
@@ -27,8 +44,8 @@ class ZoneMaster extends Model
             'ulb_masters.ulb_name'
         )
             ->join('ulb_masters', 'ulb_masters.id', 'zone_masters.ulb_id')
-            ->where('zone_masters.status', true)
-            ->where('zone_masters.ulb_id', $ulbId)
+            // ->where('zone_masters.status', true)
+            // ->where('zone_masters.ulb_id', $ulbId)
             ->orderByDesc('zone_masters.id')
             ->get();
         return $data;

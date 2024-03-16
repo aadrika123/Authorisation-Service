@@ -426,10 +426,9 @@ class ApiMasterController extends Controller
     public function getZone(Request $req)
     {
         try {
-            $ulbId = authUser()->ulb_id;
+            // $ulbId = authUser()->ulb_id;
             $list = new ZoneMaster();
-            $Zone = $list->listOfZone($ulbId);
-
+            $Zone = $list->getZone();
             return responseMsgs(true, "All Workflow List", $Zone, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
