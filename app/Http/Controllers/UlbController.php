@@ -20,7 +20,7 @@ class UlbController extends Controller
     public function getAllUlb()
     {
         $ulb = UlbMaster::orderBy('ulb_name')
-            // ->where('active_status', true)
+            ->where('active_status', true)
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
@@ -90,7 +90,7 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
-    #===========================crud for city table============================#
+    #===========================Crud for city table============================#
     /**
      * | Get City State by Ulb Id
      */
