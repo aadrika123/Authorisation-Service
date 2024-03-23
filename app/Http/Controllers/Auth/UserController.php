@@ -64,7 +64,7 @@ class UserController extends Controller
             $mWfRoleusermap = new WfRoleusermap();
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user)
-                throw new Exception("Oops! Given email does not exist");
+                throw new Exception("Invalid Credentials");
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
             if (Hash::check($req->password, $user->password)) {
@@ -81,7 +81,7 @@ class UserController extends Controller
                     throw new Exception("Mobile user not login as web user");
                 }
                 if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Web user not login as user mobile");
+                    throw new Exception("Web user not login as mobile user");
                 }
 
                 $data['token'] = $token;
@@ -90,7 +90,7 @@ class UserController extends Controller
                 return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }
 
-            throw new Exception("Password Not Matched");
+            throw new Exception("Invalid Credentials");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
