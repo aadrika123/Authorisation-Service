@@ -72,7 +72,7 @@ class CustomController extends Controller
             $docRefNo    = NULL;
             $docUniqueId = NULL;
             $user = authUser();
-            dd('ok');
+            return $request;
 
             if ($file = $request->file('document')) {
                 // $filename = time() .  '.' . $file->getClientOriginalExtension();
