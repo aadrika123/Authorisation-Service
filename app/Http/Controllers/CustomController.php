@@ -80,6 +80,7 @@ class CustomController extends Controller
                 $docRefNo    = $docResponse['data']['ReferenceNo'];
                 // $file->move($path, $filename);
             }
+            dd('ok');
 
             switch ($customFor) {
                 case ('SAF'):
