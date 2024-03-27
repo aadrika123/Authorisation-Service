@@ -9,6 +9,7 @@ return [
     "MICROSERVICES_APIS"   => env('MICROSERVICES_APIS'),
     "CUSTOM_RELATIVE_PATH" => "Uploads/Custom",
     "DOC_URL"              => env('DOC_URL'),
+    "DMS_URL"              => env('DMS_URL'),
 
     #_Module Constants
     "PROPERTY_MODULE_ID"      => 1,

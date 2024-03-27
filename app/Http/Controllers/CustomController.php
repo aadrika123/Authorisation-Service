@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\MicroServices\DocUpload;
 
 class CustomController extends Controller
 {
@@ -36,7 +37,7 @@ class CustomController extends Controller
             $mCustomDetail = new CustomDetail();
             $customData = $mCustomDetail->getCustomDetails($request);
 
-            return responseMsg(true, "Successfully Saved", $customData);
+            return responseMsg(true, "Successfully Retreived", $customData);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
@@ -58,6 +59,7 @@ class CustomController extends Controller
             if ($validated->fails()) {
                 return validationError($validated);
             }
+            $docUpload = new DocUpload;
             $path = Config::get('constants.CUSTOM_RELATIVE_PATH');
             $propertyModuleId = Config::get('constants.PROPERTY_MODULE_ID');
             $waterModuleId = Config::get('constants.WATER_MODULE_ID');
@@ -66,217 +68,222 @@ class CustomController extends Controller
             $customFor = trim(strtoupper($request->customFor));
 
             $customDetails = new CustomDetail;
-            $filename = NULL;
+            $filename    = NULL;
+            $docRefNo    = NULL;
+            $docUniqueId = NULL;
             $user = authUser();
 
             if ($file = $request->file('document')) {
                 $filename = time() .  '.' . $file->getClientOriginalExtension();
-                $file->move($path, $filename);
+                $docResponse = $docUpload->checkDoc($request);
+                $docUniqueId = $docResponse['data']['uniqueId'];
+                $docRefNo    = $docResponse['data']['ReferenceNo'];
+                // $file->move($path, $filename);
             }
 
             switch ($customFor) {
                 case ('SAF'):
                     $request->merge([
-                        "moduleId"  => $propertyModuleId,
-                        "filename"  => $filename,
-                        "path"      => $path,
-                        "ulbId"     => $user->ulb_id,
-                        "customFor" => $customFor,
-                        "reftable"  => 'prop_active_safs',
+                        "moduleId"    => $propertyModuleId,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"    => $docRefNo,
+                        "ulbId"       => $user->ulb_id,
+                        "customFor"   => $customFor,
+                        "reftable"    => 'prop_active_safs',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('PROPERTY-CONCESSION'):
                     $request->merge([
                         "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'prop_active_concessions',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('PROPERTY-OBJECTION'):
                     $request->merge([
                         "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'prop_active_objections',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('PROPERTY-HARVESTING'):
                     $request->merge([
                         "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'prop_active_harvestings',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('GBSAF'):
                     $request->merge([
                         "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'prop_active_safs',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('PROPERTY DEACTIVATION'):
                     $request->merge([
                         "moduleId" => $propertyModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'prop_active_deactivation_requests',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('WATER'):
                     $request->merge([
                         "moduleId" => $waterModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'water_applications',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('TRADE'):
                     $request->merge([
                         "moduleId" => $tradeModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'active_trade_licences',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('SELF'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'adv_active_selfadvertisements',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('MOVABLE'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'adv_active_vehicles',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('PRIVATE'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'adv_active_privatelands',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('AGENCY'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'adv_active_agencies',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('HOARDING'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'adv_active_hoardings',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('BANQUET'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'mar_active_banqute_halls',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('LODGE'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'mar_active_lodges',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('HOSTEL'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'mar_active_hostels',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
 
                 case ('DHARAMSHALA'):
                     $request->merge([
                         "moduleId" => $advertisementModuleId,
-                        "filename" => $filename,
-                        "path"     => $path,
+                        "docUniqueId" => $docUniqueId,
+                        "docRefNo"     => $docRefNo,
                         "ulbId"    => $user->ulb_id,
                         "customFor" => $customFor,
                         "reftable" => 'mar_active_dharamshalas',
                     ]);
-                    $this->saveCustomDetail($request, $filename, $customDetails, $path);
+                    $this->saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId);
                     break;
             }
 
@@ -286,17 +293,17 @@ class CustomController extends Controller
         }
     }
 
-    public function saveCustomDetail($request, $filename, $customDetails, $path)
+    public function saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId)
     {
         $mCustomDetail = new CustomDetail();
         if ($request->remarks && $request->document) {
 
             $reqs = [
                 'ref_id'        => $request->applicationId,
-                'doc_name'      => $request->filename,
-                'remarks'       => $request->remarks,
                 'ref_type'      => $request->customFor,
-                'relative_path' => $request->path,
+                'doc_ref_no'    => $docRefNo,
+                'doc_unique_id' => $docUniqueId,
+                'remarks'       => $request->remarks,
                 'module_id'     => $request->moduleId,
                 'workflow_id'   => $request->workflowid,
                 'ulb_id'        => $request->ulbId,
@@ -307,8 +314,8 @@ class CustomController extends Controller
         } elseif ($request->document) {
 
             $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_name = $filename;
-            $customDetails->relative_path = $path;
+            $customDetails->doc_ref_no = $docRefNo;
+            $customDetails->doc_unique_id = $docUniqueId;
             $customDetails->type = "file";
         } elseif ($request->remarks) {
 

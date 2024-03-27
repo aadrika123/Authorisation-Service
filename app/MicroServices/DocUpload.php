@@ -2,6 +2,8 @@
 
 namespace App\MicroServices;
 
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Str;
 
@@ -27,4 +29,74 @@ class DocUpload
 
         return $imageName;
     }
+
+    /**
+     * | New DMS Code
+     */
+    public function checkDoc($request)
+    {
+        try {
+            // $contentType = (collect(($request->headers->all())['content-type'] ?? "")->first());
+            $dmsUrl = Config::get('constants.DMS_URL');
+            $file = $request->document;
+            $filePath = $file->getPathname();
+            $hashedFile = hash_file('sha256', $filePath);
+            $filename = ($request->document)->getClientOriginalName();
+            $api = "$dmsUrl/backend/document/upload";
+            $transfer = [
+                "file" => $request->document,
+                "tags" => $filename,
+                // "reference" => 425
+            ];
+            $returnData = Http::withHeaders([
+                "x-digest"      => "$hashedFile",
+                "token"         => "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+                "folderPathId"  => 1
+            ])->attach([
+                [
+                    'file',
+                    file_get_contents($filePath),
+                    $filename
+                ]
+            ])->post("$api", $transfer);
+            if ($returnData->successful()) {
+                return (json_decode($returnData->body(), true));
+            }
+            throw new \Exception((json_decode($returnData->body(), true))["message"] ?? "");
+        } catch (\Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    public function getSingleDocUrl($document)
+    {
+        $dmsUrl = Config::get('constants.DMS_URL');
+        
+        $apiUrl = "$dmsUrl/backend/document/view-by-reference";
+        $key = collect();
+
+        if ($document) {
+            $postData = [
+                'referenceNo' => $document->reference_no,
+            ];
+            $response = Http::withHeaders([
+                "token" => "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+            ])->post($apiUrl, $postData);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+                $key['id'] =  $document->id ?? null;
+                $key['doc_id'] =  $document->doc_id ?? null;
+                $key['doc_code'] =  $document->doc_code;
+                $key['verify_status'] =  $document->verify_status;
+                $key['owner_name'] =  $document->owner_name;
+                $key['remarks'] =  $document->remarks ?? null;
+                $key['doc_path'] = $responseData['data']['fullPath'] ?? "";
+                $key['responseData'] = $responseData;
+                // $data->push($key);
+            }
+        }
+        return $key;
+    }
+
 }
