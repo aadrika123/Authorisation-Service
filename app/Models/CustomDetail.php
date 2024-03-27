@@ -38,7 +38,7 @@ class CustomDetail extends Model
 
         $customDetails = $customDetails->map(function ($val) use ($docUpload) {
             $docResponse =  $docUpload->getSingleDocUrl($val);
-            $val->docUrl =  $docResponse['doc_path'];
+            $val->docUrl =  $docResponse['doc_path'] ?? null;
             return $val;
         });
         return $customDetails;

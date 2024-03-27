@@ -296,33 +296,51 @@ class CustomController extends Controller
     public function saveCustomDetail($customDetails, $request, $docRefNo, $docUniqueId)
     {
         $mCustomDetail = new CustomDetail();
+
+        $reqs = [
+            'ref_id'        => $request->applicationId,
+            'ref_type'      => $request->customFor,
+            'doc_ref_no'    => $docRefNo,
+            'doc_unique_id' => $docUniqueId,
+            'remarks'       => $request->remarks,
+            'module_id'     => $request->moduleId,
+            'workflow_id'   => $request->workflowid,
+            'ulb_id'        => $request->ulbId,
+            'ref_table'     => $request->reftable,
+            // 'type'          => "both",
+        ];
+
         if ($request->remarks && $request->document) {
-
-            $reqs = [
-                'ref_id'        => $request->applicationId,
-                'ref_type'      => $request->customFor,
-                'doc_ref_no'    => $docRefNo,
-                'doc_unique_id' => $docUniqueId,
-                'remarks'       => $request->remarks,
-                'module_id'     => $request->moduleId,
-                'workflow_id'   => $request->workflowid,
-                'ulb_id'        => $request->ulbId,
-                'ref_table'     => $request->reftable,
-                'type'          => "both",
-            ];
-            $mCustomDetail->saveCustomDetail($reqs);
+            $reqs['type'] = "both";
+            // $reqs = [
+            //     'ref_id'        => $request->applicationId,
+            //     'ref_type'      => $request->customFor,
+            //     'doc_ref_no'    => $docRefNo,
+            //     'doc_unique_id' => $docUniqueId,
+            //     'remarks'       => $request->remarks,
+            //     'module_id'     => $request->moduleId,
+            //     'workflow_id'   => $request->workflowid,
+            //     'ulb_id'        => $request->ulbId,
+            //     'ref_table'     => $request->reftable,
+            //     'type'          => "both",
+            // ];
+            // $request->add(['type' => "both"]);
+            // $mCustomDetail->saveCustomDetail($reqs);
         } elseif ($request->document) {
+            $reqs['type'] = "file";
 
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->doc_ref_no = $docRefNo;
-            $customDetails->doc_unique_id = $docUniqueId;
-            $customDetails->type = "file";
+            // $customDetails->ref_id = $request->applicationId;
+            // $customDetails->doc_ref_no = $docRefNo;
+            // $customDetails->doc_unique_id = $docUniqueId;
+            // $customDetails->type = "file";
         } elseif ($request->remarks) {
+            $reqs['type'] = "text";
 
-            $customDetails->ref_id = $request->applicationId;
-            $customDetails->remarks = $request->remarks;
-            $customDetails->type = "text";
+            // $customDetails->ref_id = $request->applicationId;
+            // $customDetails->remarks = $request->remarks;
+            // $customDetails->type = "text";
         }
+        $mCustomDetail->saveCustomDetail($reqs);
     }
 
     /**
