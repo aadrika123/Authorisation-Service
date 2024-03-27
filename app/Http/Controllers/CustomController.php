@@ -72,6 +72,7 @@ class CustomController extends Controller
             $docRefNo    = NULL;
             $docUniqueId = NULL;
             $user = authUser();
+            dd('ok');
 
             if ($file = $request->file('document')) {
                 // $filename = time() .  '.' . $file->getClientOriginalExtension();
@@ -80,7 +81,6 @@ class CustomController extends Controller
                 $docRefNo    = $docResponse['data']['ReferenceNo'];
                 // $file->move($path, $filename);
             }
-            dd('ok');
 
             switch ($customFor) {
                 case ('SAF'):
