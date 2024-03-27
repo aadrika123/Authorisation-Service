@@ -24,6 +24,19 @@ class UlbController extends Controller
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
+    /**
+     * |Get All Ulb 
+     */
+    public function getAllUlbDtls()
+    {
+        $ulb = UlbMaster::select(
+            'ulb_masters.*',
+            'ulb_masters.active_status as is_suspended'
+        )
+            ->orderBy('ulb_name',)
+            ->get();
+        return responseMsgs(true, "", remove_null($ulb));
+    }
 
     /**
      * |active or deactive ulb_masters by id

@@ -80,6 +80,7 @@ class UlbMaster extends Model
         $data->association_with = $req->associationWith;
         $data->latitude = $req->latitude;
         $data->longitude = $req->longitude;
+        $data->active_status = true;
         $data->save();
         return $data->id;
     }
