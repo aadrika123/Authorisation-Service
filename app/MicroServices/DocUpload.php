@@ -2,6 +2,7 @@
 
 namespace App\MicroServices;
 
+use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
@@ -62,8 +63,8 @@ class DocUpload
             if ($returnData->successful()) {
                 return (json_decode($returnData->body(), true));
             }
-            throw new \Exception((json_decode($returnData->body(), true))["message"] ?? "");
-        } catch (\Exception $e) {
+            throw new Exception((json_decode($returnData->body(), true))["message"] ?? "");
+        } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
