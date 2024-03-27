@@ -74,7 +74,7 @@ class CustomController extends Controller
             $user = authUser();
 
             if ($file = $request->file('document')) {
-                $filename = time() .  '.' . $file->getClientOriginalExtension();
+                // $filename = time() .  '.' . $file->getClientOriginalExtension();
                 $docResponse = $docUpload->checkDoc($request);
                 $docUniqueId = $docResponse['data']['uniqueId'];
                 $docRefNo    = $docResponse['data']['ReferenceNo'];
