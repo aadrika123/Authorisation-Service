@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Pipelines\User;
+namespace App\Pipelines\Citizen;
 
 use Closure;
 
-class SearchByEmail
+class CitizenSearchByEmail
 {
     public function handle($request, Closure $next)
     {
@@ -12,9 +12,9 @@ class SearchByEmail
             return $next($request);
         }
         if (request()->has("strict") == true) {
-            return $next($request)->where("users.email", request()->input('email'));
+            return $next($request)->where("email", request()->input('email'));
         }
         return $next($request)
-            ->where('users.email', 'ilike', '%' . request()->input('email') . '%');
+            ->where('email', 'ilike', '%' . request()->input('email') . '%');
     }
 }

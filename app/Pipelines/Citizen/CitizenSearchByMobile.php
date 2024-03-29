@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Pipelines\User;
+namespace App\Pipelines\Citizen;
 
 use Closure;
 
-class SearchByMobile
+class CitizenSearchByMobile
 {
     public function handle($request, Closure $next)
     {
@@ -12,9 +12,9 @@ class SearchByMobile
             return $next($request);
         }
         if (request()->has("strict") == true) {
-            return $next($request)->where("users.mobile", request()->input('mobile'));
+            return $next($request)->where("mobile", request()->input('mobile'));
         }
         return $next($request)
-            ->where('users.mobile', 'ilike', '%' . request()->input('mobile') . '%');
+            ->where('mobile', 'ilike', '%' . request()->input('mobile') . '%');
     }
 }

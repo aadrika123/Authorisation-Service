@@ -119,6 +119,7 @@ Route::controller(WorkflowMapController::class)->group(function () {
 Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/send-otp', 'sendOtp');
     Route::post('user/verify-otp', "verifyOtp");
+    Route::post('forgot-password', 'forgotPasswordViaOtp');
 });
 
 

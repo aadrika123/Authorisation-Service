@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RequestSendOtp;
 use App\MicroServices\IdGeneration;
 use App\Models\Auth\ActiveCitizen;
 use App\Models\OtpMaster;
 use App\Models\OtpRequest;
-use App\Models\User;
 use Seshac\Otp\Otp;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use WpOrg\Requests\Auth;
+use App\Models\Auth\User;
+use App\Pipelines\User\SearchByEmail;
+use App\Pipelines\User\SearchByMobile;
+use App\Pipelines\Citizen\CitizenSearchByEmail;
+use App\Pipelines\Citizen\CitizenSearchByMobile;
+use Illuminate\Pipeline\Pipeline;
 
 class ThirdPartyController extends Controller
 {
@@ -105,4 +111,105 @@ class ThirdPartyController extends Controller
         $otp = 123123;
         return $otp;
     }
+
+    /**
+     * | Forgot Password Via Otp or Mail
+         Email And Sms is commented for now
+     */
+    public function forgotPasswordViaOtp(RequestSendOtp $request)
+    {
+        try {
+            $mOtpRequest = new OtpRequest();
+            $email = $request->email;
+            $mobileNo  = $request->mobile;
+            $userType = $request->userType;
+            $otpType = 'Forgot Password';
+            $request->merge(["strict" => true]);
+            if (!$email && !$mobileNo) {
+                throw new Exception("Invalid Data Given");
+            }
+            $userData = User::where('suspended', false)
+                ->orderByDesc('id');
+            $userData = app(Pipeline::class)
+                ->send(
+                    $userData
+                )
+                ->through([
+                    SearchByEmail::class,
+                    SearchByMobile::class
+                ])
+                ->thenReturn()
+                ->first();
+            if ($userType == "Citizen") {
+                $userData = ActiveCitizen::orderByDesc('id');
+                $userData = app(Pipeline::class)
+                    ->send(
+                        $userData
+                    )
+                    ->through([
+                        CitizenSearchByEmail::class,
+                        CitizenSearchByMobile::class
+                    ])
+                    ->thenReturn()
+                    ->first();
+            }
+            if (!$userData && $email) {
+                throw new Exception("Email doesn't exist");
+            }
+            elseif(!$userData && $mobileNo)
+            {
+                throw new Exception("Mobile doesn't exist");
+            }
+            elseif(!$userData)
+            {
+                throw new Exception("Data Not Found");
+            }
+            $generateOtp = $this->generateOtp();
+            $request->merge([
+                "mobileNo" => $request->mobile,
+                "type" => $otpType,
+                "otpType" => $otpType,
+                "Otp" => $generateOtp,
+                "userId" => $userData->id,
+                "userType" => $userData->gettable(),
+            ]);
+            // $smsDta = OTP($request->all());
+            // if ($mobileNo &&  !$smsDta["status"]) {
+            //     throw new Exception("Some Error Occurs Server On Otp Sending");
+            // }
+            $sms = $smsDta["sms"] ?? "";
+            $temp_id = $smsDta["temp_id"] ?? "";
+            $sendsOn = [];
+            // if ($mobileNo) {
+            //     $response = send_sms($mobileNo, $sms, $temp_id);
+            //     $sendsOn[] = "Mobile No.";
+            // }
+            if ($email) {
+                $sendsOn[] = "Email";
+                $details = [
+                    "title" => "Password Reset Information",
+                    "name"  => $userData->getTable() != "users" ? $userData->user_name : $userData->name,
+                    "Otp" => $request->Otp
+                ];
+                // try {
+                //     Mail::to($userData->email)->send(new ForgotPassword($details));
+                // } catch (Exception $e) {
+                //     throw new Exception("Currently Email Service is stopped Please try another way");
+                // }
+            }
+            $responseSms = "";
+            foreach ($sendsOn as $val) {
+                $responseSms .= ($val . " & ");
+            }
+            $responseSms = trim($responseSms, "& ");
+            // $responseSms = "OTP send to your " . $responseSms;
+            $responseSms = "Your OTP Is 123123";
+            $mOtpRequest->saveOtp($request, $generateOtp);
+
+            return responseMsgs(true, $responseSms, "", "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+
 }
