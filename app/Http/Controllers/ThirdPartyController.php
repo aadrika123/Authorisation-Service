@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RequestSendOtp;
+use App\Http\Requests\RequestVerifyOtp;
 use App\MicroServices\IdGeneration;
 use App\Models\Auth\ActiveCitizen;
 use App\Models\OtpMaster;
@@ -13,11 +14,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use WpOrg\Requests\Auth;
 use App\Models\Auth\User;
+use App\Models\PasswordResetOtpToken;
 use App\Pipelines\User\SearchByEmail;
 use App\Pipelines\User\SearchByMobile;
 use App\Pipelines\Citizen\CitizenSearchByEmail;
 use App\Pipelines\Citizen\CitizenSearchByMobile;
+use App\Pipelines\Otp\SearchByEmail as OtpSearchByEmail;
+use App\Pipelines\Otp\SearchByMobile as OtpSearchByMobile;
+use App\Pipelines\Otp\SearchByOtpType as OtpSearchByOtpType;
+use App\Pipelines\Otp\SearchByUserType as OtpSearchByUserType;
+use App\Pipelines\Otp\SearchByOtp as OtpSearchByOtp;
+use Carbon\Carbon;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class ThirdPartyController extends Controller
 {
@@ -93,6 +103,8 @@ class ThirdPartyController extends Controller
                 return responseMsgs(false, $msg, "", "", "01", ".ms", "POST", "");
             }
             $token = $mActiveCitizen->changeToken($request);
+            $token = collect($token)->first();
+
             $checkOtp->delete();
             DB::commit();
             return responseMsgs(true, "OTP Validated!", remove_null($token), "", "01", ".ms", "POST", "");
@@ -114,6 +126,8 @@ class ThirdPartyController extends Controller
 
     /**
      * | Forgot Password Via Otp or Mail
+     * | Created By: Mrinal Kumar
+     * | Date      : 29-03-2024
          Email And Sms is commented for now
      */
     public function forgotPasswordViaOtp(RequestSendOtp $request)
@@ -155,13 +169,9 @@ class ThirdPartyController extends Controller
             }
             if (!$userData && $email) {
                 throw new Exception("Email doesn't exist");
-            }
-            elseif(!$userData && $mobileNo)
-            {
+            } elseif (!$userData && $mobileNo) {
                 throw new Exception("Mobile doesn't exist");
-            }
-            elseif(!$userData)
-            {
+            } elseif (!$userData) {
                 throw new Exception("Data Not Found");
             }
             $generateOtp = $this->generateOtp();
@@ -212,4 +222,147 @@ class ThirdPartyController extends Controller
         }
     }
 
+    /**
+     * | Verify Otp Version 2
+     */
+    public function otpVerification(RequestVerifyOtp $request)
+    {
+        try {
+            $mOtpMaster             = new OtpRequest();
+            $mPasswordResetOtpToken = new PasswordResetOtpToken();
+
+            $checkOtp = $mOtpMaster::orderByDesc("id");
+            $checkOtp = app(Pipeline::class)
+                ->send(
+                    $checkOtp
+                )
+                ->through([
+                    OtpSearchByEmail::class,
+                    OtpSearchByMobile::class,
+                    OtpSearchByOtpType::class,
+                    OtpSearchByUserType::class,
+                    OtpSearchByOtp::class,
+                ])
+                ->thenReturn()
+                ->first();
+
+            if (!$checkOtp) {
+                throw new Exception("OTP not match!");
+            }
+            if ($checkOtp->expires_at < Carbon::now()) {
+                $this->transerLog($checkOtp);
+                throw new Exception("OTP is expired");
+            }
+            $checkOtp->use_date_time = Carbon::now();
+            $request->merge([
+                "tokenableType"  => $checkOtp->gettable(),
+                "tokenableId"  => $checkOtp->id,
+                "userType"     => $checkOtp->user_type,
+                "userId"     => $checkOtp->user_id,
+            ]);
+
+            DB::beginTransaction();
+            $checkOtp->update();
+            $this->transerLog($checkOtp);
+
+            $sms = "OTP Validated!";
+            $response = [];
+            if ($checkOtp->otp_type == "Forgot Password") {
+                $sms = "Proceed For Password Update. Token Is Valid Only for 10 minutes";
+                $response["token"] = $mPasswordResetOtpToken->store($request);
+            }
+            DB::commit();
+
+            return responseMsgs(true, $sms, $response, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+
+    private function transerLog(OtpRequest $checkOtp)
+    {
+        $OldOtps =  OtpRequest::where("expires_at", Carbon::now())
+            ->whereNotNull("expires_at")
+            ->where(DB::raw("CAST(created_at AS Date)"), Carbon::now()->format("Y-m-d"))
+            ->get();
+        foreach ($OldOtps as $val) {
+            $otpLog = $val->replicate();
+            $otpLog->setTable('log_otp_requests');
+            $otpLog->id = $val->id;
+            $otpLog->save();
+            $checkOtp->delete();
+        }
+        if ($checkOtp) {
+            $otpLog = $checkOtp->replicate();
+            $otpLog->setTable('log_otp_requests');
+            $otpLog->id = $checkOtp->id;
+            $otpLog->save();
+            $checkOtp->delete();
+        }
+    }
+
+    /**
+     * | Password Change Via Token
+     */
+    public function changePasswordViaToken(Request $request)
+    {
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                "token" => "required",
+                'password' => [
+                    'required',
+                    'min:6',
+                    'max:255',
+                    'regex:/[a-z]/',      // must contain at least one lowercase letter
+                    'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                    'regex:/[0-9]/',      // must contain at least one digit
+                    'regex:/[@$!%*#?&]/'  // must contain a special character
+                ]
+            ]
+        );
+        if ($validator->fails())
+            return validationError($validator);
+
+        try {
+            $mActiveCitizen = new ActiveCitizen();
+            $mUsers         = new User();
+            $mPasswordResetOtpToken         = new PasswordResetOtpToken();
+            $requestToken = $mPasswordResetOtpToken
+                ->where("token", $request->token)
+                ->where("status", 0)
+                ->whereNotNull("user_type")
+                ->whereNotNull("user_id")
+                ->first();
+            if (!$requestToken) {
+                throw new Exception("Invalid Token");
+            }
+            if ($requestToken->expires_at < Carbon::now()) {
+                throw new Exception("Token Is Expired");
+            }
+            $users = $requestToken->user_type == $mActiveCitizen->gettable() ? $mActiveCitizen->find($requestToken->user_id) : $mUsers->find($requestToken->user_id);
+            if (!$users || (!in_array($requestToken->user_type, [$mActiveCitizen->gettable(), $mUsers->gettable()]))) {
+                throw new Exception("Invalid Password Update Request Apply");
+            }
+            $requestToken->status = 1;
+            $users->password = Hash::make($request->password);
+
+            DB::beginTransaction();
+            $users->tokens->each(function ($token, $key) {
+                $token->expires_at = Carbon::now();
+                $token->update();
+                $token->delete();
+            });
+            $requestToken->update();
+            $users->update();
+            DB::commit();
+
+            return responseMsgs(true, "Password Updated Successfully", "", "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
 }

@@ -120,6 +120,8 @@ Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/send-otp', 'sendOtp');
     Route::post('user/verify-otp', "verifyOtp");
     Route::post('forgot-password', 'forgotPasswordViaOtp');
+    Route::post('otp-verification', 'otpVerification'); 
+    Route::post('change-password-token', 'changePasswordViaToken'); 
 });
 
 
