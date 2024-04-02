@@ -548,6 +548,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
         Route::post('property/location', 'unAuthApis');
         Route::post('property/location/ward-list', 'unAuthApis');
+        Route::post('saf/payment-receipt', 'unAuthApis');
 
         // Route::match(["get", 'post'], "property/independent/get-holding-dues", "unAuthApis");
         Route::post("property/independent/get-holding-dues", "unAuthApis");
