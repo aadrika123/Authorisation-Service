@@ -576,6 +576,27 @@ class UserController extends Controller
         return responseMsgs(true, "User Type", $userType);
     }
 
+    /**
+     * | List Admin
+     */
+    public function listAdmin(Request $req)
+    {
+        $userList = User::select(
+            'users.id',
+            'users.user_name',
+            'users.mobile',
+            'users.email',
+            'users.name',
+            'ulb_name',
+            'suspended',
+        )
+            ->where('user_type', 'Admin')
+            ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->get();
+        return responseMsgs(true, "User List", $userList);
+    }
+
+
     public function resetPassword(Request $req)
     {
         $validated = Validator::make($req->all(), [
@@ -599,7 +620,7 @@ class UserController extends Controller
             $respons = $this->getUser($req, $id);
             $respons = json_decode(json_encode($respons), true);
             if (!$respons["original"]["status"]) {
-                throw new Exception("Unabel To Find Your Role Dtl");
+                throw new Exception("Unable To Find Your Role Dtl");
             }
             $RoleDtl = collect($respons["original"]["data"]);
             if (!in_array(strtoupper($RoleDtl["role_name"]), ["ADMIN", "SUPER ADMIN"])) {
