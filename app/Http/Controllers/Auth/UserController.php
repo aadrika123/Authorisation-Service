@@ -101,7 +101,7 @@ class UserController extends Controller
     private function checkMobileUserRole($menuRoleDetails)
     {
         foreach ($menuRoleDetails as $role) {
-            if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR') {
+            if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR'|| $role->roles == 'JUNIOR ENGINEER'|| $role->roles == 'TAX DAROGA') {
 
                 return true;
             }
