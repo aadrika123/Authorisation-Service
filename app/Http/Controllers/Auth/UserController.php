@@ -12,6 +12,7 @@ use App\Models\ModuleMaster;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
 use App\Models\UlbWardMaster;
+use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
 use App\Pipelines\User\SearchByEmail;
 use App\Pipelines\User\SearchByMobile;
@@ -135,19 +136,45 @@ class UserController extends Controller
             $firstname = explode(" ", $request->name);
             $user->user_name = $firstname[0] . '.' . substr($request->mobile, 0, 3);
             $user->password = Hash::make($firstname[0] . '@' . substr($request->mobile, 7, 3));
-            $user->save();
 
+            DB::beginTransaction();
+            $user->save();
+            if ($request->role == 'ADMIN') {
+                $this->assignRole($request->role, $user);
+            }
+            DB::commit();
             $data['userName'] = $user->user_name;
             return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
             Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
         } catch (Exception $e) {
+            DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
 
     /**
-     * | ROle addition of ther user
+     * | Role addition of ther user
      */
+    public function assignRole($role, $user)
+    {
+        $adminRole = Config::get('constants.ADMIN_ROLE');
+        $loggedInUser = authUser()->id;
+        $mWfRoleUser = new WfRoleusermap();
+        $mWfRoleusermap = new WfRoleusermap();
+        $roleIds = $mWfRoleUser->getRoleIdByUserId($loggedInUser)->pluck('wf_role_id')->toArray();                      // Model to () get Role By User Id
+        if (in_array($adminRole, $roleIds)) {
+            $roleList = WfRole::get();
+            $roleId = collect($roleList)->where('role_name', $role)->first()->id;
+            $addRequest = new Request([
+                "wfRoleId" => $roleId,
+                "userId" => $user->id,
+                "createdBy" => $loggedInUser,
+            ]);
+            $mWfRoleusermap->addRoleUser($addRequest);
+        } else
+            throw new Exception("You r not Authorized");
+    }
+
 
     /**
      * | Update User Details

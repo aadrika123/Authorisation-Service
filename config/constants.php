@@ -29,4 +29,6 @@ return [
         "Pseudo User",
     ],
 
+    "ADMIN_ROLE" => 1,
+
 ];
