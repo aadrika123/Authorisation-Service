@@ -213,9 +213,9 @@ class UserController extends Controller
                     $user->save();
                 }
             }
-            return responseMsgs(true, "Successfully Updated", "", "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "Successfully Updated", "", "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -247,9 +247,9 @@ class UserController extends Controller
                 ->thenReturn()
                 ->paginate($perPage);
 
-            return responseMsgs(true, "User List", $userList, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "User List", $userList, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -280,9 +280,9 @@ class UserController extends Controller
                 // ->orderByDesc('id')
                 ->get();
 
-            return responseMsgs(true, "User List", $data, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "User List", $data, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -316,19 +316,22 @@ class UserController extends Controller
                     'isSuspended' => 'required|boolean'
                 ]
             );
+            $adminRole = Config::get('constants.ADMIN_ROLE');
+            $loggedInUser = authUser()->id;
+            $mWfRoleUser = new WfRoleusermap();
+            $roleIds = $mWfRoleUser->getRoleIdByUserId($loggedInUser)->pluck('wf_role_id')->toArray();                      // Model to () get Role By User Id
+            if ($request->isAdmin) {
+                if (!in_array($adminRole, $roleIds))
+                    throw new Exception("chala ja");
+            }
 
             $data = User::find($request->id);
             $data->suspended = $request->isSuspended;
             $data->save();
 
-            // if($data->suspended = true)
-            // {
-
-            // }
-
-            return responseMsgs(true, "Data Deleted", '', "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "Status Changed Succesfully", '', "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -350,11 +353,11 @@ class UserController extends Controller
                 $token = $request->user()->currentAccessToken();
                 $token->expires_at = Carbon::now();
                 $token->save();
-                return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", ".ms", "POST", $request->deviceId);
+                return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
             }
             throw new Exception("Old Password dosen't Match!");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "02", ".ms", "POST", $request->deviceId);
+            return responseMsgs(false, $e->getMessage(), "", "", "02", responseTime(), "POST", $request->deviceId);
         }
     }
 
@@ -370,9 +373,9 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
 
-            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", ".ms", "POST", $request->deviceId);
+            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", $request->deviceId);
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", $request->deviceId);
         }
     }
 
@@ -398,9 +401,9 @@ class UserController extends Controller
                 'ulb_name'  => $details->ulb_name,
             ];
 
-            return responseMsgs(true, "Data Fetched", $usersDetails, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "Data Fetched", $usersDetails, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -419,9 +422,9 @@ class UserController extends Controller
             if (!$data)
                 throw new Exception('No Role For the User');
 
-            return responseMsgs(true, "User Details", $data, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "User Details", $data, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -440,9 +443,9 @@ class UserController extends Controller
             if ($data->isEmpty())
                 throw new Exception('No User Found');
 
-            return responseMsgs(true, "User Details", $data, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "User Details", $data, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
@@ -459,9 +462,9 @@ class UserController extends Controller
                 ->orderBy('id')
                 ->get();
 
-            return responseMsgs(true, "List Employee", $data, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "List Employee", $data, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 
