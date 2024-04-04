@@ -592,6 +592,7 @@ class UserController extends Controller
         )
             ->where('user_type', 'Admin')
             ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->orderBy('name')
             ->get();
         return responseMsgs(true, "User List", $userList);
     }
