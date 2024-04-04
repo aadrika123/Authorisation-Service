@@ -17,6 +17,7 @@ use App\Models\Workflows\WfRoleusermap;
 use App\Pipelines\User\SearchByEmail;
 use App\Pipelines\User\SearchByMobile;
 use App\Pipelines\User\SearchByName;
+use App\Pipelines\User\SearchByRole;
 use App\Traits\Auth;
 use Carbon\Carbon;
 use Exception;
@@ -242,7 +243,8 @@ class UserController extends Controller
                 ->through([
                     SearchByName::class,
                     SearchByEmail::class,
-                    SearchByMobile::class
+                    SearchByMobile::class,
+                    SearchByRole::class
                 ])
                 ->thenReturn()
                 ->paginate($perPage);
