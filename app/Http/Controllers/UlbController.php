@@ -268,7 +268,7 @@ class UlbController extends Controller
                 "state_id"      => $request->stateId
             ];
             $data = $mDistrictMaster->addDistrict($request);
-            return responseMsgs(true, "", remove_null($data), "Succesfully Add", "01", ".ms", "POST");
+            return responseMsgs(true, "Add District Successfully", remove_null($data), "Succesfully Add", "01", ".ms", "POST");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), $e->getFile(), "", "01", ".ms", "POST",);
         }
@@ -294,6 +294,25 @@ class UlbController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             return responseMsgs(true, $e->getMessage(), "", "050501", "1.0", "", "POST", $request->deviceId ?? "");
+        }
+    }
+    #get district by Id
+    public function getDistrictById(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "id" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mCity = new DistrictMaster();
+            $data = $mCity->getDataByIdDtls($request);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
     //delete master
