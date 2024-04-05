@@ -54,8 +54,18 @@ class DistrictMaster extends Model
         $data->save();
     }
     #get district
-    public function getDistrictdtl(){
-        return DistrictMaster::select('id','district_code','district_name','status as is_suspended')
-        ->get();
-}
+    public function getDistrictdtl()
+    {
+        return DistrictMaster::select('id', 'district_code', 'district_name', 'status as is_suspended')
+            ->get();
+    }
+    #get data by id
+    public function getDataByIdDtls($request)
+    {
+        return self::select(
+            '*'
+        )
+            ->where('id', $request->id)
+            ->first();
+    }
 }

@@ -102,6 +102,7 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('get-all-state', 'getAllState');
     Route::post('add-district', 'addDistrict');                                                //march
     Route::post('update-districtBy-Id', 'updateDistrict');                                     //march
+    Route::post('get-districtBy-Id', 'getDistrictById');                                     //march
     Route::post('delete-district', 'deleteDistrict');                                         //march
     Route::post('get-district', 'getDistrictdtl');                                            //march
     Route::post('create-city', 'createCity');                                                 //march
