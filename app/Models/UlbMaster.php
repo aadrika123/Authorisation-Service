@@ -33,9 +33,9 @@ class UlbMaster extends Model
         $data = UlbMaster::find($req->id);
 
         if ($req->status == 1) {
-            $data->active_status = false;
-        } else {
             $data->active_status = true;
+        } else {
+            $data->active_status = false;
         }
         // Save the changes to the database
         $data->save();
