@@ -151,6 +151,7 @@ class MenuRoleController extends Controller
                         order by m.id";
 
             $data = DB::select($query);
+            $data = collect($data)->groupBy('module_name');
 
             return responseMsg(true, "Menu Role Map List", $data);
         } catch (Exception $e) {
