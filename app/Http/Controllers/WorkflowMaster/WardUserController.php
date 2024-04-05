@@ -209,6 +209,7 @@ class WardUserController extends Controller
                         order by ward.id";
 
             $data = DB::select($query);
+            $data = collect($data)->whereNull('old_ward_name')->values();
 
             // $WardUsers = $mWfWardUser->listWardUser()
             //     ->where('users.id', $req->userId)
