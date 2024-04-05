@@ -31,11 +31,9 @@ class UlbController extends Controller
     {
         $ulb = UlbMaster::select(
             'ulb_masters.*',
-            DB::raw("case when active_status = true 
-                            then false
-                     else true end as is_suspended"),
+            'active_status as is_suspended',
         )
-            ->orderBy('ulb_name',)
+            ->orderBy('ulb_name')
             ->get();
         return responseMsgs(true, "", remove_null($ulb));
     }
