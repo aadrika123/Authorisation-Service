@@ -228,7 +228,7 @@ class UserController extends Controller
     {
         try {
             $perPage = $req->perPage ?? 10;
-            $ulbId = authUser()->ulb_id;
+            $ulbId = $req->ulbId ?? authUser()->ulb_id;
             $data = User::select(
                 '*',
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
