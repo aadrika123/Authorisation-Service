@@ -11,6 +11,7 @@ use App\Models\Auth\User;
 use App\Models\ModuleMaster;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
+use App\Models\UlbMaster;
 use App\Models\UlbWardMaster;
 use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
@@ -85,7 +86,7 @@ class UserController extends Controller
                 if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Web user not login as mobile user");
                 }
-
+                $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
                 $data['userDetails']['role'] = $role;
@@ -101,7 +102,7 @@ class UserController extends Controller
     private function checkMobileUserRole($menuRoleDetails)
     {
         foreach ($menuRoleDetails as $role) {
-            if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR'|| $role->roles == 'JUNIOR ENGINEER'|| $role->roles == 'TAX DAROGA') {
+            if ($role->roles == 'TAX COLLECTOR' || $role->roles == 'ULB TAX COLLECTOR' || $role->roles == 'JUNIOR ENGINEER' || $role->roles == 'TAX DAROGA') {
 
                 return true;
             }
