@@ -83,8 +83,12 @@ class UserController extends Controller
                 if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Mobile user not login as web user");
                 }
-                if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Web user not login as mobile user");
+                $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
+
+                if (collect($jeRole)->isEmpty()) {
+                    if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
+                        throw new Exception("Web user not login as mobile user");
+                    }
                 }
                 $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
                 $data['token'] = $token;
