@@ -383,6 +383,111 @@ class EpramaanController extends Controller
     }
 
     /**
+     * | Logout Epramaan
+     */
+    public function logoutEpramaan(Request $req)
+    {
+        setcookie("verifier_c", "", time() - 3600, "/");
+        setcookie("nonce_c", "", time() - 3600, "/");
+        $type  = $req->type;
+
+        switch ($type) {
+            case 'citizen':
+                // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';         #_previous url of service id 100001332
+                $serviceId    = '100001332';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+
+            case 'mobile':
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                break;
+
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'https://jharkhandegovernance.com/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'https://jharkhandegovernance.com/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'https://jharkhandegovernance.com/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'https://jharkhandegovernance.com/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'https://jharkhandegovernance.com/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'https://jharkhandegovernance.com/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'https://jharkhandegovernance.com/agency/login/e-pramaan';
+                break;
+
+            default:
+                // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'http://site2.aadrikainfomedia.in/citizen/login/e-pramaan';         #_previous url of service id 100001332
+                $serviceId    = '100001332';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+        }
+
+        $scope                 = 'openid';
+        $response_type         = 'code';
+        $code_challenge_method = 'S256';
+        // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
+        $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
+        $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+
+        $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
+
+        //nonce
+        $nonce = bin2hex(random_bytes(16));
+
+        setcookie("nonce_c", "$nonce", time() + 3600, "/");
+
+        //verifier
+        $verifier_bytes = random_bytes(64);
+        $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
+
+
+        setcookie("verifier_c", "$code_verifier", time() + 3600, "/");
+
+
+        //code challenge
+        $challenge_bytes = hash("sha256", $code_verifier, true);
+        $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
+
+        $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
+
+        //apiHmac
+        $apiHmac = hash_hmac('sha256', $input, $aeskey, true);
+        $apiHmac = base64_encode($apiHmac);
+        $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
+
+        $data['url']           = $finalUrl;
+        $data['nonce']         = $nonce;
+        $data['code_verifier'] = $code_verifier;
+        return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
+    }
+
+    /**
      * |
      */
     public function base64url_encode($data)
