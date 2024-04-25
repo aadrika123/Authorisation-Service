@@ -504,10 +504,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('add-update-quickaccess', 'addUpdateQuickAccess');
     });
 
-    Route::controller(TestController::class)->group(function () {
-        Route::post('repo/test', 'test');
-    });
-
     Route::controller(WorkflowMap::class)->group(function () {
         Route::post('workflow/getWardByUlb', 'getWardByUlb');
     });
