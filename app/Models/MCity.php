@@ -16,8 +16,9 @@ class MCity extends Model
      */
     public function getCityStateByUlb($ulbId)
     {
-        return UlbMaster::select("ulb_masters.*", "c.city_name", "s.name")
+        return UlbMaster::select("ulb_masters.*", "c.city_name", "s.name", "district_name")
             ->join("m_cities as c", 'c.id', '=', 'ulb_masters.city_id')
+            ->join("district_masters", 'district_masters.id', 'ulb_masters.district_id')
             ->join("m_states as s", "s.id", '=', 'c.state_id')
             ->where('c.status', 1)
             ->where("ulb_masters.id", $ulbId)
