@@ -27,6 +27,7 @@ return [
         "TC",
         "TL",
         "Pseudo User",
+        "Water-Agency",
     ],
 
     "ADMIN_ROLE" => 1,
