@@ -155,17 +155,33 @@ class MenuController extends Controller
         }
     }
 
-    public function listParentSerial()
+    public function listParentSerial(Request $req)
     {
         try {
             $mMenuMaster = new MenuMaster();
             $parentMenu = $mMenuMaster->getParentMenue()
+                ->where('module_id', $req->moduleId)
                 ->get();
             return responseMsgs(true, "parent Menu!", $parentMenu, "", "", "", "POST", "");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | List of parent menu by module
+     */
+    // public function listParentByModule()
+    // {
+    //     try {
+    //         $mMenuMaster = new MenuMaster();
+    //         $parentMenu = $mMenuMaster->getParentMenue()
+    //             ->get();
+    //         return responseMsgs(true, "parent Menu!", $parentMenu, "", "", "", "POST", "");
+    //     } catch (Exception $e) {
+    //         return responseMsg(false, $e->getMessage(), "");
+    //     }
+    // }
 
     /**
      * | Get Menu by module 

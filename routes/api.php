@@ -186,6 +186,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-role/get', 'getRole');            #API_ID=120303  | Get Workflow Role By Id
         Route::post('user-managment/v1/crud/workflow-role/list', 'getAllRoles');       #API_ID=120304  | Get All Workflow Role          
         Route::post('user-managment/v1/crud/workflow-role/delete', 'deleteRole');      #API_ID=120305  | Delete Workflow Role
+        Route::post('user-managment/v1/crud/workflow-role/selected-role', 'selectedRole');      #API_ID=120306  | Selected Workflow Role
     });
 
     /**
@@ -559,6 +560,9 @@ Route::middleware(['apiPermission'])->group(function () {
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
         Route::post("marriage/payment-receipt", "unAuthApis");
+
+        #_Fines
+        Route::post("fines/penalty-record/payment-receipt", "unAuthApis");
 
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
