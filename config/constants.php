@@ -28,6 +28,7 @@ return [
         "TL",
         "Pseudo User",
         "Water-Agency",
+        "UlbUser",
     ],
 
     "ADMIN_ROLE" => 1,
