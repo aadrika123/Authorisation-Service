@@ -121,8 +121,8 @@ Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('user/send-otp', 'sendOtp');
     Route::post('user/verify-otp', "verifyOtp");
     Route::post('forgot-password', 'forgotPasswordViaOtp');
-    Route::post('otp-verification', 'otpVerification'); 
-    Route::post('change-password-token', 'changePasswordViaToken'); 
+    Route::post('otp-verification', 'otpVerification');
+    Route::post('change-password-token', 'changePasswordViaToken');
 });
 
 
@@ -563,6 +563,19 @@ Route::middleware(['apiPermission'])->group(function () {
 
         #_Fines
         Route::post("fines/penalty-record/payment-receipt", "unAuthApis");
+        Route::post("fines/user/enf-officer", "unAuthApis");
+        Route::post('fines/deactivate-application', "unAuthApis");
+        Route::post('fines/deactivate-challan', "unAuthApis");
+        Route::post('fines/deactivate-payment', "unAuthApis");
+        Route::post('fines/citizen-online-payment', "unAuthApis");
+        Route::post('fines/penalty-record/get-challan', "unAuthApis");
+        Route::post('fines/penalty-record/payment-receipt', "unAuthApis");
+        Route::post('fines/penalty-record/citizen-challan-search', "unAuthApis");
+        Route::post('fines/penalty-record/get-tran-no', "unAuthApis");
+        Route::post('fines/v2/violation/crud/list', "unAuthApis");
+        Route::post('fines/razorpay/save-response', "unAuthApis");
+
+
 
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
