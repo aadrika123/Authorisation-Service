@@ -80,7 +80,7 @@ class ChangePassRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'status'    => false,
-            'message'   => 'Validation errors',
+            'message'   => 'The given data is invalid',
             'data'      => $validator->errors()
         ], 200),);
     }
