@@ -576,8 +576,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('fines/razorpay/save-response', "unAuthApis");
         Route::post('fines/mini-dashboard', "unAuthApis");
         Route::post('fines/top-collection', "unAuthApis");
-
-
+        Route::post('fines/today-ulb-collection', "unAuthApis");
 
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
