@@ -53,6 +53,7 @@ class ThirdPartyController extends Controller
             ]);
             $mOtpRequest = new OtpRequest();
             if ($request->type == "Register") {
+                $type = "Citizen Registration";
                 $userDetails = ActiveCitizen::where('mobile', $request->mobileNo)
                     ->first();
                 if ($userDetails) {
@@ -60,6 +61,7 @@ class ThirdPartyController extends Controller
                 }
             }
             if ($request->type == "Forgot") {
+                $type = "Forgot Password";
                 $userDetails = ActiveCitizen::where('mobile', $request->mobileNo)
                     ->first();
                 if (!$userDetails) {
@@ -69,11 +71,22 @@ class ThirdPartyController extends Controller
             $generateOtp = $this->generateOtp();
             DB::beginTransaction();
             $mOtpRequest->saveOtp($request, $generateOtp);
+            $whatsaapData = (Whatsapp_Send(
+                $request->mobileNo,
+                "send_sms",
+                [
+                    "content_type" => "text",
+                    [
+                        $type,
+                        $generateOtp
+                    ]
+                ]
+            ));
             DB::commit();
-            return responseMsgs(true, "OTP send to your mobile No!", $generateOtp, "", "01", ".ms", "POST", "");
+            return responseMsgs(true, "OTP send to your mobile No!", [], "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
             DB::rollBack();
-            return responseMsgs(false, $e->getMessage(), "", "0101", "01", ".ms", "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "0101", "01", responseTime(), "POST", "");
         }
     }
 
