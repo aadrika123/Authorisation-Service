@@ -155,7 +155,7 @@ class WorkflowMap implements iWorkflowMapRepository
         )
             ->where('ulb_id', $ulbId)
             ->where('status', 1)
-            ->orderby('id')
+            ->orderby('ward_name')
             ->get();
 
         $groupByWards = $workkFlow->groupBy('ward_name');
