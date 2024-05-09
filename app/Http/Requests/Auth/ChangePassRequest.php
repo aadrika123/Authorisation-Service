@@ -79,8 +79,8 @@ class ChangePassRequest extends FormRequest
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'success'   => false,
-            'message'   => 'Validation errors',
+            'status'    => false,
+            'message'   => 'The given data is invalid',
             'data'      => $validator->errors()
         ], 200),);
     }
