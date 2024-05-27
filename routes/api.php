@@ -580,6 +580,10 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('fines/top-collection', "unAuthApis");
         Route::post('fines/today-ulb-collection', "unAuthApis");
 
+        #_Rig
+        Route::post("rig/application/payment-receipt", "unAuthApis");
+
+
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
         Route::post("payment/get-tran-by-orderid", "unAuthApis");
