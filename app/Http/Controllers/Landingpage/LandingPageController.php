@@ -203,7 +203,7 @@ class LandingPageController extends Controller
             $mScheme = new Scheme();
             $list = $mScheme->listAllScheme()->get();
             $list1 = collect($list)->groupBy('scheme_type');
-            return responseMsgs(true, "List Fectch Successfully", $list1, 055102, "1.0", responseTime(), "POST", $req->deviceId);
+            return responseMsgs(true, "List Fetch Successfully", $list1, 055102, "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "050516", "1.0", "", 'POST', $req->deviceId ?? "");
         }
