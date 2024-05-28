@@ -549,6 +549,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
         Route::match(["get", 'post'], "property/search-holding", "unAuthApis");
         Route::post('property/location', 'unAuthApis');
+        Route::post('property/report/mpl-todayCollection-new', 'unAuthApis');
         Route::post('property/location/ward-list', 'unAuthApis');
         Route::post('saf/payment-receipt', 'unAuthApis');
 
@@ -579,6 +580,10 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('fines/mini-dashboard', "unAuthApis");
         Route::post('fines/top-collection', "unAuthApis");
         Route::post('fines/today-ulb-collection', "unAuthApis");
+
+        #_Rig
+        Route::post("rig/application/payment-receipt", "unAuthApis");
+
 
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");

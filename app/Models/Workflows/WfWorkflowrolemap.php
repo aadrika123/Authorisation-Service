@@ -187,6 +187,7 @@ class WfWorkflowrolemap extends Model
             ->join('wf_workflows', 'wf_workflows.id', 'wf_workflowrolemaps.workflow_id')
             ->where('wf_workflows.ulb_id', $ulbId)
             ->where('workflow_id', $request->workflowId)
+            ->where('wf_workflowrolemaps.is_suspended',false)
             ->where(function ($where) {
                 $where->orWhereNotNull("wf_workflowrolemaps.forward_role_id")
                     ->orWhereNotNull("wf_workflowrolemaps.backward_role_id")
