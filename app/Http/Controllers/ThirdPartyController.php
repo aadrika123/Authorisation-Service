@@ -73,7 +73,7 @@ class ThirdPartyController extends Controller
             $mOtpRequest->saveOtp($request, $generateOtp);
 
             $mobile     = $request->mobileNo;
-            $message    = "OTP for $type of UD&HD is 898989. This OTP is valid for 10 minutes. For more info call us 1800123123.-UD&HD, GOJ";
+            $message    = "OTP for $type of UD&HD is $generateOtp. This OTP is valid for 10 minutes. For more info call us 1800123123.-UD&HD, GOJ";
             $templateid = "1307171162976397795";
             $data = send_sms($mobile, $message, $templateid);
 
