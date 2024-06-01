@@ -62,7 +62,6 @@ Route::controller(LandingPageController::class)->group(function () {
     Route::post('get-scheme-type', 'getSchemetype');                                          //march
 });
 
-Route::get('me', 'AuthController@me')->middleware('log.route');
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -146,10 +145,11 @@ Route::middleware('auth:sanctum')->group(function () {
      * | Api to Check if the User is authenticated or not
      */
     Route::post('/heartbeat', function () {                 // Heartbeat Api
-        return response()->json([
-            'status' => true,
-            'authenticated' => auth()->check()
-        ]);
+
+        // return response()->json([
+        //     'status' => true,
+        //     'authenticated' => auth()->check()
+        // ]);
     });
 
     /**
