@@ -80,6 +80,10 @@ class UserController extends Controller
                     $values = $value['roles'];
                     return $values;
                 });
+                $roleId = collect($menuRoleDetails)->map(function ($value, $key) {
+                    $values = $value['roleId'];
+                    return $values;
+                });
                 if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Mobile user not login as web user");
                 }
@@ -94,6 +98,7 @@ class UserController extends Controller
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
                 $data['userDetails']['role'] = $role;
+                $data['userDetails']['roleId'] = $roleId;
                 return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }
 
