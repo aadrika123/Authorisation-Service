@@ -63,10 +63,10 @@ if (!function_exists('send_sms')) {
     function send_sms($mobile, $message, $templateid)
     {
         if (Config::get("constants.SMS_TEST")) {
-            // $mobile = "9153975142";                 #_office mobile no
+            $mobile = "9153975142";                 #_office mobile no
             // $mobile = "7631035473";                 #_deepankar sir
             // $mobile = "8797770238";                 #_mrinal sir
-            $mobile = "8906128883";                    #_rohan sir
+            // $mobile = "8906128883";                    #_rohan sir
         }
        return $res=SMSJHGOVT($mobile, $message, $templateid);
         print_var($message);
