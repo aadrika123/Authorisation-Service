@@ -585,6 +585,9 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("rig/application/payment-receipt", "unAuthApis");
         Route::post("rig/get-approve-registration-list-V1", "unAuthApis");
 
+        #_Advert
+        Route::post('advert/get-approval-letter', 'unAuthApis');                                         // 02 ( Get All Approval Letter )
+
 
 
         #_Payment
