@@ -559,6 +559,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/saf/independent/generate-order-id", "unAuthApis");
         Route::post("property/prop-payment-receipt", "unAuthApis");
         Route::post("property/saf/list-apartment", "unAuthApis");
+        Route::post("property/m-heading-list-master", "unAuthApis");
+        Route::post("property/m-heading-list-master-desc", "unAuthApis");
 
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
