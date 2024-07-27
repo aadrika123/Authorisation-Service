@@ -561,6 +561,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/saf/list-apartment", "unAuthApis");
         Route::post("property/m-heading-list-master", "unAuthApis");
         Route::post("property/m-heading-list-master-desc", "unAuthApis");
+        Route::post("property/ m-dashboard-data", "unAuthApis");
+       
 
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
