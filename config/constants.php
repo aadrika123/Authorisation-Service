@@ -37,6 +37,7 @@ return [
         "JSK",
         "TC",
         "TL",
+        "EO",
         "Pseudo User",
         "Water-Agency",
         "UlbUser",
