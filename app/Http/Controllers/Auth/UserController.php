@@ -64,6 +64,7 @@ class UserController extends Controller
         if ($validated->fails())
             return validationError($validated);
         try {
+           
             $mWfRoleusermap = new WfRoleusermap();
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user)
@@ -111,7 +112,7 @@ class UserController extends Controller
     private function checkMobileUserRole($menuRoleDetails)
     {
         foreach ($menuRoleDetails as $role) {
-            if (in_array($role->roles,['TAX COLLECTOR' ,'ULB TAX COLLECTOR' ,'TAX DAROGA', 'DRIVER' ,'SEPTIC TANKER DRIVER','ENFORCEMENT OFFICER' ,"CONDUCTOR"])) {
+            if (in_array($role->roles,['TAX COLLECTOR' ,'ULB TAX COLLECTOR' ,'TAX DAROGA', 'DRIVER' ,'SEPTIC TANKER DRIVER','ENFORCEMENT OFFICER' ,"CONDUCTOR","PARKING INCHARGE"])) {
 
                 return true;
             }
