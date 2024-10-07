@@ -64,7 +64,6 @@ class UserController extends Controller
         if ($validated->fails())
             return validationError($validated);
         try {
-           
             $mWfRoleusermap = new WfRoleusermap();
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user)
