@@ -565,7 +565,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/m-heading-list-master-desc", "unAuthApis");
         Route::post("property/m-dashboard-data", "unAuthApis");
         Route::post("property/reports/oldHolding", "unAuthApis");
-       
+
 
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
@@ -600,7 +600,12 @@ Route::middleware(['apiPermission'])->group(function () {
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
         Route::post("payment/get-tran-by-orderid", "unAuthApis");
+<<<<<<< HEAD
         
+=======
+        //ptms
+        Route::match(["get", 'post'], "ptms/v1/prime-dashboard", "unAuthApis");
+>>>>>>> d67cf097cff220f34a0931038589b576f1e8abd6
     });
 });
 
