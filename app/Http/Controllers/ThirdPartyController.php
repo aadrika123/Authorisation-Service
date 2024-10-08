@@ -51,6 +51,7 @@ class ThirdPartyController extends Controller
                 'mobileNo' => "required|digits:10|regex:/[0-9]{10}/", #exists:active_citizens,mobile|
                 'type' => "nullable|in:Register,Forgot",
             ]);
+            $type = "";
             $mOtpRequest = new OtpRequest();
             if ($request->type == "Register") {
                 $type = "Citizen Registration";
@@ -89,7 +90,7 @@ class ThirdPartyController extends Controller
             //     ]
             // ));
             DB::commit();
-            return responseMsgs(true, "OTP send to your mobile No!", [], "", "01", responseTime(), "POST", "");
+            return responseMsgs(true, "OTP send to your mobile No!", $data, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
             DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "0101", "01", responseTime(), "POST", "");

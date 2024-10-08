@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
 use App\Models\Auth\User;
+use App\Models\EPramanExistCheck;
 use App\Models\ModuleMaster;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
@@ -781,5 +782,11 @@ class UserController extends Controller
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", 010101, "1.0", responseTime(), "POST", $req->deviceId);
         }
+    }
+
+    public function ePramanCheck()
+    {
+        $data = EPramanExistCheck::select('id','is_epramaan')->get();
+        return responseMsgs(true, "E Pramaan Detail", $data, 010101, "1.0", responseTime(), "POST", "");
     }
 }

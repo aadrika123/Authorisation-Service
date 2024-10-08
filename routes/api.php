@@ -75,6 +75,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('register', 'store');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
     Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum');
+    Route::post('e_pramaanCheck', 'ePramanCheck');
 });
 
 /**
@@ -475,6 +476,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('delete-user-notification', 'deactivateNotification');
         Route::post('hash-password', 'hashPassword');
         Route::post('user/password-reset', 'resetPassword');
+
     });
 
     // Citizen Register
@@ -598,6 +600,7 @@ Route::middleware(['apiPermission'])->group(function () {
         #_Payment
         Route::post("payment/verify-payment-status", "unAuthApis");
         Route::post("payment/get-tran-by-orderid", "unAuthApis");
+        
     });
 });
 
