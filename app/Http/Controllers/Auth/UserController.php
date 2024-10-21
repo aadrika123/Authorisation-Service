@@ -111,8 +111,9 @@ class UserController extends Controller
 
     private function checkMobileUserRole($menuRoleDetails)
     {
+
         foreach ($menuRoleDetails as $role) {
-            if (in_array($role->roles,['TAX COLLECTOR' ,'ULB TAX COLLECTOR' ,'TAX DAROGA', 'DRIVER' ,'SEPTIC TANKER DRIVER','ENFORCEMENT OFFICER' ,"CONDUCTOR","PARKING INCHARGE","LAMS FieldOfficer"])) {
+            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer"])) {
 
                 return true;
             }
@@ -786,7 +787,7 @@ class UserController extends Controller
 
     public function ePramanCheck()
     {
-        $data = EPramanExistCheck::select('id','is_epramaan')->get();
+        $data = EPramanExistCheck::select('id', 'is_epramaan')->get();
         return responseMsgs(true, "E Pramaan Detail", $data, 010101, "1.0", responseTime(), "POST", "");
     }
 }
