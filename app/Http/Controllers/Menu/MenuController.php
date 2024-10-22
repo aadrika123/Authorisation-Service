@@ -245,7 +245,7 @@ class MenuController extends Controller
             return validationError($validated);
         }
         try {
-             $user = authUser();
+            $user = authUser();
             $userId = $user->id;
             $mWfRoleUserMap = new WfRoleusermap();
             $mMenuRoleusermap = new MenuRoleusermap();
@@ -272,9 +272,9 @@ class MenuController extends Controller
             ]);
 
             $treeStructure = $this->generateMenuTree($mreqs);
-             $menu = collect($treeStructure)['original']['data'];
+            $menu = collect($treeStructure)['original']['data'];
 
-            if (isEmpty($menu)) {
+            if (collect($menu)->isEmpty()) {
                 // Revoke the current token
                 $request->user()->currentAccessToken()->delete();
                 return response()->json([
