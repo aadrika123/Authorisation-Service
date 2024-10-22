@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPUnit\Framework\isEmpty;
+
 class MenuController extends Controller
 {
 
@@ -243,7 +245,7 @@ class MenuController extends Controller
             return validationError($validated);
         }
         try {
-            $user = authUser();
+             $user = authUser();
             $userId = $user->id;
             $mWfRoleUserMap = new WfRoleusermap();
             $mMenuRoleusermap = new MenuRoleusermap();
@@ -270,8 +272,17 @@ class MenuController extends Controller
             ]);
 
             $treeStructure = $this->generateMenuTree($mreqs);
-            $menu = collect($treeStructure)['original']['data'];
+             $menu = collect($treeStructure)['original']['data'];
 
+            if (isEmpty($menu)) {
+                // Revoke the current token
+                $request->user()->currentAccessToken()->delete();
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthenticated. Permission is empty, token expired.',
+                    'code' => 401
+                ], 401);
+            }
             $menuPermission['permission'] = $menu;
             $menuPermission['userDetails'] = [
                 'userName' => $user->name,
