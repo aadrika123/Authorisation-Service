@@ -54,6 +54,17 @@ class WfRole extends Model
             ->orderByDesc('id');
     }
 
+    //role list
+    public function roleListv1($workflowId)
+    {
+        return  WfRole::select('wf_roles.id', 'role_name', 'wf_roles.is_suspended', 'users.name as created_by')
+            ->join('users', 'users.id', 'wf_roles.created_by')
+            ->join('wf_workflowrolemaps', 'wf_workflowrolemaps.wf_role_id', 'wf_roles.id')
+            ->where('wf_workflowrolemaps.workflow_id', $workflowId)
+            ->where('wf_roles.is_suspended', false)
+            ->orderByDesc('id');
+    }
+
     //delete role
 
     public function deleteRole($req)

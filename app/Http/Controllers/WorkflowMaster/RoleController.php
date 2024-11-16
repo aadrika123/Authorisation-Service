@@ -124,6 +124,23 @@ class RoleController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120304", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+    /**
+     * | Role List
+     */
+    public function selectedRoleByModule(Request $req)
+    {
+        try {
+            $mWfRole = new WfRole();
+            $roles = $mWfRole->roleListv1($req->workflowId)
+                ->get();
+            if ($roles->isEmpty())
+                throw new Exception("No data Found");
+
+            return responseMsgs(true, "All Role List", $roles, "120304", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120304", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 
     /**
      * | Delete Role

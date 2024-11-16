@@ -188,6 +188,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-role/list', 'getAllRoles');       #API_ID=120304  | Get All Workflow Role          
         Route::post('user-managment/v1/crud/workflow-role/delete', 'deleteRole');      #API_ID=120305  | Delete Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/selected-role', 'selectedRole');      #API_ID=120306  | Selected Workflow Role
+        Route::post('user-managment/v1/crud/workflow-role/by-module', 'selectedRoleByModule');      #API_ID=120306  | Selected Workflow Role
     });
 
     /**
@@ -477,7 +478,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('delete-user-notification', 'deactivateNotification');
         Route::post('hash-password', 'hashPassword');
         Route::post('user/password-reset', 'resetPassword');
-
     });
 
     // Citizen Register
