@@ -62,6 +62,7 @@ class WfRole extends Model
             ->join('wf_workflowrolemaps', 'wf_workflowrolemaps.wf_role_id', 'wf_roles.id')
             ->where('wf_workflowrolemaps.workflow_id', $workflowId)
             ->where('wf_roles.is_suspended', false)
+            ->where('wf_workflowrolemaps.is_suspended', false)
             ->orderByDesc('id');
     }
 
