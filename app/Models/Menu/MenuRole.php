@@ -20,6 +20,7 @@ class MenuRole extends Model
     {
         $newMenues = new MenuRole();
         $newMenues->menu_role_name  =  $request->menuRoleName;
+        $newMenues->module_id  =  $request->moduleId;
         $newMenues->created_by      =  authUser()->id;
         $newMenues->save();
         return $newMenues;

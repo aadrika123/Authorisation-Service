@@ -20,7 +20,7 @@ class MenuRoleController extends Controller
         try {
             $request->validate([
                 'menuRoleName' => 'required',
-                // 'moduleId'     => 'required|integer'
+                'moduleId'     => 'required|integer'
             ]);
             $mMenuRolemap = new MenuRolemap();
             $mMenuRole = new MenuRole();

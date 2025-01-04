@@ -171,7 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(WorkflowController::class)->group(function () {
         Route::post('user-managment/v1/crud/wf-workflow/save', 'createWorkflow');      #API_ID=120201  | Save Workflow
-        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');      #API_ID=120202  | Edit Workflow 
+        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');       #API_ID=120202  | Edit Workflow 
         Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');         #API_ID=120203  | Get Workflow By Id
         Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');      #API_ID=120204  | Get All Workflow
         Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');    #API_ID=120205  | Delete Workflow
