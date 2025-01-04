@@ -111,8 +111,11 @@ class MenuRoleController extends Controller
     {
         try {
             $mMenuRole = new MenuRole();
-            $list = $mMenuRole->listMenuRole()
-                ->get();
+            $list = $mMenuRole->listMenuRole();
+            if ($request->moduleId != null) {
+                $list->where('module_id', $request->moduleId);
+            }
+            $list =  $list->get();
 
             return responseMsgs(true, "List of Menu Role!", $list, "", "01", "", "POST", "");
         } catch (Exception $e) {
