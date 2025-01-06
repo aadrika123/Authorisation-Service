@@ -463,6 +463,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/multiple-user/list', 'multipleUserList'); #_Get Multiple User
         Route::post('user-managment/v1/crud/get/user-type', 'listUserType');          #_List User Type
         Route::post('user-managment/v1/crud/get/admin-list', 'listAdmin');            #_List Admin
+        Route::post('user-managment/v1/crud/get/user-list-by-ulb-id', 'listUserByUlbId');            #_List Admin
 
 
         Route::post('change-password', 'changePass');                       // Change password with login

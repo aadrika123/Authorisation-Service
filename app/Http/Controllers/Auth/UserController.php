@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Str;
+
 use function PHPUnit\Framework\throwException;
 
 class UserController extends Controller
@@ -240,6 +241,46 @@ class UserController extends Controller
         try {
             $perPage = $req->perPage ?? 10;
             $ulbId = $req->ulbId ?? authUser()->ulb_id;
+            $data = User::select(
+                '*',
+                DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
+                DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
+            )
+                ->where('ulb_id', $ulbId)
+                ->orderBy('id');
+
+            $userList = app(Pipeline::class)
+                ->send(
+                    $data
+                )
+                ->through([
+                    SearchByName::class,
+                    SearchByEmail::class,
+                    SearchByMobile::class,
+                    SearchByRole::class
+                ])
+                ->thenReturn()
+                ->paginate($perPage);
+
+            return responseMsgs(true, "User List", $userList, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+    /**
+     * | List User
+     */
+    public function listUserByUlbId(Request $req)
+    {
+        $req->validate([
+            'ulbId' => 'required'
+        ]);
+        try {
+            $perPage = $req->perPage ?? 10;
+            $ulbId = $req->ulbId;
+            if ($ulbId == null) {
+                throw new Exception('Please Provide Ulb Id !');
+            }
             $data = User::select(
                 '*',
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
