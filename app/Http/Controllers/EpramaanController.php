@@ -617,8 +617,8 @@ class EpramaanController extends Controller
 
         // Step 8: Send POST request to the external endpoint
 
-        // $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-        $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
+        $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+        // $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
 
 
 
