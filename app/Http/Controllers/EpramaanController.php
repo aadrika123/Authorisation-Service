@@ -541,7 +541,6 @@ class EpramaanController extends Controller
         // Step 1: Retrieve the session data (assuming JWS is stored in the session)
 
         // $jsonString = Session::get('JWS');
-        try {
 
 
             $jsonString = $request->sessionId ?? Session::get('JWS');
@@ -592,8 +591,8 @@ class EpramaanController extends Controller
             // Step 6: Generate HMAC hash
 
             $hmac = hash_hmac('sha256', $inputValue, $aesKey);
-            $hmac1 = base64_encode($hmac);
-            return response()->json(['hamc' => $hmac, 'hamc1'=>$hmac1], 200);
+            // $hmac1 = base64_encode($hmac);
+            // return response()->json(['hamc' => $hmac, 'hamc1'=>$hmac1], 200);
 
 
             // Step 7: Prepare data to send
@@ -632,7 +631,6 @@ class EpramaanController extends Controller
             $response = Http::post($url, $data);
 
 
-
             // Step 9: Return a response (could be redirection or direct response)
 
             if ($response->successful()) {
@@ -647,9 +645,7 @@ class EpramaanController extends Controller
 
                 return response()->json(['error' => 'Logout failed' , 'data' => $response], 500);
             }
-        } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
-        }
+        
     }
 
     /**
