@@ -561,19 +561,19 @@ class EpramaanController extends Controller
 
         $json = json_decode($jsonString, true);
 
-        return $json;
+ 
 
         // Step 4: Extract necessary parameters
 
         $clientId = "100001511"; // Please make changes if needed
 
-        $sessionId =   $json['session_id'] ?? '';
+        $sessionId =   $json->session_id ?? '';
 
         $iss = "ePramaan"; // Change as per requirement
 
         $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a"; // Please make changes
 
-        $sub = $json['sub'] ?? '';
+        $sub = $json->sub ?? '';
 
         $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan"; // Change as needed
 
@@ -617,8 +617,8 @@ class EpramaanController extends Controller
 
         // Step 8: Send POST request to the external endpoint
 
-        $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-        // $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
+        // $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+        $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
 
 
 
