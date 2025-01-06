@@ -347,6 +347,7 @@ class EpramaanController extends Controller
         $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
         $payload = $jws->getPayload();
         $responseJson = $payload;
+        $jsonres = $payload;
         // $payload = '{"sub":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","pwd_auth_status":"true","gender":"M","iss":"ePramaan","session_id":"b670d78a-1234-45b1-953d-87ea5d3459c9","sso_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","loginMode":"CITIZEN","aud":"100001033","unique_user_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","dob":"26\/04\/1998","name":"Mrinal","exp":1701347884,"mobile_number":"8797770238","iat":1701261484,"jti":"b670d78a-1234-45b1-953d-87ea5d3459c9","username":"mrinal9911"}';
         $payload = json_decode($payload);
         $mEpramaanLogin = new EpramaanLogin();
@@ -407,6 +408,7 @@ class EpramaanController extends Controller
             $userDetails['user_type'] = $citizenInfo->user_type;
             $userDetails['token']     = $token;
             $userDetails['payload']     = $payload;
+            $userDetails['eparmanToken']     = $epReqs;
             return responseMsgs(true, "Login Successfully", $userDetails, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
