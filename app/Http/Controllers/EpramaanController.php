@@ -406,6 +406,7 @@ class EpramaanController extends Controller
             $userDetails['userType']  = $citizenInfo->user_type;
             $userDetails['user_type'] = $citizenInfo->user_type;
             $userDetails['token']     = $token;
+            $userDetails['payload']     = $payload;
             return responseMsgs(true, "Login Successfully", $userDetails, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
@@ -564,7 +565,7 @@ class EpramaanController extends Controller
 
         $clientId = "100001511"; // Please make changes if needed
 
-        $sessionId =   $json['session_id'] ??'';
+        $sessionId =   $json['session_id'] ?? '';
 
         $iss = "ePramaan"; // Change as per requirement
 
