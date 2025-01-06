@@ -11,6 +11,12 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\File;
 
+use Illuminate\Support\Facades\Session;
+
+use Illuminate\Support\Str;
+
+use Illuminate\Support\Facades\Http;
+
 /**
  ** Use following packages for E-parmaan
  **/
@@ -521,6 +527,112 @@ class EpramaanController extends Controller
         $data['nonce']         = $nonce;
         $data['code_verifier'] = $code_verifier;
         return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
+    }
+
+    // chages by imran alma
+    public function eLogout(Request $request)
+
+    {
+
+        // Step 1: Retrieve the session data (assuming JWS is stored in the session)
+
+        $jsonString = Session::get('JWS');
+
+
+
+        if (!$jsonString) {
+
+            return response()->json(['error' => 'Session not found'], 400);
+        }
+
+
+
+        // Step 2: Generate UUID for logout request
+
+        $logoutRequestId = Str::uuid()->toString();
+
+
+
+        // Step 3: Create the JSON object
+
+        $json = json_decode($jsonString, true);
+
+
+
+        // Step 4: Extract necessary parameters
+
+        $clientId = "100001511"; // Please make changes if needed
+
+        $sessionId = $json['session_id'] ?? '';
+
+        $iss = "ePramaan"; // Change as per requirement
+
+        $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a"; // Please make changes
+
+        $sub = $json['sub'] ?? '';
+
+        $redirectUrl = "http://localhost:8080/JavaInt1"; // Change as needed
+
+
+
+        // Step 5: Prepare the input for HMAC
+
+        $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
+
+
+
+        // Step 6: Generate HMAC hash
+
+        $hmac = hash_hmac('sha256', $inputValue, $aesKey);
+
+
+
+        // Step 7: Prepare data to send
+
+        $data = [
+
+            'clientId' => $clientId,
+
+            'sessionId' => $sessionId,
+
+            'hmac' => $hmac,
+
+            'iss' => $iss,
+
+            'logoutRequestId' => $logoutRequestId,
+
+            'sub' => $sub,
+
+            'redirectUrl' => $redirectUrl,
+
+            'customParameter' => ''
+
+        ];
+
+
+
+        // Step 8: Send POST request to the external endpoint
+
+        $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+
+
+
+        // If you want to use the Laravel HTTP client:
+
+        $response = Http::post($url, $data);
+
+
+
+        // Step 9: Return a response (could be redirection or direct response)
+
+        if ($response->successful()) {
+
+            return redirect()->away($redirectUrl); // Redirect to the provided URL
+
+        } else {
+
+            return response()->json(['error' => 'Logout failed'], 500);
+        }
     }
 
     /**

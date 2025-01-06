@@ -133,6 +133,7 @@ Route::controller(EpramaanController::class)->group(function () {
     Route::post('e-pramaan/login', 'loginEpramaan');
     Route::post('e-pramaan/dashboard', 'dashboardEpramaan');
     Route::post('e-pramaan/logout', 'logoutEpramaan');
+    Route::post('e-pramaan/e-logout', 'eLogout');
 });
 
 /**
