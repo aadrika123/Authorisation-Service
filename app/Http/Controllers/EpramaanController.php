@@ -591,8 +591,8 @@ class EpramaanController extends Controller
 
             // Step 6: Generate HMAC hash
 
-            $hmac = hash_hmac('sha256', $inputValue, $aesKey);
-
+            $hmac = hash_hmac('sha256', $inputValue, $aesKey,true);
+            $hmac = base64_encode($hmac);
 
 
             // Step 7: Prepare data to send
