@@ -563,7 +563,7 @@ class EpramaanController extends Controller
 
         $clientId = "100001511"; // Please make changes if needed
 
-        $sessionId = $json['session_id'] ?? '';
+        $sessionId =  $request->sessionId ?? $json['session_id'];
 
         $iss = "ePramaan"; // Change as per requirement
 
