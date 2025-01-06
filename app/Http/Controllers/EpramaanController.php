@@ -635,11 +635,8 @@ class EpramaanController extends Controller
 
             if ($response->successful()) {
 
-                // return redirect()->away($redirectUrl); // Redirect to the provided URL
-                return response()->json(['response' => $response], 200); 
-
-
-
+                return redirect()->away($redirectUrl); // Redirect to the provided URL
+                return response()->json(['response' => $response,'redirectUrl'=>$redirectUrl], 200); 
             }
             else {
 
