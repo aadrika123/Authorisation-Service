@@ -571,7 +571,7 @@ class EpramaanController extends Controller
 
         $sub = $json['sub'] ?? '';
 
-        $redirectUrl = "http://localhost:8080/JavaInt1"; // Change as needed
+        $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan"; // Change as needed
 
 
 
