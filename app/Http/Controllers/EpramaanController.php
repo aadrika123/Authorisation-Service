@@ -536,7 +536,8 @@ class EpramaanController extends Controller
 
         // Step 1: Retrieve the session data (assuming JWS is stored in the session)
 
-        $jsonString = Session::get('JWS');
+        // $jsonString = Session::get('JWS');
+        $jsonString = $request->sessionId ?? Session::get('JWS');
 
 
 
@@ -563,7 +564,7 @@ class EpramaanController extends Controller
 
         $clientId = "100001511"; // Please make changes if needed
 
-        $sessionId =  $request->sessionId ?? $json['session_id'];
+        $sessionId =   $json['session_id'] ??'';
 
         $iss = "ePramaan"; // Change as per requirement
 
