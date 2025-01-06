@@ -642,7 +642,7 @@ class EpramaanController extends Controller
             }
             else {
 
-                return response()->json(['error' => 'Logout failed' , $data => $response], 500);
+                return response()->json(['error' => 'Logout failed' , 'data' => $response], 500);
             }
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
