@@ -561,7 +561,7 @@ class EpramaanController extends Controller
 
         $json = json_decode($jsonString, true);
 
-
+        return $json;
 
         // Step 4: Extract necessary parameters
 
