@@ -193,16 +193,14 @@ class WardUserController extends Controller
 
             $query = "select 
                             ward.id,
-                            wu.ward_id as ward_name,
-                           -- wu.old_ward_name,
+                            ward.ward_name,
+                            ward.old_ward_name,
                             wu.user_id,
-                           case 
-                              when wu.is_suspended is true then false
-                               else
-                                 true  
-                           end as permission_status
-
-                    
+                            case 
+                                when wu.user_id is null then false
+                                else
+                                    true  
+                            end as permission_status
                         from ulb_ward_masters as ward
                         left join (select * from wf_ward_users where user_id=$req->userId) as wu on wu.ward_id=ward.id
                         where ward.ulb_id = $user->ulb_id
@@ -221,12 +219,6 @@ class WardUserController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
-
-    // -- case 
-    //                        --     when wu.user_id is null then false
-    //                          --   else
-    //                        --         true  
-    //                        -- end as permission_status
 
     public function getTcTlJSKList(Request $req)
     {
