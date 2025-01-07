@@ -401,4 +401,113 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    //create WardUser
+    public function createModuleUlb(Request $req)
+    {
+
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'ulbId' => 'required',
+                'moduleList' => 'required|array',
+                // 'permissionStatus'=>'required
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $ulbId           = $req->ulbId;
+            $moduleId         = $req->moduleList;
+            
+
+            collect($moduleId)->map(function ($item) use ($ulbId) {
+
+                $mUlbModulePermission = new UlbModulePermission();
+                $checkExisting = $mUlbModulePermission::where('ulb_id', $ulbId)
+                    ->where('module_id', $item['moduleId'])
+                    ->first();
+
+                if ($item['permissionStatus'] == 0)
+                    $isSuspended = true;
+
+                if ($item['permissionStatus'] == 1)
+                    $isSuspended = false;
+
+                if ($checkExisting) {
+
+                    $req = new Request([
+                        'id' => $checkExisting->id,
+                        'ulbId' => $ulbId,
+                        'moduleId' => $item['moduleId'],
+                        'isSuspended' => $isSuspended,
+                    ]);
+
+                    $mUlbModulePermission->updateModuleUlb($req);
+                } else {
+                    $req = new Request([
+                        'ulbId' => $ulbId,
+                        'moduleId' => $item['moduleId'],
+                        'isSuspended' => $isSuspended,
+                    ]);
+                    $mUlbModulePermission->addModuleUlb($req);
+                }
+            });
+
+            // $checkExisting = WfWardUser::where('user_id', $req->userId)
+            //     ->where('ward_id', $req->wardId)
+            //     ->first();
+
+            // if ($checkExisting)
+            //     throw new Exception("User Exist");
+
+            // $mWfWardUser = new WfWardUser();
+            // $mWfWardUser->addWardUser($req);
+
+            return responseMsg(true, "Successfully Saved", "");
+        } catch (Exception $e) {
+            return responseMsg(true,  $e->getMessage(), "");
+        }
+    }
+
+    public function ulbModuleList(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            ['ulbId'     => 'required|int',]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $mUlbModulePermission = new UlbModulePermission();
+            $user = authUser();
+
+            $query = "select 
+                            mm.id,
+                            um.ulb_id,
+                            mm.module_name as module_name,
+                            um.created_by,
+                            case 
+                                when um.module_id is null then false
+                                else
+                                    true  
+                            end as permission_status
+                        from module_masters as mm
+                        left join (select * from ulb_module_permissions where ulb_id=$req->ulbId and is_suspended = false) as um on um.module_id=mm.id
+                        order by um.id";
+
+            $data = DB::select($query);
+            // $data = collect($data)->whereNull('ulb_id')->values();
+
+            // $WardUsers = $mWfWardUser->listWardUser()
+            //     ->where('users.id', $req->userId)
+            //     ->get();
+
+            return responseMsg(true, "Module List of Ulb", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
 }

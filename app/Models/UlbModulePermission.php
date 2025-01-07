@@ -37,7 +37,7 @@ class UlbModulePermission extends Model
         return self::select(".*")
             ->where('id', $req->id)
             ->update([
-                'is_active' => false
+                'is_suspended' => true
             ]);
     }
 
@@ -45,7 +45,29 @@ class UlbModulePermission extends Model
     {
         return self::where('ulb_id', $user->ulb_id)
             ->where('module_id', $req->moduleId)
-            ->where('is_active', false)
+            ->where('is_suspended',)
             ->first();
+    }
+
+    //create warduser
+    public function addModuleUlb($req)
+    {
+        // $createdBy = Auth()->user()->id;
+        $mUlbModulePermission = new UlbModulePermission;
+        $mUlbModulePermission->ulb_id = $req->ulbId;
+        $mUlbModulePermission->module_id = $req->moduleId;
+        // $mUlbModulePermission->created_by = $createdBy;
+        $mUlbModulePermission->save();
+    }
+
+    //update ward user
+    public function updateModuleUlb($req)
+    {
+        $mUlbModulePermission = UlbModulePermission::find($req->id);
+        $mUlbModulePermission->ulb_id      = $req->ulbId      ?? $mUlbModulePermission->ulb_id;
+        $mUlbModulePermission->module_id      = $req->moduleId      ?? $mUlbModulePermission->module_id;
+        // $mUlbModulePermission->is_admin     = $req->isAdmin     ?? $mUlbModulePermission->is_admin;
+        $mUlbModulePermission->is_suspended = $req->isSuspended ?? $mUlbModulePermission->is_suspended;
+        $mUlbModulePermission->save();
     }
 }

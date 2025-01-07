@@ -111,9 +111,9 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('city/enable-disable', 'enableOrDesable');                                   //march
     Route::post('update-city-by-id', 'updateCity');                                          //15/24
     #=====operation to make api for ulb wise module permissions ====#
-    Route::post('create/ulb-wise-module', 'createUlbModule');
+    Route::post('create/ulb-wise-module', 'createModuleUlb');
 
-    Route::post('get/moudle-by-Ulb-id', 'getMoudleByUlbId');
+    Route::post('get/moudle-by-Ulb-id', 'ulbModuleList');
 
     Route::post('remove/module-from-ulb', 'removeModuleFromUlb');
 });
