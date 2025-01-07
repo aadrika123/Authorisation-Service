@@ -38,10 +38,10 @@ class WardUserController extends Controller
                     ->where('ward_id', $item['wardId'])
                     ->first();
 
-                if ($item['permissionStatus'] == 0)
+                if ($item['permissionStatus'] == false)
                     $isSuspended = true;
 
-                if ($item['permissionStatus'] == 1)
+                if ($item['permissionStatus'] == true)
                     $isSuspended = false;
 
                 if ($checkExisting) {
@@ -193,14 +193,15 @@ class WardUserController extends Controller
 
             $query = "select 
                             ward.id,
-                            ward.ward_name,
-                            ward.old_ward_name,
+                            wu.ward_id as ward_name,
+                           -- wu.old_ward_name,
                             wu.user_id,
-                            case 
-                                when wu.user_id is null then false
-                                else
-                                    true  
-                            end as permission_status
+                           case 
+                              when wu.is_suspended is true then false
+                               else
+                                 true  
+                           end as permission_status
+
                     
                         from ulb_ward_masters as ward
                         left join (select * from wf_ward_users where user_id=$req->userId) as wu on wu.ward_id=ward.id
@@ -220,6 +221,12 @@ class WardUserController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
+    // -- case 
+    //                        --     when wu.user_id is null then false
+    //                          --   else
+    //                        --         true  
+    //                        -- end as permission_status
 
     public function getTcTlJSKList(Request $req)
     {
