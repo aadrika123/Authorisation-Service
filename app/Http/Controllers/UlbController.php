@@ -6,6 +6,7 @@ use App\MicroServices\DocUpload;
 use App\Models\DistrictMaster;
 use App\Models\MCity;
 use App\Models\UlbMaster;
+use App\Models\UlbModulePermission;
 use App\Models\UlbNewWardmap;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,6 +15,12 @@ use Illuminate\Support\Facades\Validator;
 
 class UlbController extends Controller
 {
+    protected $_UlbModulePermission;
+    public function __construct()
+    {
+        $this->_UlbModulePermission = new UlbModulePermission();
+    }
+
     /**
      * | Get All Ulbs
      */
@@ -340,5 +347,57 @@ class UlbController extends Controller
         $data = DB::table('m_state')
             ->get();
         return responseMsgs(true, "", remove_null($data));
+    }
+    #########################################################################################################################################
+    /**
+     Functions For  Make Ulb Wise Module Permissions
+     created on = 2025-01-07
+     created by = Arshad Hussain 
+     */
+    public function createUlbModule(Request $request)
+    {
+        try {
+            $request->validate([
+                "ulbId" => "required",
+                "moduleId" => "required"
+            ]);
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $data = $mUlbModulePermission->mapModuleUlB($request);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
+    //  get list of module list by ulb id 
+    public function getMoudleByUlbId(Request $req)
+    {
+        try {
+            $req->validate([
+                "ulbId" => "required",
+            ]);
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $data = $mUlbModulePermission->getModuleListByUlbId($req);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    //  remove module from specific ulb 
+    public function removeModuleFromUlb(Request $req)
+    {
+        try {
+            $req->validate([
+                "id" => "required",
+            ]);
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $data = $this->_UlbModulePermission::find($req->id);
+            if ($data == null) {
+                throw new Exception('Data Not Found!');
+            }
+            $data = $mUlbModulePermission->removeModuleFromUlb($req);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
     }
 }

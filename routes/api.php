@@ -110,7 +110,12 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('get-by-Id-city', 'getByIdCiTy');                                                     //march
     Route::post('city/enable-disable', 'enableOrDesable');                                   //march
     Route::post('update-city-by-id', 'updateCity');                                          //15/24
-    #=====Crud 
+    #=====operation to make api for ulb wise module permissions ====#
+    Route::post('create/ulb-wise-module', 'createUlbModule');
+
+    Route::post('get/moudle-by-Ulb-id', 'getMoudleByUlbId');
+
+    Route::post('remove/module-from-ulb', 'removeModuleFromUlb');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {

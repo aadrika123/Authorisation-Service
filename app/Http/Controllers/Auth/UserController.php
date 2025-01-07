@@ -13,6 +13,7 @@ use App\Models\ModuleMaster;
 use App\Models\Notification\MirrorUserNotification;
 use App\Models\Notification\UserNotification;
 use App\Models\UlbMaster;
+use App\Models\UlbModulePermission;
 use App\Models\UlbWardMaster;
 use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
@@ -41,10 +42,12 @@ class UserController extends Controller
     private $_UserMenuMobileExclude;
     private $_UserMenuMobileInclude;
     private $_ModuleMaster;
+    private $_UlbModulePermission;
     public function __construct()
     {
         $this->_mUser = new User();
         $this->_ModuleMaster = new ModuleMaster();
+        $this->_UlbModulePermission = new UlbModulePermission();
         // $this->_MenuMobileMaster = new MenuMobileMaster();
         // $this->_UserMenuMobileExclude   = new UserMenuMobileExclude();
         // $this->_UserMenuMobileInclude   = new UserMenuMobileInclude();
@@ -60,7 +63,8 @@ class UserController extends Controller
             [
                 'email' => 'required|email',
                 'password' => 'required',
-                'type' => "nullable|in:mobile"
+                'type' => "nullable|in:mobile",
+                'moduleId' => "nullable"
             ]
         );
         if ($validated->fails())
@@ -72,6 +76,13 @@ class UserController extends Controller
                 throw new Exception("Invalid Credentials");
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
+            // if ($req->moduleId != null) {
+            //     $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 
+            //     if ($checkModule) {
+            //         throw new Exception('Module is Restricted for this ulb !');
+            //     }
+            // }
+
             if (Hash::check($req->password, $user->password)) {
                 $token = $user->createToken('my-app-token')->plainTextToken;
                 $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
