@@ -20,6 +20,7 @@ class UlbModulePermission extends Model
         $data = new UlbModulePermission();
         $data->ulb_id = $req->ulbId;
         $data->module_id = $req->moduleId;
+        $data->module_name = $req->moduleName;
         $data->save();
         return $data->id;
     }

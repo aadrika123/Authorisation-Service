@@ -359,7 +359,8 @@ class UlbController extends Controller
         try {
             $request->validate([
                 "ulbId" => "required",
-                "moduleId" => "required"
+                "moduleId" => "required",
+                "moduleName" => "required|string"
             ]);
             $mUlbModulePermission = $this->_UlbModulePermission;
             $data = $mUlbModulePermission->mapModuleUlB($request);
