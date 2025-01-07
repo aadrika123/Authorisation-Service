@@ -38,10 +38,10 @@ class WardUserController extends Controller
                     ->where('ward_id', $item['wardId'])
                     ->first();
 
-                if ($item['permissionStatus'] == false)
+                if ($item['permissionStatus'] == 0)
                     $isSuspended = true;
 
-                if ($item['permissionStatus'] == true)
+                if ($item['permissionStatus'] == 1)
                     $isSuspended = false;
 
                 if ($checkExisting) {
@@ -202,7 +202,7 @@ class WardUserController extends Controller
                                     true  
                             end as permission_status
                         from ulb_ward_masters as ward
-                        left join (select * from wf_ward_users where user_id=$req->userId) as wu on wu.ward_id=ward.id
+                        left join (select * from wf_ward_users where user_id=$req->userId and is_suspended = false) as wu on wu.ward_id=ward.id
                         where ward.ulb_id = $user->ulb_id
                         and status=1
                         order by ward.id";
