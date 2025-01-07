@@ -488,6 +488,7 @@ class UlbController extends Controller
                             mm.id,
                             um.ulb_id,
                             mm.module_name as module_name,
+                            mm.url,
                             um.created_by,
                             case 
                                 when um.module_id is null then false
