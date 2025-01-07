@@ -543,106 +543,106 @@ class EpramaanController extends Controller
         // $jsonString = Session::get('JWS');
 
 
-            $jsonString = $request->sessionId ?? Session::get('JWS');
+        $jsonString = $request->sessionId ?? Session::get('JWS');
 
 
 
-            if (!$jsonString) {
+        if (!$jsonString) {
 
-                return response()->json(['error' => 'Session not found'], 400);
-            }
-
-
-
-            // Step 2: Generate UUID for logout request
-
-            $logoutRequestId = Str::uuid()->toString();
+            return response()->json(['error' => 'Session not found'], 400);
+        }
 
 
 
-            // Step 3: Create the JSON object
+        // Step 2: Generate UUID for logout request
 
-            $json = json_decode($jsonString, true);
-
-
-
-            // Step 4: Extract necessary parameters
-
-            $clientId = "100001511"; // Please make changes if needed
-
-            $sessionId =  $json['session_id'] ?? '';
-
-            $iss = "ePramaan"; // Change as per requirement
-
-            $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a"; // Please make changes
-
-            $sub = $json['sub'] ?? '';
-
-            $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan"; // Change as needed
+        $logoutRequestId = Str::uuid()->toString();
 
 
 
-            // Step 5: Prepare the input for HMAC
+        // Step 3: Create the JSON object
 
-            $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
-
-
-
-            // Step 6: Generate HMAC hash
-
-            $hmac = hash_hmac('sha256', $inputValue, $aesKey);
-            // $hmac1 = base64_encode($hmac);
-            // return response()->json(['hamc' => $hmac, 'hamc1'=>$hmac1], 200);
-
-
-            // Step 7: Prepare data to send
-
-            $data = [
-
-                'clientId' => $clientId,
-
-                'sessionId' => $sessionId,
-
-                'hmac' => $hmac,
-
-                'iss' => $iss,
-
-                'logoutRequestId' => $logoutRequestId,
-
-                'sub' => $sub,
-
-                'redirectUrl' => $redirectUrl,
-
-                'customParameter' => ''
-
-            ];
+        $json = json_decode($jsonString, true);
 
 
 
-            // Step 8: Send POST request to the external endpoint
+        // Step 4: Extract necessary parameters
 
-            // $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-            $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+        // $clientId = "100001511"; // Please make changes if needed
+        $clientId = "100001513"; // Please make changes if needed
+
+        $sessionId =  $json['session_id'] ?? '';
+
+        $iss = "ePramaan"; // Change as per requirement
+
+        $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a"; // Please make changes
+
+        $sub = $json['sub'] ?? '';
+
+        // $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan"; // Change as needed
+        $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman"; // Change as needed
 
 
 
-            // If you want to use the Laravel HTTP client:
+        // Step 5: Prepare the input for HMAC
 
-            $response = Http::post($url, $data);
+        $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
 
 
-            // Step 9: Return a response (could be redirection or direct response)
 
-            if ($response->successful()) {
+        // Step 6: Generate HMAC hash
 
-                // return redirect()->away($redirectUrl); // Redirect to the provided URL
-                return response()->json(['response' => $response,'redirectUrl'=>$redirectUrl], 200); 
-            }
-            else {
+        $hmac = hash_hmac('sha256', $inputValue, $aesKey);
+        // $hmac1 = base64_encode($hmac);
+        // return response()->json(['hamc' => $hmac, 'hamc1'=>$hmac1], 200);
 
-                return response()->json(['error' => 'Logout failed' , 'data' => $response], 500);
-            }
-        
+
+        // Step 7: Prepare data to send
+
+        $data = [
+
+            'clientId' => $clientId,
+
+            'sessionId' => $sessionId,
+
+            'hmac' => $hmac,
+
+            'iss' => $iss,
+
+            'logoutRequestId' => $logoutRequestId,
+
+            'sub' => $sub,
+
+            'redirectUrl' => $redirectUrl,
+
+            'customParameter' => ''
+
+        ];
+
+
+
+        // Step 8: Send POST request to the external endpoint
+
+        // $url = 'https://epstg.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+        $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+
+
+
+        // If you want to use the Laravel HTTP client:
+
+        $response = Http::post($url, $data);
+
+
+        // Step 9: Return a response (could be redirection or direct response)
+
+        if ($response->successful()) {
+
+            // return redirect()->away($redirectUrl); // Redirect to the provided URL
+            return response()->json(['response' => $response, 'redirectUrl' => $redirectUrl], 200);
+        } else {
+
+            return response()->json(['error' => 'Logout failed', 'data' => $response], 500);
+        }
     }
 
     /**
