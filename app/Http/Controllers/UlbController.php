@@ -8,6 +8,7 @@ use App\Models\MCity;
 use App\Models\UlbMaster;
 use App\Models\UlbModulePermission;
 use App\Models\UlbNewWardmap;
+use App\Models\UlbService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +17,11 @@ use Illuminate\Support\Facades\Validator;
 class UlbController extends Controller
 {
     protected $_UlbModulePermission;
+    protected $_UlbServices;
     public function __construct()
     {
         $this->_UlbModulePermission = new UlbModulePermission();
+        $this->_UlbServices = new UlbService();
     }
 
     /**
@@ -354,53 +357,6 @@ class UlbController extends Controller
      created on = 2025-01-07
      created by = Arshad Hussain 
      */
-    public function createUlbModule(Request $request)
-    {
-        try {
-            $request->validate([
-                "ulbId" => "required",
-                "moduleId" => "required",
-                "moduleName" => "required|string"
-            ]);
-            $mUlbModulePermission = $this->_UlbModulePermission;
-            $data = $mUlbModulePermission->mapModuleUlB($request);
-            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $request->getMethod(), $request->deviceId);
-        }
-    }
-    //  get list of module list by ulb id 
-    public function getMoudleByUlbId(Request $req)
-    {
-        try {
-            $req->validate([
-                "ulbId" => "required",
-            ]);
-            $mUlbModulePermission = $this->_UlbModulePermission;
-            $data = $mUlbModulePermission->getModuleListByUlbId($req);
-            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        }
-    }
-    //  remove module from specific ulb 
-    public function removeModuleFromUlb(Request $req)
-    {
-        try {
-            $req->validate([
-                "id" => "required",
-            ]);
-            $mUlbModulePermission = $this->_UlbModulePermission;
-            $data = $this->_UlbModulePermission::find($req->id);
-            if ($data == null) {
-                throw new Exception('Data Not Found!');
-            }
-            $data = $mUlbModulePermission->removeModuleFromUlb($req);
-            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        }
-    }
 
     //create WardUser
     public function createModuleUlb(Request $req)
@@ -420,11 +376,11 @@ class UlbController extends Controller
         try {
             $ulbId           = $req->ulbId;
             $moduleId         = $req->moduleList;
-            
+
 
             collect($moduleId)->map(function ($item) use ($ulbId) {
 
-                $mUlbModulePermission = new UlbModulePermission();
+                $mUlbModulePermission = $this->_UlbModulePermission;
                 $checkExisting = $mUlbModulePermission::where('ulb_id', $ulbId)
                     ->where('module_id', $item['moduleId'])
                     ->first();
@@ -481,7 +437,7 @@ class UlbController extends Controller
             return validationError($validated);
         }
         try {
-            $mUlbModulePermission = new UlbModulePermission();
+            $mUlbModulePermission = $this->_UlbModulePermission;
             $user = authUser();
 
             $query = "select 
@@ -500,12 +456,162 @@ class UlbController extends Controller
                         order by um.id";
 
             $data = DB::select($query);
-            // $data = collect($data)->whereNull('ulb_id')->values();
+            return responseMsg(true, "Module List of Ulb", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+    //  get list of module list by ulb id 
+    public function getMoudleByUlbId(Request $req)
+    {
+        try {
+            $req->validate([
+                "ulbId" => "required",
+            ]);
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $data = $mUlbModulePermission->getModuleListByUlbId($req);
+            return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 
-            // $WardUsers = $mWfWardUser->listWardUser()
-            //     ->where('users.id', $req->userId)
-            //     ->get();
+    // Manage services with respect to among ulb wise 
+    public function createServicesUlb(Request $req)
+    {
 
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'ulbId' => 'required',
+                'serviceList' => 'required|array',
+                // 'permissionStatus'=>'required
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $ulbId           = $req->ulbId;
+            $serviceId         = $req->serviceList;
+
+
+            collect($serviceId)->map(function ($item) use ($ulbId) {
+
+                $mUlbModulePermission =  $this->_UlbServices;
+                $checkExisting = $mUlbModulePermission::where('ulb_id', $ulbId)
+                    ->where('service_id', $item['serviceId'])
+                    ->first();
+
+                if ($item['permissionStatus'] == 0)
+                    $isSuspended = true;
+
+                if ($item['permissionStatus'] == 1)
+                    $isSuspended = false;
+
+                if ($checkExisting) {
+
+                    $req = new Request([
+                        'id' => $checkExisting->id,
+                        'ulbId' => $ulbId,
+                        'serviceId' => $item['serviceId'],
+                        'isSuspended' => $isSuspended,
+                    ]);
+
+                    $mUlbModulePermission->updateModuleUlb($req);
+                } else {
+                    $req = new Request([
+                        'ulbId' => $ulbId,
+                        'serviceId' => $item['serviceId'],
+                        'isSuspended' => $isSuspended,
+                    ]);
+                    $mUlbModulePermission->addModuleUlb($req);
+                }
+            });
+
+            // $checkExisting = WfWardUser::where('user_id', $req->userId)
+            //     ->where('ward_id', $req->wardId)
+            //     ->first();
+
+            // if ($checkExisting)
+            //     throw new Exception("User Exist");
+
+            // $mWfWardUser = new WfWardUser();
+            // $mWfWardUser->addWardUser($req);
+
+            return responseMsg(true, "Successfully Saved", "");
+        } catch (Exception $e) {
+            return responseMsg(true,  $e->getMessage(), "");
+        }
+    }
+    //
+    public function ulbServicesList(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            ['ulbId'     => 'nullable|int',]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $user = authUser();
+            $ulbId = $user->ulb_id ?? $req->ulbId;
+            $query = "select 
+                            mm.id,
+                            us.ulb_id,
+                            mm.menu_string as services,
+                            mm.route,
+                            mom.module_name,
+                            us.created_by,
+                            case 
+                                when us.service_id is null then false
+                                else
+                                    true  
+                            end as permission_status
+                        from menu_masters as mm
+                        left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
+                        left join module_masters as mom on mom.id = mm.module_id
+                        order by us.id";
+
+            $data = DB::select($query);
+            return responseMsg(true, "Module List of Ulb", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+    //
+    public function ulbServicesListv1(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            ['ulbId'     => 'required|int',]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $mUlbModulePermission = $this->_UlbModulePermission;
+            $ulbId = $req->ulbId;
+            $query = "select 
+                            mm.id,
+                            us.ulb_id,
+                            mm.menu_string as services,
+                            mm.route,
+                            mom.module_name,
+                            us.created_by,
+                            case 
+                                when us.service_id is null then false
+                                else
+                                    true  
+                            end as permission_status
+                        from menu_masters as mm
+                        left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
+                        left join module_masters as mom on mom.id = mm.module_id
+                        order by us.id";
+
+            $data = DB::select($query);
             return responseMsg(true, "Module List of Ulb", $data);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");

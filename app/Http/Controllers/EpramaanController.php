@@ -693,17 +693,17 @@ class EpramaanController extends Controller
 
         // Step 9: Send POST request to the external endpoint
         $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-        return response()->json(['formData' => $formData, 'url' => $url, 'hmac'=> $hmac, 'data'=>$data], 200); 
+        // return response()->json(['formData' => $formData, 'url' => $url, 'hmac'=> $hmac, 'data'=>$data], 200); 
         // Generate the form HTML
-        // $formHtml = '<form id="logoutForm" action="' . $url . '" method="post">';
-        // foreach ($formData as $key => $value) {
-        //     $formHtml .= '<input type="hidden" name="' . $key . '" value="' . htmlspecialchars($value) . '">';
-        // }
-        // $formHtml .= '</form>';
-        // $formHtml .= '<script>document.getElementById("logoutForm").submit();</script>';
+        $formHtml = '<form id="logoutForm" action="' . $url . '" method="post">';
+        foreach ($formData as $key => $value) {
+            $formHtml .= '<input type="hidden" name="' . $key . '" value="' . htmlspecialchars($value) . '">';
+        }
+        $formHtml .= '</form>';
+        $formHtml .= '<script>document.getElementById("logoutForm").submit();</script>';
 
-        // // Step 10: Return the form HTML for submission
-        // return response($formHtml)->header('Content-Type', 'text/html');
+        // Step 10: Return the form HTML for submission
+        return response($formHtml)->header('Content-Type', 'text/html');
     }
 
     /**
