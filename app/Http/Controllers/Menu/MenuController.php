@@ -124,6 +124,40 @@ class MenuController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
         }
     }
+    /**
+     * | List all Menus
+     */
+    // public function menuList(Request $request)
+    // {
+    //     try {
+    //         $mMenuMaster = new MenuMaster();
+
+    //         // Fetch and sort menus
+    //         $refmenues = $mMenuMaster->fetchAllMenues()->get();
+    //         $menues = $refmenues->sortByDesc("id");
+
+    //         // Initialize an array to store the final menu list
+    //         $listedMenues = [];
+
+    //         // Iterate through the menus
+    //         foreach ($menues as $menu) {
+    //             if ($menu['parent_id'] != 0) {
+    //                 // Fetch parent menu if parent_id exists
+    //                 $parent = $mMenuMaster->getMenuById($menu['parent_id']);
+    //                 $menu['parentName'] = $parent['menu_string'];
+    //             }
+
+    //             // Add menu to the final list
+    //             $listedMenues[] = $menu;
+    //         }
+
+    //         // Return the response
+    //         return responseMsgs(true, "List of Menues!", $listedMenues, "", "02", "", "POST", "");
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+    //     }
+    // }
+
 
     /**
      * | Module List

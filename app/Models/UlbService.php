@@ -16,11 +16,11 @@ class UlbService extends Model
     //create warduser
     public function addModuleUlb($req)
     {
-        // $createdBy = Auth()->user()->id;
+        $createdBy = Auth()->user()->id;
         $mUlbModulePermission = new UlbService;
         $mUlbModulePermission->ulb_id = $req->ulbId;
         $mUlbModulePermission->service_id = $req->serviceId;
-        // $mUlbModulePermission->created_by = $createdBy;
+        $mUlbModulePermission->created_by = $createdBy;
         $mUlbModulePermission->save();
     }
 

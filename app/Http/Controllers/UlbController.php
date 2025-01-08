@@ -544,12 +544,17 @@ class UlbController extends Controller
             return responseMsg(true,  $e->getMessage(), "");
         }
     }
-    //
+
+    // get service lists with restpect to ulb id 
+
     public function ulbServicesList(Request $req)
     {
         $validated = Validator::make(
             $req->all(),
-            ['ulbId'     => 'nullable|int',]
+            [
+                'ulbId'     => 'nullable|int',
+                'moduleId'   =>  'required|int'
+            ]
         );
         if ($validated->fails()) {
             return validationError($validated);
@@ -558,6 +563,7 @@ class UlbController extends Controller
             $mUlbModulePermission = $this->_UlbModulePermission;
             $user = authUser();
             $ulbId = $user->ulb_id ?? $req->ulbId;
+            $moduleId = $req->moduleId;
             $query = "select 
                             mm.id,
                             us.ulb_id,
@@ -572,7 +578,8 @@ class UlbController extends Controller
                             end as permission_status
                         from menu_masters as mm
                         left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
-                        left join module_masters as mom on mom.id = mm.module_id
+                        left join module_masters as mom on mom.id = mm.module_id,
+                        where mom.id=$moduleId
                         order by us.id";
 
             $data = DB::select($query);
@@ -594,6 +601,7 @@ class UlbController extends Controller
         try {
             $mUlbModulePermission = $this->_UlbModulePermission;
             $ulbId = $req->ulbId;
+            $moduleId = $req->moduleId;
             $query = "select 
                             mm.id,
                             us.ulb_id,
@@ -609,6 +617,7 @@ class UlbController extends Controller
                         from menu_masters as mm
                         left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
                         left join module_masters as mom on mom.id = mm.module_id
+                        where mom.id=$moduleId
                         order by us.id";
 
             $data = DB::select($query);

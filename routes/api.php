@@ -117,8 +117,7 @@ Route::controller(UlbController::class)->group(function () {
 
     Route::post('remove/module-from-ulb', 'removeModuleFromUlb');
     #========== ulb wise services manage api ===============#
-    Route::post('create/ulb-wise-seervices', 'createServicesUlb');
-
+   
     Route::post('get/services-b-ulb-id-v1', 'ulbServicesListv1');
 });
 
@@ -434,7 +433,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('list-ulb-by-district', 'districtWiseUlb');
         Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
         Route::post('v2/get-newward-by-oldward', 'getNewWardByOldWard')->withoutMiddleware('auth:sanctum');
-
+        Route::post('create/ulb-wise-services', 'createServicesUlb');
         Route::post('get/services-b-ulb-id', 'ulbServicesList');
     });
 
