@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\MicroServices\DocUpload;
 use App\Models\DistrictMaster;
 use App\Models\MCity;
+use App\Models\ServiceMapping;
+use App\Models\ServiceMaster;
 use App\Models\UlbMaster;
 use App\Models\UlbModulePermission;
 use App\Models\UlbNewWardmap;
@@ -21,7 +23,7 @@ class UlbController extends Controller
     public function __construct()
     {
         $this->_UlbModulePermission = new UlbModulePermission();
-        $this->_UlbServices = new UlbService();
+        $this->_UlbServices = new ServiceMapping();
     }
 
     /**
@@ -504,10 +506,10 @@ class UlbController extends Controller
                     ->first();
 
                 if ($item['permissionStatus'] == 0)
-                    $isSuspended = true;
+                    $isSuspended = 0;
 
                 if ($item['permissionStatus'] == 1)
-                    $isSuspended = false;
+                    $isSuspended = 1;
 
                 if ($checkExisting) {
 
@@ -603,25 +605,45 @@ class UlbController extends Controller
             $ulbId = $req->ulbId;
             $moduleId = $req->moduleId;
             $query = "select 
-                            mm.id,
-                            us.ulb_id,
-                            mm.menu_string as services,
-                            mm.route,
+                            sm.id,
+                            smp.ulb_id,
+                            sm.service_name as services,
                             mom.module_name,
-                            us.created_by,
                             case 
-                                when us.service_id is null then false
+                                when smp.service_id is null then false
                                 else
                                     true  
                             end as permission_status
-                        from menu_masters as mm
-                        left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
-                        left join module_masters as mom on mom.id = mm.module_id
+                        from service_masters as sm   
+                        left join (select * from service_mappings where ulb_id=$ulbId and status = 1) as smp on smp.service_id=sm.id
+                        left join module_masters as mom on mom.id = sm.module_id
                         where mom.id=$moduleId
-                        order by us.id";
+                        order by sm.id";
 
             $data = DB::select($query);
             return responseMsg(true, "Module List of Ulb", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    public function createServiceMaster(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'serviceName'     => 'required|string',
+                'path'            => 'required|string',
+                'moduleId'        =>  'required|int'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $mService   = new ServiceMaster();
+            $data = $mService->store($req);
+            return responseMsg(true, "Created Data Succesfully!", $data);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
