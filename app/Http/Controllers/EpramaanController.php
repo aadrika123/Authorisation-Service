@@ -647,53 +647,60 @@ class EpramaanController extends Controller
 
     public function eLogout(Request $request)
     {
-        // Step 1: Retrieve the session data (assuming JWS is stored in the session)
-        $jsonString = $request->sessionId ?? Session::get('JWS');
+        try {
 
-        if (!$jsonString) {
-            return response()->json(['error' => 'Session not found'], 400);
+
+            // Step 1: Retrieve the session data (assuming JWS is stored in the session)
+            $jsonString = $request->sessionId ?? Session::get('JWS');
+
+            if (!$jsonString) {
+                return response()->json(['error' => 'Session not found'], 400);
+            }
+
+            // Step 2: Generate UUID for logout request
+            $logoutRequestId = Str::uuid()->toString();
+
+            // Step 3: Create the JSON object
+            $json = json_decode($jsonString, true);
+
+            // Step 4: Extract necessary parameters
+            $clientId = "100001513";
+            $sessionId = $json['session_id'] ?? '';
+            $iss = "ePramaan";
+            $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a";
+            $sub = $json['sub'] ?? '';
+            $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
+
+            // Step 5: Prepare the input for HMAC
+            $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
+
+            // Step 6: Generate HMAC hash
+            $hmac = hash_hmac('sha256', $inputValue, $aesKey, true);
+            $hmac = base64_encode($hmac);
+            // Step 7: Prepare data to send
+            $data = [
+                'clientId' => $clientId,
+                'sessionId' => $sessionId,
+                'hmac' => $hmac,
+                'iss' => $iss,
+                'logoutRequestId' => $logoutRequestId,
+                'sub' => $sub,
+                'redirectUrl' => $redirectUrl,
+                'customParameter' => ''
+            ];
+
+            // Step 8: Prepare the form data
+            $formData = [
+                'data' => json_encode($data)
+            ];
+
+            // Step 9: Send POST request to the external endpoint
+            $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
+            // return response()->json(['formData' => $formData, 'url' => $url, 'hmac' => $hmac, 'data' => $data], 200);
+            return responseMsgs(true, "Initiate logout", ['formData' => $formData, 'url' => $url, 'hmac' => $hmac, 'data' => $data]);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
         }
-
-        // Step 2: Generate UUID for logout request
-        $logoutRequestId = Str::uuid()->toString();
-
-        // Step 3: Create the JSON object
-        $json = json_decode($jsonString, true);
-
-        // Step 4: Extract necessary parameters
-        $clientId = "100001513";
-        $sessionId = $json['session_id'] ?? '';
-        $iss = "ePramaan";
-        $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a";
-        $sub = $json['sub'] ?? '';
-        $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
-
-        // Step 5: Prepare the input for HMAC
-        $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
-
-        // Step 6: Generate HMAC hash
-        $hmac = hash_hmac('sha256', $inputValue, $aesKey,true);
-        $hmac = base64_encode($hmac);
-        // Step 7: Prepare data to send
-        $data = [
-            'clientId' => $clientId,
-            'sessionId' => $sessionId,
-            'hmac' => $hmac,
-            'iss' => $iss,
-            'logoutRequestId' => $logoutRequestId,
-            'sub' => $sub,
-            'redirectUrl' => $redirectUrl,
-            'customParameter' => ''
-        ];
-
-        // Step 8: Prepare the form data
-        $formData = [
-            'data' => json_encode($data)
-        ];
-
-        // Step 9: Send POST request to the external endpoint
-        $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-        return response()->json(['formData' => $formData, 'url' => $url, 'hmac' => $hmac, 'data' => $data], 200);
         // Generate the form HTML
         // $formHtml = '<form id="logoutForm" action="' . $url . '" method="post">';
         // foreach ($formData as $key => $value) {
