@@ -672,4 +672,39 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+    /**
+     check module services of different ulb
+     */
+    public  function checkUlbModuleServices(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'moduleId'     => 'required|int',
+                'path'            => 'required|string',
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $user = authUser();
+            $ulbId = $user->ulb_id;
+            $data = ServiceMapping::select(
+                'service_masters.id'
+            )
+                ->join('service_masters', 'service_masters.id', 'service_mappings.service_id')
+                ->where('service_mappings.ulb_id', $ulbId)
+                ->where('service_masters.module_id', $req->moduleId)
+                ->where('service_masters.path', $req->path)
+                ->where('service_mappings.status', 1)
+                ->first();
+            if (!$data) {
+                return responseMsgs(false, 'Service Resitricted!', "");
+            }
+            return responseMsgs(true, "Services Permission", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
 }

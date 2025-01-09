@@ -441,6 +441,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('v2/get-newward-by-oldward', 'getNewWardByOldWard')->withoutMiddleware('auth:sanctum');
         Route::post('create/ulb-wise-services', 'createServicesUlb');
         Route::post('get/services-b-ulb-id', 'ulbServicesList');
+        Route::post('get/services-by-module', 'checkUlbModuleServices');
     });
 
     /**
