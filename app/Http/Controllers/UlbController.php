@@ -580,7 +580,7 @@ class UlbController extends Controller
                             end as permission_status
                         from menu_masters as mm
                         left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
-                        left join module_masters as mom on mom.id = mm.module_id,
+                        left join module_masters as mom on mom.id = mm.module_id
                         where mom.id=$moduleId
                         order by us.id";
 
