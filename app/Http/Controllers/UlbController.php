@@ -659,4 +659,16 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
+    //  get service list 
+    public  function updateSeviceMater(Request $req)
+    {
+        try {
+            $mService = new ServiceMaster();
+            $data = $mService->updateMasters($req);
+            return responseMsgs(true, "Updated Services", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
 }

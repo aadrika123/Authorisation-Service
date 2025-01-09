@@ -35,4 +35,13 @@ class ServiceMaster extends Model
             ->orderby('id', 'Desc')
             ->get();
     }
+
+    //update ward user
+    public function updateMasters($req)
+    {
+        $mUlbModulePermission = ServiceMaster::find($req->id);
+        $mUlbModulePermission->service_name      = $req->serviceName      ?? $mUlbModulePermission->service_name;
+        $mUlbModulePermission->path            = $req->path      ?? $mUlbModulePermission->path;
+        $mUlbModulePermission->save();
+    }
 }

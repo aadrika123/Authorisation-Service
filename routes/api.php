@@ -122,7 +122,9 @@ Route::controller(UlbController::class)->group(function () {
 
     Route::post('create/services', 'createServiceMaster');
 
-    Route::post('get/service-list','getListService');
+    Route::post('get/service-list', 'getListService');
+
+    Route::post('update/service-by-id', 'updateSeviceMater');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
