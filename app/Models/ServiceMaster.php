@@ -19,4 +19,20 @@ class ServiceMaster extends Model
         $mUlbModulePermission->module_id = $req->moduleId;
         $mUlbModulePermission->save();
     }
+    // get service 
+    public function getServices($req)
+    {
+        return self::select(
+            'service_masters.id',
+            'service_masters.service_name',
+            'module_masters.module_name',
+            'service_masters.status',
+            'service_masters.path'
+        )
+            ->join('module_masters', 'module_masters.id', 'service_masters.module_id')
+            ->where('status', 1)
+            ->where('service_masters.module_id', $req->moduleId)
+            ->orderby('id', 'Desc')
+            ->get();
+    }
 }

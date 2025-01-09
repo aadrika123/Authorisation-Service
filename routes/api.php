@@ -121,6 +121,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('get/services-b-ulb-id-v1', 'ulbServicesListv1');
 
     Route::post('create/services', 'createServiceMaster');
+
+    Route::post('get/service-list','getListService');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {

@@ -626,7 +626,7 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
-
+    // create services
     public function createServiceMaster(Request $req)
     {
         $validated = Validator::make(
@@ -644,6 +644,17 @@ class UlbController extends Controller
             $mService   = new ServiceMaster();
             $data = $mService->store($req);
             return responseMsg(true, "Created Data Succesfully!", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+    //  get service list 
+    public  function getListService(Request $req)
+    {
+        try {
+            $mService = new ServiceMaster();
+            $data = $mService->getServices($req);
+            return responseMsgs(true, "List Of Services", $data);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
