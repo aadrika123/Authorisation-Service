@@ -700,7 +700,7 @@ class EpramaanController extends Controller
             $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
             $result = $formData.$url.$hmac.$data;
             // return response()->json(['formData' => $formData, 'url' => $url, 'hmac' => $hmac, 'data' => $data], 200);
-            return responseMsgs(true, "Initiate logout",$result);
+            return responseMsgs(true, "Initiate logout",['data'=> $result]);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
