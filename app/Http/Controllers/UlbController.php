@@ -608,6 +608,7 @@ class UlbController extends Controller
                             sm.id,
                             smp.ulb_id,
                             sm.service_name as services,
+                            sm.path,
                             mom.module_name,
                             case 
                                 when smp.service_id is null then false
