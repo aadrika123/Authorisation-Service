@@ -567,23 +567,21 @@ class UlbController extends Controller
             $ulbId = $user->ulb_id ?? $req->ulbId;
             $moduleId = $req->moduleId;
             $query = "select 
-                            mm.id,
-                            us.ulb_id,
-                            mm.menu_string as services,
-                            mm.route,
+                            sm.id,
+                            smp.ulb_id,
+                            sm.service_name as services,
+                            sm.path,
                             mom.module_name,
-                            us.created_by,
                             case 
-                                when us.service_id is null then false
+                                when smp.service_id is null then false
                                 else
                                     true  
                             end as permission_status
-                        from menu_masters as mm
-                        left join (select * from ulb_services where ulb_id=$ulbId and is_suspended = false) as us on us.service_id=mm.id
-                        left join module_masters as mom on mom.id = mm.module_id
+                        from service_masters as sm   
+                        left join (select * from service_mappings where ulb_id=$ulbId and status = 1) as smp on smp.service_id=sm.id
+                        left join module_masters as mom on mom.id = sm.module_id
                         where mom.id=$moduleId
-                        order by us.id";
-
+                        order by sm.id";
             $data = DB::select($query);
             return responseMsg(true, "Module List of Ulb", $data);
         } catch (Exception $e) {
