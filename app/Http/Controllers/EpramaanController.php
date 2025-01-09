@@ -694,13 +694,10 @@ class EpramaanController extends Controller
                 'data' => json_encode($data)
             ];
 
-           
-
             // Step 9: Send POST request to the external endpoint
             $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processOIDCSLORequest.do';
-            $result = $formData.$url.$hmac.$data;
             // return response()->json(['formData' => $formData, 'url' => $url, 'hmac' => $hmac, 'data' => $data], 200);
-            return responseMsgs(true, "Initiate logout",['data'=> $result]);
+            return responseMsgs(true, "Initiate logout", [$formData, $url,  $hmac,  $data]);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
