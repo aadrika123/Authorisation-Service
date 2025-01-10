@@ -22,6 +22,9 @@ return [
     "SMS_SENDER_ID"          => env('SMS_SENDER_ID'),
     "SMS_SECURE_KEY"         => env('SMS_SECURE_KEY'),
     "SMS_URL"                => env('SMS_URL'),
+    "E_CLIENT_ID_MOBILE"     => env('E_CLIENT_ID_MOBILE'),
+    "E_CLIENT_ID_WEB"        => env('E_CLIENT_ID_WEB'),
+    "FRONTEND_URL"           => env('FRONTEND_URL'),
 
     #_Module Constants
     "PROPERTY_MODULE_ID"      => 1,
