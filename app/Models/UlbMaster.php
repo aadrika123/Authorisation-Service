@@ -113,4 +113,25 @@ class UlbMaster extends Model
         $data->save();
         return $data->id;
     }
+
+    //create warduser
+    public function addUlbMasterv1($req)
+    {
+        $createdBy = Auth()->user()->id;
+        $mUlbModulePermission = new UlbMaster;
+        $mUlbModulePermission->ulb_id = $req->ulbId;
+        // $mUlbModulePermission->module_id = $req->moduleId;
+        $mUlbModulePermission->service_id = $req->serviceId;
+        $mUlbModulePermission->save();
+    }
+
+    //update ward user
+    public function updateUlbPermissions($req)
+    {
+        $mUlbModulePermission = UlbMaster::find($req->ulbId);
+        $mUlbModulePermission->active_status     = $req->isSuspended      ?? $mUlbModulePermission->active_status;
+        // $mUlbModulePermission->is_admin     = $req->isAdmin     ?? $mUlbModulePermission->is_admin;
+        // $mUlbModulePermission->status = $req->isSuspended ?? $mUlbModulePermission->status;
+        $mUlbModulePermission->save();
+    }
 }
