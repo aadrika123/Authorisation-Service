@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Str;
 
+use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\throwException;
 
 class UserController extends Controller
@@ -64,7 +65,7 @@ class UserController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
                 'type' => "nullable|in:mobile",
-                'moduleId' => "nullable"
+                'moduleId' => "nullable|int"
             ]
         );
         if ($validated->fails())
@@ -76,12 +77,13 @@ class UserController extends Controller
                 throw new Exception("Invalid Credentials");
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
-            // if ($req->moduleId != null) {
-            //     $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 
-            //     if ($checkModule) {
-            //         throw new Exception('Module is Restricted for this ulb !');
-            //     }
-            // }
+
+            if ($req->moduleId) {
+                $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 
+                if (!$checkModule) {
+                    throw new Exception('Module is Restricted For This ulb !');
+                }
+            }
 
             if (Hash::check($req->password, $user->password)) {
                 $token = $user->createToken('my-app-token')->plainTextToken;

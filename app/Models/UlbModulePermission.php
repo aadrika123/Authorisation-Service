@@ -45,7 +45,7 @@ class UlbModulePermission extends Model
     {
         return self::where('ulb_id', $user->ulb_id)
             ->where('module_id', $req->moduleId)
-            ->where('is_suspended',)
+            ->where('is_suspended',false)
             ->first();
     }
 
