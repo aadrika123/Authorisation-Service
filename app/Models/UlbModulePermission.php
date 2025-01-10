@@ -45,18 +45,18 @@ class UlbModulePermission extends Model
     {
         return self::where('ulb_id', $user->ulb_id)
             ->where('module_id', $req->moduleId)
-            ->where('is_suspended',false)
+            ->where('is_suspended', false)
             ->first();
     }
 
     //create warduser
     public function addModuleUlb($req)
     {
-        $createdBy = Auth()->user()->id;
+        // $createdBy = Auth()->user()->id;
         $mUlbModulePermission = new UlbModulePermission;
         $mUlbModulePermission->ulb_id = $req->ulbId;
         $mUlbModulePermission->module_id = $req->moduleId;
-        $mUlbModulePermission->created_by = $createdBy;
+        // $mUlbModulePermission->created_by = $createdBy;
         $mUlbModulePermission->save();
     }
 
