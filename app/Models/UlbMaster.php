@@ -129,7 +129,7 @@ class UlbMaster extends Model
     public function updateUlbPermissions($req)
     {
         $mUlbModulePermission = UlbMaster::find($req->ulbId);
-        $mUlbModulePermission->active_status     = $req->isSuspended      ?? $mUlbModulePermission->active_status;
+        $mUlbModulePermission->active_status     = $req->permissions      ?? $mUlbModulePermission->active_status;
         // $mUlbModulePermission->is_admin     = $req->isAdmin     ?? $mUlbModulePermission->is_admin;
         // $mUlbModulePermission->status = $req->isSuspended ?? $mUlbModulePermission->status;
         $mUlbModulePermission->save();

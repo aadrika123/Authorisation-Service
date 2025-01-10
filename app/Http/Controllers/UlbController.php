@@ -717,7 +717,7 @@ class UlbController extends Controller
             $req->all(),
             [
                 'ulbId' => 'required',
-                'permissions' => 'required|array',
+                'permissionStatus' => 'required|',
             ]
         );
 
@@ -727,36 +727,27 @@ class UlbController extends Controller
 
         try {
             $ulbId = $req->ulbId;
-            $permissions = $req->permissions;
+            $permissions = $req->permissionStatus;
 
-            collect($permissions)->map(function ($item) use ($ulbId) {
-                $mUlbMasters =  $this->_ulbMasters;
+            $mUlbMasters =  $this->_ulbMasters;
 
-                $checkExisting = $mUlbMasters::where('id', $ulbId)->first();
+            $checkExisting = $mUlbMasters::where('id', $ulbId)->first();
+            if ($checkExisting) {
+                $req = new Request([
+                    'id' => $checkExisting->id,
+                    'ulbId' => $ulbId,
+                    'permissions' => $permissions,
+                ]);
 
-                if ($item['permissionStatus'] == 0)
-                    $isSuspended = 0;
+                $mUlbMasters->updateUlbPermissions($req);
+            } else {
+                $req = new Request([
+                    'ulbId' => $ulbId,
+                    'permissions' => $permissions,
+                ]);
 
-                if ($item['permissionStatus'] == 1)
-                    $isSuspended = 1;
-
-                if ($checkExisting) {
-                    $req = new Request([
-                        'id' => $checkExisting->id,
-                        'ulbId' => $ulbId,
-                        'isSuspended' => $isSuspended,
-                    ]);
-
-                    $mUlbMasters->updateUlbPermissions($req);
-                } else {
-                    $req = new Request([
-                        'ulbId' => $ulbId,
-                        'isSuspended' => $isSuspended,
-                    ]);
-
-                    $mUlbMasters->addUlbMasterv1($req);
-                }
-            });
+                $mUlbMasters->addUlbMasterv1($req);
+            }
 
             return responseMsg(true, "Successfully Saved", "");
         } catch (Exception $e) {
