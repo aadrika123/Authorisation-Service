@@ -72,11 +72,17 @@ class UserController extends Controller
             return validationError($validated);
         try {
             $mWfRoleusermap = new WfRoleusermap();
+            $mUlbMaster = new UlbMaster();
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user)
                 throw new Exception("Invalid Credentials");
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
+            // 
+            $checkUlbStatus = $mUlbMaster->checkUlb($user);
+            if (!$checkUlbStatus) {
+                throw new Exception('This Ulb is Retricted SuperAdmin!');
+            }
 
             if ($req->moduleId) {
                 $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 

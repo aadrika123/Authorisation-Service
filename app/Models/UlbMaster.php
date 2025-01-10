@@ -134,4 +134,14 @@ class UlbMaster extends Model
         // $mUlbModulePermission->status = $req->isSuspended ?? $mUlbModulePermission->status;
         $mUlbModulePermission->save();
     }
+
+    public function checkUlb($user)
+    {
+        return UlbMaster::select(
+            'id'
+        )
+            ->where('id', $user->ulb_id)
+            ->where('active_status', true)
+            ->first();
+    }
 }
