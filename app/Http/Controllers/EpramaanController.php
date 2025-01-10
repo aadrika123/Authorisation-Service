@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
 
 use Illuminate\Support\Facades\Session;
@@ -649,9 +650,11 @@ class EpramaanController extends Controller
     {
         try {
 
+            $type = $request->type;
+            $jsonString = $request->sessionId ?? Session::get('JWS');
+
 
             // Step 1: Retrieve the session data (assuming JWS is stored in the session)
-            $jsonString = $request->sessionId ?? Session::get('JWS');
 
             if (!$jsonString) {
                 return response()->json(['error' => 'Session not found'], 400);
@@ -663,13 +666,23 @@ class EpramaanController extends Controller
             // Step 3: Create the JSON object
             $json = json_decode($jsonString, true);
 
+            if ($type == 'mobile') {
+                $clientId = Config::get('constants.E_CLIENT_ID_MOBILE');
+                $redirectUrl = Config::get('constants.FRONTEND_URL') . '/juidco-app/auth/logout-e-praman';
+                // $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
+            } else {
+                // $clientId = "100001511";
+                // $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan";
+                $clientId = Config::get('constants.E_CLIENT_ID_WEB');
+                $redirectUrl = Config::get('constants.FRONTEND_URL') . '/citizen/logout/e-pramaan';
+            }
             // Step 4: Extract necessary parameters
-            $clientId = "100001513";
+            // $clientId = "100001513";
             $sessionId = $json['session_id'] ?? '';
             $iss = "ePramaan";
             $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a";
             $sub = $json['sub'] ?? '';
-            $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
+            // $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
 
             // Step 5: Prepare the input for HMAC
             $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
