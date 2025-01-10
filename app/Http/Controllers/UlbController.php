@@ -573,14 +573,16 @@ class UlbController extends Controller
                             sm.path,
                             mom.module_name,
                             case 
-                                when smp.service_id is null then false
+                                when smp.status=0 then false
                                 else
                                     true  
                             end as permission_status
                         from service_masters as sm   
-                        left join (select * from service_mappings where ulb_id=$ulbId and status = 1) as smp on smp.service_id=sm.id
                         left join module_masters as mom on mom.id = sm.module_id
+                        left join service_mappings as smp on smp.service_id = sm.id
                         where mom.id=$moduleId
+                        and smp.ulb_id=$ulbId
+                        and smp.status = 1
                         order by sm.id";
             $data = DB::select($query);
             return responseMsg(true, "Module List of Ulb", $data);
