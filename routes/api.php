@@ -63,7 +63,7 @@ Route::controller(LandingPageController::class)->group(function () {
 });
 
 
-Route::middleware(['auth:sanctum', "expireBearerToken"])->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -157,7 +157,7 @@ Route::controller(EpramaanController::class)->group(function () {
  * | Module Id = 12 
  * | Module Name = User Management
  */
-Route::middleware(['auth:sanctum', "expireBearerToken"])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     /**
      * | Api to Check if the User is authenticated or not
