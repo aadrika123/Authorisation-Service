@@ -700,6 +700,29 @@ class UserController extends Controller
             ->get();
         return responseMsgs(true, "User List", $userList);
     }
+    /**
+     * | List Admin
+     */
+    public function listAdminv1(Request $req)
+    {
+        $ulbId = $req->ulbId;
+        $userList = User::select(
+            'users.id',
+            'ulb_masters.id as ulbId',
+            'users.user_name',
+            'users.mobile',
+            'users.email',
+            'users.name',
+            'ulb_name',
+            'suspended',
+        )
+            ->where('user_type', 'Admin')
+            ->where('ulb_id', $ulbId)
+            ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->orderBy('name')
+            ->get();
+        return responseMsgs(true, "User List", $userList);
+    }
 
 
     public function resetPassword(Request $req)
