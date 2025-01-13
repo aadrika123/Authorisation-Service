@@ -713,6 +713,7 @@ class UserController extends Controller
             'users.mobile',
             'users.email',
             'users.name',
+            'users.address',
             'ulb_name',
             'suspended',
         )
