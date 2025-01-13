@@ -703,26 +703,95 @@ class UserController extends Controller
     /**
      * | List Admin
      */
-    public function listAdminv1(Request $req)
+    // public function listAdminv1(Request $req)
+    // {
+    //     $ulbId = $req->ulbId;
+    //     $userList = User::select(
+    //         'users.id',
+    //         'ulb_masters.id as ulbId',
+    //         'users.user_name',
+    //         'users.mobile',
+    //         'users.email',
+    //         'users.name',
+    //         'users.address',
+    //         'ulb_name',
+    //         'suspended',
+    //     )
+    //         ->where('user_type', 'Admin')
+    //         ->where('ulb_id', $ulbId)
+    //         ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+    //         ->orderBy('name')
+    //         ->get();
+    //     return responseMsgs(true, "User List", $userList);
+    // }
+    public function searchUsers(Request $request)
     {
-        $ulbId = $req->ulbId;
-        $userList = User::select(
-            'users.id',
-            'ulb_masters.id as ulbId',
-            'users.user_name',
-            'users.mobile',
-            'users.email',
-            'users.name',
-            'users.address',
-            'ulb_name',
-            'suspended',
-        )
-            ->where('user_type', 'Admin')
-            ->where('ulb_id', $ulbId)
-            ->join('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
-            ->orderBy('name')
-            ->get();
-        return responseMsgs(true, "User List", $userList);
+        $validated = Validator::make(
+            $request->all(),
+            [
+                'filterBy'  => 'nullable',
+                'parameter' => 'nullable',
+                'perPage'   => 'nullable',
+            ]
+        );
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $key       = $request->filterBy;
+            $parameter = $request->parameter;
+            $ulbId     = $request->ulbId;
+            $pages          = $request->perPage ?? 10;
+
+            $query = User::select(
+                'users.id',
+                'ulb_masters.id as ulbId',
+                'users.user_name',
+                'users.mobile',
+                'users.email',
+                'users.name',
+                'users.address',
+                'ulb_name',
+                'suspended'
+            )
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
+                ->where('ulb_masters.id', $ulbId)
+                ->orderBy('users.name');
+            if ($key != null) {
+                switch ($key) {
+                    case "name":
+                        $query->where('users.name', 'like', '%' . $parameter . '%');
+                        break;
+                    case "email":
+                        $query->where('users.email', 'like', '%' . $parameter . '%');
+                        break;
+                    case "mobile":
+                        $query->where('users.mobile', 'like', '%' . $parameter . '%');
+                        break;
+                    default:
+                        throw new Exception("Invalid filterBy value provided!");
+                }
+            }
+
+            $inboxDetails = $query->paginate($pages);
+
+            if ($inboxDetails->isEmpty()) {
+                throw new Exception("Data according to " . $key . " not found!");
+            }
+
+            $list = [
+                "current_page" => $inboxDetails->currentPage(),
+                "last_page"    => $inboxDetails->lastPage(),
+                "data"         => $inboxDetails->items(),
+                "total"        => $inboxDetails->total(),
+            ];
+
+            return responseMsgs(true, "Water Consumer Data According to Parameter!", $list);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
     }
 
 

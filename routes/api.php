@@ -77,7 +77,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum');
     Route::post('e_pramaanCheck', 'ePramanCheck');
 
-    Route::post('user-managment/v1/crud/get/admin-list-v1', 'listAdminv1');            #_List Admin by ulb Id
+    Route::post('user-managment/v1/crud/get/admin-list-v1', 'searchUsers');            #_List Admin by ulb Id
 });
 
 /**
