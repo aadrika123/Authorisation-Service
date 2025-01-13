@@ -758,6 +758,7 @@ class UserController extends Controller
             )
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
                 ->where('ulb_masters.id', $ulbId)
+                ->where('users.user_type', 'Admin')
                 ->orderBy('users.name');
             if ($key != null) {
                 switch ($key) {
@@ -788,7 +789,7 @@ class UserController extends Controller
                 "total"        => $inboxDetails->total(),
             ];
 
-            return responseMsgs(true, "Water Consumer Data According to Parameter!", $list);
+            return responseMsgs(true, "Admin List", $list);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
