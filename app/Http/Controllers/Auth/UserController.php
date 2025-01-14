@@ -750,6 +750,7 @@ class UserController extends Controller
                 'ulb_masters.id as ulbId',
                 'users.user_name',
                 'users.mobile',
+                'users.alternate_mobile',
                 'users.email',
                 'users.name',
                 'users.address',
@@ -777,11 +778,10 @@ class UserController extends Controller
             }
 
             $inboxDetails = $query->paginate($pages);
-
+            
             if ($inboxDetails->isEmpty()) {
-                throw new Exception("Data according to " . $key . " not found!");
+                return responseMsgs(false, "No users found for the given filters!", []);
             }
-
             $list = [
                 "current_page" => $inboxDetails->currentPage(),
                 "last_page"    => $inboxDetails->lastPage(),
