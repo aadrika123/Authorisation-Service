@@ -349,6 +349,7 @@ class UserController extends Controller
                     'alternateMobile'=> $user->alternate_mobile,
                     'email'          => $user->email,
                     'name'           => $user->name,
+                    'user_type'      => $user->user_type,
                     'address'        => $user->address,
                     'suspended'      => $user->suspended,
                     'referenceNo'    => $user->reference_no,
