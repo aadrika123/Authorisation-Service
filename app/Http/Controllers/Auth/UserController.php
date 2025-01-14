@@ -295,38 +295,83 @@ class UserController extends Controller
         $req->validate([
             'ulbId' => 'required'
         ]);
+    
         try {
             $perPage = $req->perPage ?? 10;
             $ulbId = $req->ulbId;
+    
             if ($ulbId == null) {
-                throw new Exception('Please Provide Ulb Id !');
+                throw new Exception('Please Provide Ulb Id!');
             }
-            $data = User::select(
-                '*',
+    
+            // Base query
+            $query = User::select(
+                'id',
+                'user_name',
+                'mobile',
+                'email',
+                'user_type',
+                'name',
+                'address',
+                'alternate_mobile',
+                'suspended',
+                'reference_no',
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
                 ->where('ulb_id', $ulbId)
-                ->orderBy('id');
-
-            $userList = app(Pipeline::class)
-                ->send(
-                    $data
-                )
+                ->orderBy('id','desc');
+    
+            // Apply pipeline filters
+            $filteredQuery = app(Pipeline::class)
+                ->send($query)
                 ->through([
                     SearchByName::class,
                     SearchByEmail::class,
                     SearchByMobile::class,
                     SearchByRole::class
                 ])
-                ->thenReturn()
-                ->paginate($perPage);
-
-            return responseMsgs(true, "User List", $userList, "", "01", responseTime(), "POST", "");
+                ->thenReturn();
+    
+            // Paginate results
+            $userList = $filteredQuery->paginate($perPage);
+    
+            // Attach document data to each user
+            $docUpload = new DocUpload();
+            $data = $userList->map(function ($user) use ($docUpload) {
+                $docDetails = $docUpload->getSingleDocUrl($user); // Fetch document details
+                $docUrl = $docDetails['doc_path'] ?? null;
+    
+                return [
+                    'id'             => $user->id,
+                    'user_name'      => $user->user_name,
+                    'mobile'         => $user->mobile,
+                    'alternateMobile'=> $user->alternate_mobile,
+                    'email'          => $user->email,
+                    'name'           => $user->name,
+                    'address'        => $user->address,
+                    'suspended'      => $user->suspended,
+                    'referenceNo'    => $user->reference_no,
+                    'photo'          => $user->photo,
+                    'signature'      => $user->signature,
+                    'documentUrl'    => $docUrl, // Add document URL to response
+                ];
+            });
+    
+            // Build response structure
+            $userListResponse = [
+                "current_page" => $userList->currentPage(),
+                "last_page"    => $userList->lastPage(),
+                "data"         => $data,
+                "total"        => $userList->total(),
+            ];
+    
+            return responseMsgs(true, "User List", $userListResponse, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
+    
 
     /**
      * | Multiple List User
