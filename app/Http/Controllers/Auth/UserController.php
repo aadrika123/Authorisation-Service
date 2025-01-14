@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\AuthorizeRequestUser;
 use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
+use App\MicroServices\DocUpload;
 use App\Models\Auth\User;
 use App\Models\EPramanExistCheck;
 use App\Models\ModuleMaster;
@@ -755,7 +756,8 @@ class UserController extends Controller
                 'users.name',
                 'users.address',
                 'ulb_name',
-                'suspended'
+                'suspended',
+                'reference_no'
             )
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
                 ->where('ulb_masters.id', $ulbId)
@@ -778,14 +780,36 @@ class UserController extends Controller
             }
 
             $inboxDetails = $query->paginate($pages);
-            
+            // Attach document data to each user
+            $docUpload = new DocUpload;
+            $data = $inboxDetails->map(function ($user) use ($docUpload) {
+                $docDetails = $docUpload->getSingleDocUrl($user); // Fetch document details
+                $docUrl = $docDetails['doc_path'] ?? null;
+
+                return [
+                    'id'             => $user->id,
+                    'ulbId'          => $user->ulbId,
+                    'userName'       => $user->user_name,
+                    'mobile'         => $user->mobile,
+                    'alternateMobile' => $user->alternate_mobile,
+                    'email'          => $user->email,
+                    'name'           => $user->name,
+                    'address'        => $user->address,
+                    'ulbName'        => $user->ulb_name,
+                    'suspended'      => $user->suspended,
+                    'referenceNo'    => $user->reference_no,
+                    'documentUrl'    => $docUrl, // Add the document URL to the response
+                ];
+            });
+
+
             if ($inboxDetails->isEmpty()) {
                 return responseMsgs(false, "No users found for the given filters!", []);
             }
             $list = [
                 "current_page" => $inboxDetails->currentPage(),
                 "last_page"    => $inboxDetails->lastPage(),
-                "data"         => $inboxDetails->items(),
+                "data"         => $data,
                 "total"        => $inboxDetails->total(),
             ];
 

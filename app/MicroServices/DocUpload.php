@@ -100,4 +100,42 @@ class DocUpload
         return $key;
     }
 
+    /**
+     * | This function is to get the document url from the DMS for multiple documents
+     */
+    public function getDocUrl($documents)
+    {
+        $dmsUrl = Config::get('module-constants.DMS_URL');
+        $apiUrl = "$dmsUrl/backend/document/view-by-reference";
+        $data = collect();
+
+        foreach ($documents as $document) {
+            $postData = [
+                'referenceNo' => $document->reference_no,
+            ];
+            if ($document->reference_no) {
+                $response = Http::withHeaders([
+                    "token" => "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+                ])->post($apiUrl, $postData);
+
+                if ($response->successful()) {
+                    $responseData = $response->json();
+                    $key['id'] =  $document->id;
+                    $key['doc_code'] =  $document->doc_code??"";
+                    $key['verify_status'] =  $document->verify_status??"";
+                    $key['owner_name'] =  $document->owner_name??"";
+                    $key['remarks'] =  $document->remarks??"";
+                    $key['owner_dtl_id'] =  $document->owner_dtl_id ?? null;
+                    $key['doc_path'] = $responseData['data']['fullPath'] ?? null;
+                    $key['latitude'] = $document->latitude ?? null;
+                    $key['longitude'] = $document->longitude ?? null;
+                    $key['responseData'] = $responseData;
+                    $data->push($key);
+                }
+            }
+        }
+        return $data;
+    }
+
+
 }

@@ -51,18 +51,34 @@ trait Auth
             $user->workflow_participant = $request->workflowParticipant;
         }
         if ($request->photo) {
-            $filename = explode('.', $request->photo->getClientOriginalName());
+            // $filename = explode('.', $request->photo->getClientOriginalName());
+            // $document = $request->photo;
+            // $imageName = $docUpload->upload($filename[0], $document, $imageRelativePath);
+            // $user->photo_relative_path = $imageRelativePath;
+            // $user->photo = $imageName;
             $document = $request->photo;
-            $imageName = $docUpload->upload($filename[0], $document, $imageRelativePath);
-            $user->photo_relative_path = $imageRelativePath;
-            $user->photo = $imageName;
+            $newRequest = new Request([
+                'document' => $document
+            ]);
+
+            $imageName = $docUpload->checkDoc($newRequest);
+            $user->unique_id = $imageName['data']['uniqueId'];
+            $user->reference_no = $imageName['data']['ReferenceNo'];
         }
         if ($request->signature) {
-            $filename = explode('.', $request->signature->getClientOriginalName());
+            // $filename = explode('.', $request->signature->getClientOriginalName());
+            // $document = $request->signature;
+            // $imageName = $docUpload->upload($filename[0], $document, $signatureRelativePath);
+            // $user->sign_relative_path = $signatureRelativePath;
+            // $user->signature = $imageName;
             $document = $request->signature;
-            $imageName = $docUpload->upload($filename[0], $document, $signatureRelativePath);
-            $user->sign_relative_path = $signatureRelativePath;
-            $user->signature = $imageName;
+            $newRequest = new Request([
+                'document' => $document
+            ]);
+
+            $imageName = $docUpload->checkDoc($newRequest);
+            $user->unique_id = $imageName['data']['uniqueId'];
+            $user->reference_no = $imageName['data']['ReferenceNo'];
         }
 
         $token = Str::random(80);                       //Generating Random Token for Initial
