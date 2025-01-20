@@ -49,6 +49,7 @@ class WfWardUser extends Model
     //list ward user by id
     public function listbyId($req)
     {
+
         $data = WfWardUser::select(
             'wf_ward_users.id',
             'user_id',
@@ -59,11 +60,13 @@ class WfWardUser extends Model
         )
             ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
             ->join('users', 'users.id', 'wf_ward_users.user_id')
-            ->where('wf_ward_users.id', $req->id)
+            ->where('wf_ward_users.user_id', $req->id)
             ->where('is_suspended', 'false')
             ->get();
         return $data;
     }
+
+
 
     //list ward user
     public function listWardUser()

@@ -100,7 +100,6 @@ class WardUserController extends Controller
 
             $mWfWardUser = new WfWardUser();
             $list  = $mWfWardUser->listbyId($req);
-
             return responseMsg(true, "WardUser List", $list);
         } catch (Exception $e) {
             return response()->json(false, $e->getMessage());
