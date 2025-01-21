@@ -16,6 +16,7 @@ use App\Models\Notification\UserNotification;
 use App\Models\UlbMaster;
 use App\Models\UlbModulePermission;
 use App\Models\UlbWardMaster;
+use App\Models\UserLoginDetail;
 use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
 use App\Pipelines\User\SearchByEmail;
@@ -116,6 +117,17 @@ class UserController extends Controller
                         throw new Exception("Web user not login as mobile user");
                     }
                 }
+                //
+                if ($user->user_type == 'TC' || $user->user_type == 'TL') {
+                    $userlog = new UserLoginDetail();
+                    $userlog->user_id = $user->id;
+                    $userlog->login_date = Carbon::now()->format("Y-m-d");
+                    $userlog->login_time = Carbon::now()->format("h:i:s a");
+                    $userlog->ip_address = $req->ip();
+                    $userlog->save();
+                }
+
+                //
                 $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
@@ -295,15 +307,15 @@ class UserController extends Controller
         $req->validate([
             'ulbId' => 'required'
         ]);
-    
+
         try {
             $perPage = $req->perPage ?? 10;
             $ulbId = $req->ulbId;
-    
+
             if ($ulbId == null) {
                 throw new Exception('Please Provide Ulb Id!');
             }
-    
+
             // Base query
             $query = User::select(
                 'id',
@@ -320,8 +332,8 @@ class UserController extends Controller
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
                 ->where('ulb_id', $ulbId)
-                ->orderBy('id','desc');
-    
+                ->orderBy('id', 'desc');
+
             // Apply pipeline filters
             $filteredQuery = app(Pipeline::class)
                 ->send($query)
@@ -332,21 +344,21 @@ class UserController extends Controller
                     SearchByRole::class
                 ])
                 ->thenReturn();
-    
+
             // Paginate results
             $userList = $filteredQuery->paginate($perPage);
-    
+
             // Attach document data to each user
             $docUpload = new DocUpload();
             $data = $userList->map(function ($user) use ($docUpload) {
                 $docDetails = $docUpload->getSingleDocUrl($user); // Fetch document details
                 $docUrl = $docDetails['doc_path'] ?? null;
-    
+
                 return [
                     'id'             => $user->id,
                     'user_name'      => $user->user_name,
                     'mobile'         => $user->mobile,
-                    'alternateMobile'=> $user->alternate_mobile,
+                    'alternateMobile' => $user->alternate_mobile,
                     'email'          => $user->email,
                     'name'           => $user->name,
                     'user_type'      => $user->user_type,
@@ -358,7 +370,7 @@ class UserController extends Controller
                     'documentUrl'    => $docUrl, // Add document URL to response
                 ];
             });
-    
+
             // Build response structure
             $userListResponse = [
                 "current_page" => $userList->currentPage(),
@@ -366,13 +378,13 @@ class UserController extends Controller
                 "data"         => $data,
                 "total"        => $userList->total(),
             ];
-    
+
             return responseMsgs(true, "User List", $userListResponse, "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
-    
+
 
     /**
      * | Multiple List User
