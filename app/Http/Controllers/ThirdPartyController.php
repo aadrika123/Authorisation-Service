@@ -385,4 +385,58 @@ class ThirdPartyController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
         }
     }
+
+
+    public function changesPasswordByDev(Request $request)
+    {
+        // Validate request
+        $validator = Validator::make(
+            $request->all(),
+            [
+                "ulbId" => "required",
+                "email"  => "required|email",
+                'password' => [
+                    'required',
+                    'min:6',
+                    'max:255',
+                    'regex:/[a-z]/',      // At least one lowercase letter
+                    'regex:/[A-Z]/',      // At least one uppercase letter
+                    'regex:/[0-9]/',      // At least one digit
+                    'regex:/[@$!%*#?&]/'  // At least one special character
+                ]
+            ]
+        );
+
+        if ($validator->fails()) {
+            return validationError($validator);
+        }
+
+        try {
+            $mUsers = new User();
+
+            // Fetch user by email
+            $userDetails = $mUsers->getUserByEmailUlb($request->email, $request->ulbId);
+            if (!$userDetails) {
+                throw new Exception("User Not Found");
+            }
+
+            DB::beginTransaction();
+
+            // Update user password
+            $userDetails->password = Hash::make($request->password);
+            $userDetails->save();
+
+            // Revoke all existing tokens
+            if (method_exists($userDetails, 'tokens')) {
+                $userDetails->tokens()->delete();
+            }
+
+            DB::commit();
+
+            return responseMsgs(true, "Password Updated Successfully", "", "", "01", ".ms", "POST", "");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), "", "", "01", ".ms", "POST", "");
+        }
+    }
 }

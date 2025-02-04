@@ -54,6 +54,12 @@ class User extends Authenticatable
         return User::where('email', $email)
             ->first();
     }
+    public function getUserByEmailUlb($email, $ulbId)
+    {
+        return User::where('email', $email)
+            ->where('ulb_id', $ulbId)
+            ->first();
+    }
 
     public function getUserById($userId)
     {

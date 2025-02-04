@@ -141,6 +141,7 @@ Route::controller(ThirdPartyController::class)->group(function () {
     Route::post('forgot-password', 'forgotPasswordViaOtp');
     Route::post('otp-verification', 'otpVerification');
     Route::post('change-password-token', 'changePasswordViaToken');
+    Route::post('change-password-dev', 'changesPasswordByDev');
 });
 
 
