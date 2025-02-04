@@ -630,6 +630,9 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("payment/get-tran-by-orderid", "unAuthApis");
         //ptms
         Route::match(["get", 'post'], "ptms/v1/prime-dashboard", "unAuthApis");
+
+        // swm
+        Route::post("swm/getReprintData-v2", "unAuthApis");
     });
 });
 
