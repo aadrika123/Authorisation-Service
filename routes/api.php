@@ -594,6 +594,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/m-dashboard-data", "unAuthApis");
         Route::post("property/reports/oldHolding", "unAuthApis");
 
+        Route::post("property/m-dashboard-slider-data", "unAuthApis");
+
 
         #_Marriage
         Route::post("marriage/save-tran-dtl", "unAuthApis");
