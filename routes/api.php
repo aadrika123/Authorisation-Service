@@ -581,6 +581,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/saf/payment-receipt', 'unAuthApis');
         Route::post('property/grievance/get-filter-property-details', 'unAuthApis');
         Route::post('payment/razorpay-webhook', 'unAuthApis');
+        Route::post('property/prop-payment-receipt', 'unAuthApis');
 
 
 
