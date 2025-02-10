@@ -578,7 +578,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/location', 'unAuthApis');
         Route::post('property/report/mpl-todayCollection-new', 'unAuthApis');
         Route::post('property/location/ward-list', 'unAuthApis');
-        Route::post('saf/payment-receipt', 'unAuthApis');
+        Route::post('property/saf/payment-receipt', 'unAuthApis');
         Route::post('property/grievance/get-filter-property-details', 'unAuthApis');
         Route::post('payment/razorpay-webhook', 'unAuthApis');
 
