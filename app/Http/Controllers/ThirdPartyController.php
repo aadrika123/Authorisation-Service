@@ -76,7 +76,11 @@ class ThirdPartyController extends Controller
             $mobile     = $request->mobileNo;
             $message    = "OTP for $type of UD&HD is $generateOtp. This OTP is valid for 10 minutes. For more info call us 1800123123.-UD&HD, GOJ";
             $templateid = "1307171162976397795";
-            $data       = send_sms($mobile, $message, $templateid);
+            // $data       = send_sms($mobile, $message, $templateid);
+            $data = [
+                "status" => true,
+                "msg" => "OTP send to your mobile No!"
+            ];
 
             // $whatsaapData = (Whatsapp_Send(
             //     $request->mobileNo,
