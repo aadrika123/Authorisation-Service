@@ -582,6 +582,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/grievance/get-filter-property-details', 'unAuthApis');
         Route::post('payment/razorpay-webhook', 'unAuthApis');
         Route::post('property/prop-payment-receipt', 'unAuthApis');
+        Route::post('property/details/get-owner-details', 'unAuthApis');
 
 
 
@@ -637,6 +638,9 @@ Route::middleware(['apiPermission'])->group(function () {
 
         // swm
         Route::post("swm/getReprintData-v2", "unAuthApis");
+
+        // water 
+        Route::post("consumer/get-owner-details", "unAuthApis");
     });
 });
 
