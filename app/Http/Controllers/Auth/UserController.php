@@ -562,6 +562,49 @@ class UserController extends Controller
     }
 
     /**
+     * | Get Users Details by AUth 
+     */
+    public function getUserv1(Request $req)
+    {
+        try {
+            $user = auth()->user();
+            $permittedWards = [];
+            $response       = [];
+
+            $routList = collect();
+            if ($user->id) {
+                $lastLogin = User::select('users.*', 'ulb_masters.ulb_name', 'wf_roles.id as wfRoleId', 'wf_roles.role_name')
+                    ->where('users.id', $user->id)
+                    ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
+                    ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                    ->join('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
+                    ->where('suspended', false)
+                    ->first();
+                $response['id'] = $lastLogin->id;
+                // $response['userId'] = $lastLogin->user_name;
+                $response['userName'] = $lastLogin->name;
+                $response['designation'] = $lastLogin->user_type;
+                $response['mobileNo'] = $lastLogin->mobile;
+                $response['address'] = $lastLogin->address;
+                $response['image'] = $lastLogin->photo_path;
+                $response['lastVisitedTime'] = $lastLogin->login_time;
+                $response['lastVisitedDate'] = date('d-m-Y', $lastLogin->login_date);
+                $response['lastIpAddress'] = $lastLogin->ip_address;
+                $response['role'] = $lastLogin->user_type;
+                $response['userTypeId'] = $lastLogin->user_type_id ?? $lastLogin->wfRoleId;
+                $response["routes"]        = $routList;
+                $response["permittedWard"] = $permittedWards;
+                $response["ulbName"] = $lastLogin->ulb_name;
+                $response["roleId"] = $lastLogin->wfRoleId;
+                $response["roleName"] = $lastLogin->role_name;
+            }
+            return responseMsgs(true, "User Details", $response, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+
+    /**
      * | Get All User Details
      */
     public function getAllUsers(Request $request)

@@ -502,6 +502,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('delete-user-notification', 'deactivateNotification');
         Route::post('hash-password', 'hashPassword');
         Route::post('user/password-reset', 'resetPassword');
+
+        Route::post('user-managment/get-user-dtls', 'getUserv1');
     });
 
     // Citizen Register
@@ -640,7 +642,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("swm/getReprintData-v2", "unAuthApis");
 
         // water 
-        Route::post("consumer/get-owner-details", "unAuthApis");
+        Route::post("water/consumer/get-owner-details", "unAuthApis");
     });
 });
 
