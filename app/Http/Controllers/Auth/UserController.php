@@ -568,41 +568,72 @@ class UserController extends Controller
     {
         try {
             $user = auth()->user();
+            if (!$user) {
+                return responseMsgs(false, "Unauthorized access", [], "", "01", responseTime(), "POST", "");
+            }
+
             $permittedWards = [];
             $response       = [];
+            $routList       = collect();
 
-            $routList = collect();
-            if ($user->id) {
-                $lastLogin = User::select('users.*', 'ulb_masters.ulb_name', 'wf_roles.id as wfRoleId', 'wf_roles.role_name')
-                    ->where('users.id', $user->id)
-                    ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
-                    ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
-                    ->join('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
-                    ->where('suspended', false)
-                    ->first();
-                $response['id'] = $lastLogin->id;
-                // $response['userId'] = $lastLogin->user_name;
-                $response['userName'] = $lastLogin->name;
-                $response['designation'] = $lastLogin->user_type;
-                $response['mobileNo'] = $lastLogin->mobile;
-                $response['address'] = $lastLogin->address;
-                $response['image'] = $lastLogin->photo_path;
-                $response['lastVisitedTime'] = $lastLogin->login_time;
-                $response['lastVisitedDate'] = date('d-m-Y', $lastLogin->login_date);
-                $response['lastIpAddress'] = $lastLogin->ip_address;
-                $response['role'] = $lastLogin->user_type;
-                $response['userTypeId'] = $lastLogin->user_type_id ?? $lastLogin->wfRoleId;
-                $response["routes"]        = $routList;
-                $response["permittedWard"] = $permittedWards;
-                $response["ulbName"] = $lastLogin->ulb_name;
-                $response["roleId"] = $lastLogin->wfRoleId;
-                $response["roleName"] = $lastLogin->role_name;
+            // Fetch user details
+            $lastLogin = User::select(
+                'users.*',
+                'ulb_masters.ulb_name',
+                'wf_roles.id as wfRoleId',
+                'wf_roles.role_name'
+            )
+                ->where('users.id', $user->id)
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
+                ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                ->join('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
+                ->where('suspended', false)
+                ->first();
+
+            if (!$lastLogin) {
+                return responseMsgs(false, "User not found or suspended", [], "", "01", responseTime(), "POST", "");
             }
+
+            // Fetch document details
+            $docUpload  = new DocUpload();
+            $docDetails = $docUpload->getSingleDocUrl($lastLogin);
+            $docUrl     = $docDetails['doc_path'] ?? null;
+
+            // Construct response
+            $response = [
+                '_id'              => $lastLogin->id,
+                'ulbId'            => $lastLogin->ulb_id,
+                'userName'         => $lastLogin->user_name,
+                'mobile'           => $lastLogin->mobile,
+                'alternateMobile'  => $lastLogin->alternate_mobile,
+                'email'            => $lastLogin->email,
+                'name'             => $lastLogin->name,
+                'address'          => $lastLogin->address,
+                'ulbName'          => $lastLogin->ulb_name,
+                'suspended'        => $lastLogin->suspended,
+                'referenceNo'      => $lastLogin->reference_no,
+                'imgFullPath'      => $docUrl,
+                'fullName'         => $lastLogin->name,
+                'designation'      => $lastLogin->user_type,
+                'status'           => $lastLogin->status,
+                // 'imageUrl'         => $lastLogin->photo_path,
+                'lastVisitedTime'  => $lastLogin->login_time,
+                'lastVisitedDate'  => $lastLogin->login_date ? date('d-m-Y', strtotime($lastLogin->login_date)) : null,
+                'lastIpAddress'    => $lastLogin->ip_address,
+                'role'             => $lastLogin->user_type,
+                'userTypeId'       => $lastLogin->user_type_id ?? $lastLogin->wfRoleId,
+                'routes'           => $routList,
+                'permittedWard'    => $permittedWards,
+                'roleId'           => $lastLogin->wfRoleId,
+                'roleName'         => $lastLogin->role_name,
+            ];
+
             return responseMsgs(true, "User Details", $response, "", "01", responseTime(), "POST", "");
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        } catch (\Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "01", responseTime(), "POST", "");
         }
     }
+
 
     /**
      * | Get All User Details
