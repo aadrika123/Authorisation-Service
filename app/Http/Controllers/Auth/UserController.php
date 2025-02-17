@@ -585,8 +585,8 @@ class UserController extends Controller
             )
                 ->where('users.id', $user->id)
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
-                ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
-                ->join('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
+                ->leftjoin('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                ->leftjoin('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
                 ->where('suspended', false)
                 ->first();
 
