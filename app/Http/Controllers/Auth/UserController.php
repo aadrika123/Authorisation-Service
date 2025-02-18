@@ -141,6 +141,44 @@ class UserController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+    /**
+     * | User role details by User Id
+     */
+
+    public function getUserRoleId(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'id' => 'required|int'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $user = $this->_mUser->getUserById($req->id);
+            if (!$user)
+                throw new Exception("Invalid Credentials");
+            $mWfRoleusermap = new WfRoleusermap();
+            $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($req->id);
+
+            $role = collect($menuRoleDetails)->map(function ($value, $key) {
+                $values = $value['roles'];
+                return $values;
+            });
+            $roleId = collect($menuRoleDetails)->map(function ($value, $key) {
+                $values = $value['roleId'];
+                return $values;
+            });
+            $data['userDetails'] = $user;
+            $data['userDetails']['role'] = $role;
+            $data['userDetails']['roleId'] = $roleId;
+            return responseMsgs(true, "Data Retrieved", $data, "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
 
     private function checkMobileUserRole($menuRoleDetails)
     {
