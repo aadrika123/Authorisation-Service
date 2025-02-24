@@ -67,7 +67,7 @@ class EpramaanController extends Controller
                 // break;
 
                 $serviceId    = '100001511';    #_production
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 break;
 
                 #change by prity pandey 
@@ -77,7 +77,7 @@ class EpramaanController extends Controller
                 //     break;
             case 'mobile':
                 $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
 
             case 'property':
@@ -187,7 +187,7 @@ class EpramaanController extends Controller
                 //     $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 //     break;
                 $serviceId    = '100001511';    #_production
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 break;
                 #change by prity pandey 
                 // case 'mobile':
@@ -196,7 +196,7 @@ class EpramaanController extends Controller
                 //     break;
             case 'mobile':
                 $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             case 'property':
                 $serviceId    = '100001034';
@@ -436,7 +436,7 @@ class EpramaanController extends Controller
                 //     break;
             case 'citizen':
                 $serviceId    = '100001511';    #_production
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 break;
 
                 #change by prity pandey 
@@ -446,7 +446,7 @@ class EpramaanController extends Controller
                 //     break;
             case 'mobile':
                 $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             case 'property':
                 $serviceId    = '100001034';
@@ -580,8 +580,8 @@ class EpramaanController extends Controller
 
         $sub = $json['sub'] ?? '';
 
-        // $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan"; // Change as needed
-        $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman"; // Change as needed
+        // $redirectUrl = "https://egov.rsccl.in/citizen/logout/e-pramaan"; // Change as needed
+        $redirectUrl = "https://egov.rsccl.in/juidco-app/auth/logout-e-praman"; // Change as needed
 
 
 
@@ -669,10 +669,10 @@ class EpramaanController extends Controller
             if ($type == 'mobile') {
                 $clientId = Config::get('constants.E_CLIENT_ID_MOBILE');
                 $redirectUrl = Config::get('constants.FRONTEND_URL') . '/juidco-app/auth/logout-e-praman';
-                // $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
+                // $redirectUrl = "https://egov.rsccl.in/juidco-app/auth/logout-e-praman";
             } else {
                 // $clientId = "100001511";
-                // $redirectUrl = "https://jharkhandegovernance.com/citizen/logout/e-pramaan";
+                // $redirectUrl = "https://egov.rsccl.in/citizen/logout/e-pramaan";
                 $clientId = Config::get('constants.E_CLIENT_ID_WEB');
                 $redirectUrl = Config::get('constants.FRONTEND_URL') . '/citizen/logout/e-pramaan';
             }
@@ -682,7 +682,7 @@ class EpramaanController extends Controller
             $iss = "ePramaan";
             $aesKey = "e0681502-a91b-4868-b8c0-4274b0144e1a";
             $sub = $json['sub'] ?? '';
-            // $redirectUrl = "https://jharkhandegovernance.com/juidco-app/auth/logout-e-praman";
+            // $redirectUrl = "https://egov.rsccl.in/juidco-app/auth/logout-e-praman";
 
             // Step 5: Prepare the input for HMAC
             $inputValue = $clientId . $sessionId . $iss . $aesKey . $sub . $redirectUrl;
