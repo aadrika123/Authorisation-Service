@@ -97,4 +97,13 @@ trait Auth
             $user->super_user = $request->superUser;
         }
     }
+    /**
+     * Saving Extra User Credentials
+     */
+    public function updateClientId($user, $request)
+    {
+        if ($request->clientId) {
+            $user->client_id = $request->clientId;
+        }
+    }
 }

@@ -302,6 +302,36 @@ class UserController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
+    /**
+     * | Update User Details
+     */
+    public function updateClintIdByUser(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "clientId" => 'nullable',
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $user = authUser();
+            $id   = $user->id;
+            $user = User::find($id);
+            if (!$user)
+                throw new Exception("User Not Exist");
+            if ($request->clientId) {
+                $this->updateClientId($user, $request);
+                $user->save();
+            }
+            return responseMsgs(true, "Successfully Updated CientId", "", "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, "Not Update ClientId", "", "", "01", responseTime(), "POST", "");
+        }
+    }
 
     /**
      * | List User
