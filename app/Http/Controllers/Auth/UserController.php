@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\AuthUserRequest;
 use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
 use App\MicroServices\DocUpload;
+use App\Models\Auth\ActiveCitizen;
 use App\Models\Auth\User;
 use App\Models\EPramanExistCheck;
 use App\Models\ModuleMaster;
@@ -310,7 +311,7 @@ class UserController extends Controller
         $validated = Validator::make(
             $request->all(),
             [
-                "clientId" => 'nullable',
+                "clientId" => 'nullable'
             ]
         );
         if ($validated->fails()) {
@@ -320,16 +321,13 @@ class UserController extends Controller
         try {
             $user = authUser();
             $id   = $user->id;
-            $user = User::find($id);
-            if (!$user)
-                throw new Exception("User Not Exist");
-            if ($request->clientId) {
-                $this->updateClientId($user, $request);
-                $user->save();
-            }
+            // $user = User::find($id);
+            $aciveCitizen = new ActiveCitizen();
+            $aciveCitizendtl = $aciveCitizen->getCitizenById($id);
+            $aciveCitizen->updateClientId($id, $request, $aciveCitizendtl);
             return responseMsgs(true, "Successfully Updated CientId", "", "", "01", responseTime(), "POST", "");
         } catch (Exception $e) {
-            return responseMsgs(false, "Not Update ClientId", "", "", "01", responseTime(), "POST", "");
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
 

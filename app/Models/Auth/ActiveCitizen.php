@@ -71,10 +71,30 @@ class ActiveCitizen extends Model
             ->first();
         return $data;
     }
+    /**
+     * | get citizen detail by unique id
+     */
+    public function getCitizenById($id)
+    {
+        $data = ActiveCitizen::where('id', $id)
+            ->where('is_suspended', false)
+            ->first();
+        return $data;
+    }
 
     public function citizenRegistration($request)
     {
         $data = ActiveCitizen::create($request);
         return $data;
+    }
+
+    public function updateClientId($id, $request, $aciveCitizen)
+    {
+        return ActiveCitizen::where('id', $id)
+            ->update(
+                [
+                    'client_id' => $request->clientId ?? $aciveCitizen->client_id,
+                ]
+            );
     }
 }
