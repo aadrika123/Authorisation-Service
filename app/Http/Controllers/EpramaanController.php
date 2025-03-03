@@ -62,8 +62,8 @@ class EpramaanController extends Controller
                 // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
 
                 #change by prity pandey 
-                $serviceId    = '100001332';    #_production
-                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
+                $serviceId    = '100001511';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
                 // $serviceId    = '100001511';    #_production
@@ -72,8 +72,8 @@ class EpramaanController extends Controller
 
                 #change by prity pandey  
                 case 'mobile':
-                    $serviceId    = '100001360';
-                    $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                    $serviceId    = '100001513';
+                    $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                     break;
             // case 'mobile':
             //     $serviceId    = '100001513';
