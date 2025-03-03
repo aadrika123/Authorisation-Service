@@ -183,16 +183,16 @@ class EpramaanController extends Controller
                 #change by prity pandey 
             case 'citizen':
                 //     // $serviceId    = '100001033';    #_staging
-                    $serviceId    = '100001332';    #_production
-                    $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
+                    $serviceId    = '100001511';    #_production
+                    $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 //     break;
                 // $serviceId    = '100001511';    #_production
                 // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
                 #change by prity pandey 
                 case 'mobile':
-                    $serviceId    = '100001360';
-                    $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                    $serviceId    = '100001513';
+                    $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                     break;
             // case 'mobile':
             //     $serviceId    = '100001513';
@@ -435,13 +435,13 @@ class EpramaanController extends Controller
                 //     $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 //     break;
             case 'citizen':
-                $serviceId    = '100001332';    #_production
+                $serviceId    = '100001511';    #_production
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
                 #change by prity pandey 
                 case 'mobile':
-                    $serviceId    = '100001360';
+                    $serviceId    = '100001513';
                     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
                     break;
             // case 'mobile':
