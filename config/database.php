@@ -76,10 +76,6 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
-            'options'   => [
-                PDO::ATTR_PERSISTENT => true,
-            ],
-           
         ],
 
         'sqlsrv' => [
