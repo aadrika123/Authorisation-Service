@@ -82,7 +82,7 @@ class UserController extends Controller
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
             // 
-            $checkUlbStatus = $mUlbMaster->checkUlb($user);
+           $checkUlbStatus = $mUlbMaster->checkUlb($user);
             if (!$checkUlbStatus) {
                 throw new Exception('This Ulb is Retricted SuperAdmin!');
             }
