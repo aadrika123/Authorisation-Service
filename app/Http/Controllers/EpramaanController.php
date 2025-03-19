@@ -183,8 +183,8 @@ class EpramaanController extends Controller
                 #change by prity pandey 
             case 'citizen':
                 //     // $serviceId    = '100001033';    #_staging
-                    $serviceId    = '100001511';    #_production
-                    $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                    $serviceId    = '100001033';    #_production
+                    $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';
                 //     break;
                 // $serviceId    = '100001511';    #_production
                 // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
