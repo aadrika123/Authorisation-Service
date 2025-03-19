@@ -76,9 +76,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
-            'options'  => [
-                PDO::ATTR_EMULATE_PREPARES => true, // :white_check_mark: Required for PgBouncer in transaction mode
-            ],
+            // 'options'  => [
+            //     PDO::ATTR_EMULATE_PREPARES => true, 
+            // ],
         ],
 
         'sqlsrv' => [
