@@ -141,7 +141,8 @@ class UlbMaster extends Model
             'id'
         )
             ->where('id', $user->ulb_id)
-            ->where('active_status', true)
+            // ->where('active_status', true)
+            ->whereRaw('active_status::boolean = TRUE')
             ->first();
     }
 }
