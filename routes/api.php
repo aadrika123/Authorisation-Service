@@ -558,10 +558,22 @@ Route::middleware(['apiPermission'])->group(function () {
 
         # Grievance UnAuth Api
         Route::post("grievance/auth/req-otp", "unAuthApis");
-        Route::post("grievance/auth/verify-otp", "unAuthApis");
-        // Route::post("grievance/register-grievance", "unAuthApis");
-        Route::post("grievance/auth/get-grievance", "unAuthApis");
-        Route::post("grievance/v1/complaint-application-direct/create-complaint", "unAuthApis");
+    Route::post("grievance/auth/verify-otp", "unAuthApis");
+    // Route::post("grievance/register-grievance", "unAuthApis");
+    // Route::post("grievance/register-grievance", "unAuthApis");
+    Route::post("grievance/auth/get-grievance", "unAuthApis");
+    Route::post("/grievance/v1/feedback/create-citizen-feedback", "unAuthApis");
+    // Route::get("grievance/v1/ulb-direct/get-all-ulb-d", "unAuthApis");
+    Route::get("grievance/v1/ulb-direct/get-all-ulb-d/", "unAuthApis");
+    Route::get("grievance/v1/get-complaint-application/:complaintRefNo", "unAuthApis");
+    Route::get("grievance/v1/problem-direct/get-all-problem", "unAuthApis");
+    Route::get("/grievance/v1/module-direct/get-all-module-d", "unAuthApis");
+    Route::get("/grievance/v1/complaint-direct/get-complaint-by-module-id", "unAuthApis");
+    Route::post("/grievance/v1/complaint-application-direct/create-complaint", "unAuthApis");
+    Route::get("/grievance/v1/complaint-application-direct/get-complaint-application/:complaintRefNo", "unAuthApis");
+    Route::get("/grievance/v1/notifications-direct/get-user-notification", "unAuthApis");
+    Route::get("/grievance/v1/feedback/get-all-citizen-feedback", "unAuthApis");
+    Route::get("/grievance/v1/complaint-brief-direct/get-all-complaint-brief-direct/", "unAuthApis");
 
         # Pet registration
         Route::post("pet/get-master-data", "unAuthApis");
