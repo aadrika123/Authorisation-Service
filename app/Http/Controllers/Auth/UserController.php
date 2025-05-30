@@ -60,100 +60,101 @@ class UserController extends Controller
     /**
      * | User Login
      */
-    public function loginAuth(Request $req)
-    {
-        $validated = Validator::make(
-            $req->all(),
-            [
-                'email' => 'required|email',
-                'password' => 'required',
-                'type' => "nullable|in:mobile",
-                'moduleId' => "nullable|int"
-            ]
-        );
-        if ($validated->fails())
-            return validationError($validated);
+    // public function loginAuth(Request $req)
+    // {
+    //     $validated = Validator::make(
+    //         $req->all(),
+    //         [
+    //             'email' => 'required|email',
+    //             'password' => 'required',
+    //             'type' => "nullable|in:mobile",
+    //             'moduleId' => "nullable|int"
+    //         ]
+    //     );
+    //     if ($validated->fails())
+    //         return validationError($validated);
 
-        try {
-            $secretKey = Config::get('constants.SECRETKEY'); // Your secret key
-            $email = $req->email;
-            // Get the encrypted password (Base64 encoded)
-            $encrypted = $req->password;
-            // Decode base64 encrypted string to get raw encrypted data
-            $encryptedData = base64_decode($encrypted);
-            $method = 'AES-256-CBC';
-            $key = hash('sha256', $secretKey, true);  // raw output = true for binary key
-            $iv = substr(hash('sha256', $secretKey), 0, 16);
+    //     try {
+    //         // return $r/=eq;
+    //         $secretKey = Config::get('constants.SECRETKEY'); // Your secret key
+    //         $email = $req->email;
+    //         // Get the encrypted password (Base64 encoded)
+    //         $encrypted = $req->password;
+    //         // Decode base64 encrypted string to get raw encrypted data
+    //         $encryptedData = base64_decode($encrypted);
+    //         $method = 'AES-256-CBC';
+    //         $key = hash('sha256', $secretKey, true);  // raw output = true for binary key
+    //         $iv = substr(hash('sha256', $secretKey), 0, 16);
 
-            // Decrypt the password
-            $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
+    //         // Decrypt the password
+    //         $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
 
-            if ($decrypted === false) {
-                throw new Exception("Password decryption failed or tampered data");
-            }
-            $password = $decrypted;  // decrypted password plain text
+    //         if ($decrypted === false) {
+    //             throw new Exception("Password decryption failed or tampered data");
+    //         }
+    //         $password = $decrypted;  // decrypted password plain text
 
 
-            $mWfRoleusermap = new WfRoleusermap();
-            $mUlbMaster = new UlbMaster();
+    //         $mWfRoleusermap = new WfRoleusermap();
+    //         $mUlbMaster = new UlbMaster();
 
-            $user = $this->_mUser->getUserByEmail($email);
-            if (!$user)
-                throw new Exception("Invalid Credentials");
+    //         $user = $this->_mUser->getUserByEmail($email);
+    //         if (!$user)
+    //             throw new Exception("Invalid Credentials");
 
-            if ($user->suspended == true)
-                throw new Exception("You are not authorized to log in!");
+    //         if ($user->suspended == true)
+    //             throw new Exception("You are not authorized to log in!");
 
-            $checkUlbStatus = $mUlbMaster->checkUlb($user);
-            if (!$checkUlbStatus) {
-                throw new Exception('This Ulb is Restricted SuperAdmin!');
-            }
+    //         $checkUlbStatus = $mUlbMaster->checkUlb($user);
+    //         if (!$checkUlbStatus) {
+    //             throw new Exception('This Ulb is Restricted SuperAdmin!');
+    //         }
 
-            if ($req->moduleId) {
-                $checkModule = $this->_UlbModulePermission->check($user, $req);
-                if (!$checkModule) {
-                    throw new Exception('Module is Restricted For This ulb !');
-                }
-            }
+    //         if ($req->moduleId) {
+    //             $checkModule = $this->_UlbModulePermission->check($user, $req);
+    //             if (!$checkModule) {
+    //                 throw new Exception('Module is Restricted For This ulb !');
+    //             }
+    //         }
 
-            if (Hash::check($password, $user->password)) {
-                $token = $user->createToken('my-app-token')->plainTextToken;
-                $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
-                $role = collect($menuRoleDetails)->pluck('roles');
-                $roleId = collect($menuRoleDetails)->pluck('roleId');
+    //         if (Hash::check($password, $user->password)) {
+    //             $token = $user->createToken('my-app-token')->plainTextToken;
+    //             $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+    //             $role = collect($menuRoleDetails)->pluck('roles');
+    //             $roleId = collect($menuRoleDetails)->pluck('roleId');
 
-                if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Mobile user not login as web user");
-                }
+    //             if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
+    //                 throw new Exception("Mobile user not login as web user");
+    //             }
 
-                $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
-                if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Web user not login as mobile user");
-                }
+    //             $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
+    //             if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
+    //                 throw new Exception("Web user not login as mobile user");
+    //             }
 
-                if (in_array($user->user_type, ['TC', 'TL'])) {
-                    $userlog = new UserLoginDetail();
-                    $userlog->user_id = $user->id;
-                    $userlog->login_date = now()->format("Y-m-d");
-                    $userlog->login_time = now()->format("h:i:s a");
-                    $userlog->ip_address = $req->ip();
-                    $userlog->save();
-                }
+    //             if (in_array($user->user_type, ['TC', 'TL'])) {
+    //                 $userlog = new UserLoginDetail();
+    //                 $userlog->user_id = $user->id;
+    //                 $userlog->login_date = now()->format("Y-m-d");
+    //                 $userlog->login_time = now()->format("h:i:s a");
+    //                 $userlog->ip_address = $req->ip();
+    //                 $userlog->save();
+    //             }
 
-                $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
-                $data['token'] = $token;
-                $data['userDetails'] = $user;
-                $data['userDetails']['role'] = $role;
-                $data['userDetails']['roleId'] = $roleId;
+    //             $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
+    //             $data['token'] = $token;
+    //             $data['userDetails'] = $user;
+    //             $data['userDetails']['role'] = $role;
+    //             $data['userDetails']['roleId'] = $roleId;
 
-                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
-            }
+    //             return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
+    //         }
 
-            throw new Exception("Invalid Credentials");
-        } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 401);
-        }
-    }
+    //         throw new Exception("Invalid Credentials");
+    //     } catch (Exception $e) {
+    //         return response()->json(['success' => false, 'message' => $e->getMessage()], 401);
+    //     }
+    // }
     /**
      * | User role details by User Id
      */
@@ -1181,88 +1182,88 @@ class UserController extends Controller
     /**
      old login auth function
      */
-    // public function loginAuth(Request $req)
-    // {
-    //     $validated = Validator::make(
-    //         $req->all(),
-    //         [
-    //             'email' => 'required|email',
-    //             'password' => 'required',
-    //             'type' => "nullable|in:mobile",
-    //             'moduleId' => "nullable|int"
-    //         ]
-    //     );
-    //     if ($validated->fails())
-    //         return validationError($validated);
-    //     try {
-    //         $mWfRoleusermap = new WfRoleusermap();
-    //         $mUlbMaster = new UlbMaster();
-    //         $user = $this->_mUser->getUserByEmail($req->email);
-    //         if (!$user)
-    //             throw new Exception("Invalid Credentials");
-    //         if ($user->suspended == true)
-    //             throw new Exception("You are not authorized to log in!");
-    //         // 
-    //        $checkUlbStatus = $mUlbMaster->checkUlb($user);
-    //         if (!$checkUlbStatus) {
-    //             throw new Exception('This Ulb is Retricted SuperAdmin!');
-    //         }
+    public function loginAuth(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'email' => 'required|email',
+                'password' => 'required',
+                'type' => "nullable|in:mobile",
+                'moduleId' => "nullable|int"
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $mWfRoleusermap = new WfRoleusermap();
+            $mUlbMaster = new UlbMaster();
+            $user = $this->_mUser->getUserByEmail($req->email);
+            if (!$user)
+                throw new Exception("Invalid Credentials");
+            if ($user->suspended == true)
+                throw new Exception("You are not authorized to log in!");
+            // 
+           $checkUlbStatus = $mUlbMaster->checkUlb($user);
+            if (!$checkUlbStatus) {
+                throw new Exception('This Ulb is Retricted SuperAdmin!');
+            }
 
-    //         if ($req->moduleId) {
-    //             $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 
-    //             if (!$checkModule) {
-    //                 throw new Exception('Module is Restricted For This ulb !');
-    //             }
-    //         }
+            if ($req->moduleId) {
+                $checkModule = $this->_UlbModulePermission->check($user, $req);       // CHECK USER ULB WISE MODULE PERMISSION 
+                if (!$checkModule) {
+                    throw new Exception('Module is Restricted For This ulb !');
+                }
+            }
 
-    //         if (Hash::check($req->password, $user->password)) {
-    //             $token = $user->createToken('my-app-token')->plainTextToken;
-    //             $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
-    //             // if (empty(collect($menuRoleDetails)->first())) {
-    //             //     throw new Exception('User has No Roles!');
-    //             // }
-    //             $role = collect($menuRoleDetails)->map(function ($value, $key) {
-    //                 $values = $value['roles'];
-    //                 return $values;
-    //             });
-    //             $roleId = collect($menuRoleDetails)->map(function ($value, $key) {
-    //                 $values = $value['roleId'];
-    //                 return $values;
-    //             });
-    //             if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
-    //                 throw new Exception("Mobile user not login as web user");
-    //             }
-    //             $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
+            if (Hash::check($req->password, $user->password)) {
+                $token = $user->createToken('my-app-token')->plainTextToken;
+                $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+                // if (empty(collect($menuRoleDetails)->first())) {
+                //     throw new Exception('User has No Roles!');
+                // }
+                $role = collect($menuRoleDetails)->map(function ($value, $key) {
+                    $values = $value['roles'];
+                    return $values;
+                });
+                $roleId = collect($menuRoleDetails)->map(function ($value, $key) {
+                    $values = $value['roleId'];
+                    return $values;
+                });
+                if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
+                    throw new Exception("Mobile user not login as web user");
+                }
+                $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
 
-    //             if (collect($jeRole)->isEmpty()) {
-    //                 if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-    //                     throw new Exception("Web user not login as mobile user");
-    //                 }
-    //             }
-    //             //
-    //             if ($user->user_type == 'TC' || $user->user_type == 'TL') {
-    //                 $userlog = new UserLoginDetail();
-    //                 $userlog->user_id = $user->id;
-    //                 $userlog->login_date = Carbon::now()->format("Y-m-d");
-    //                 $userlog->login_time = Carbon::now()->format("h:i:s a");
-    //                 $userlog->ip_address = $req->ip();
-    //                 $userlog->save();
-    //             }
+                if (collect($jeRole)->isEmpty()) {
+                    if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
+                        throw new Exception("Web user not login as mobile user");
+                    }
+                }
+                //
+                if ($user->user_type == 'TC' || $user->user_type == 'TL') {
+                    $userlog = new UserLoginDetail();
+                    $userlog->user_id = $user->id;
+                    $userlog->login_date = Carbon::now()->format("Y-m-d");
+                    $userlog->login_time = Carbon::now()->format("h:i:s a");
+                    $userlog->ip_address = $req->ip();
+                    $userlog->save();
+                }
 
-    //             //
-    //             $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
-    //             $data['token'] = $token;
-    //             $data['userDetails'] = $user;
-    //             $data['userDetails']['role'] = $role;
-    //             $data['userDetails']['roleId'] = $roleId;
-    //             return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
-    //         }
+                //
+                $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
+                $data['token'] = $token;
+                $data['userDetails'] = $user;
+                $data['userDetails']['role'] = $role;
+                $data['userDetails']['roleId'] = $roleId;
+                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
+            }
 
-    //         throw new Exception("Invalid Credentials");
-    //     } catch (Exception $e) {
-    //         return responseMsg(false, $e->getMessage(), "");
-    //     }
-    // }
+            throw new Exception("Invalid Credentials");
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 
     // public function encrypted(Request $req)
     // {
@@ -1276,7 +1277,7 @@ class UserController extends Controller
     //         $plainText = "Admin1#";
 
     //         $encrypted = openssl_encrypt($plainText, $method, $key, OPENSSL_RAW_DATA, $iv);
-    //         $encryptedBase64 = base64_encode($encrypted);
+    //      return   $encryptedBase64 = base64_encode($encrypted);
     //         return responseMsgs(true, "Data Retrieved", $encryptedBase64, "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
     //     } catch (Exception $e) {
     //         return responseMsgs(false, $e->getMessage(), "", "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);

@@ -80,6 +80,8 @@ Route::controller(UserController::class)->group(function () {
     Route::post('user-managment/v1/crud/get/admin-list-v1', 'searchUsers');            #_List Admin by ulb Id
 
     Route::post('user-managment/v1/get-user-roles-dtls', 'getUserRoleId');            #_role details  by user Id
+    Route::post('user-managment/v1/encrypted', 'encrypted');            #_role details  by user Id
+    
 
     
 });
