@@ -15,6 +15,7 @@ return [
     "WHATSAPP_URL"          => env("WHATSAPP_URL", "xxx"),
     "SMS_TEST"              => env("SMS_TEST", false),
     "EPRAMAAN_CLIENT_ID"    => env("EPRAMAAN_CLIENT_ID", false),
+    "SECRETKEY"             => env("secretKey"),
 
     #_Credentials for SMS
     "SMS_USER_NAME"          => env('SMS_USER_NAME'),
