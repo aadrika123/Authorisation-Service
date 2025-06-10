@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Api\ApiMaster;
+use App\Models\Api\ApiRole;
 use App\Models\ApiCategory;
+use App\Models\ApiScreenMapping;
 use App\Models\DeveloperList;
 use Exception;
 use Illuminate\Http\Request;
@@ -120,6 +122,77 @@ class ApiController extends Controller
             $list = $mApiCategory->categoryList();
 
             return responseMsg(true, "Category List", $list);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'api_endpoint' => 'required|string',
+                'method' => 'required|in:GET,POST,PUT,DELETE',
+                'description' => 'nullable|string',
+                'screens' => 'required|array',
+                'screens.*.screen_name' => 'required|string',
+                'screens.*.screen_url' => 'required|string',
+                'screens.*.description' => 'nullable|string',
+            ]);
+
+            // Create or find the API endpoint
+            $create = new ApiMaster();
+            $apimaster = $create->addApi($request);
+            // Collect screen IDs
+            $screenIds = [];
+
+            foreach ($validated['screens'] as $screenData) {
+                $screen = ApiScreenMapping::create([
+                    'api_id'       => $apimaster->id,
+                    'screen_name'  => $screenData['screen_name'],
+                    'url'          => $screenData['screen_url'],
+                    'description'  => $screenData['description'] ?? null
+                ]);
+                $screenIds[] = $screen->id;
+            }
+
+            // Sync the pivot table
+            return responseMsgs(true, "Api Saved", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+    //master list by Module Id
+    /**
+     * | List Api by Module Id
+     */
+    public function ApiByModuleId(Request $req)
+    {
+        try {
+            $req->validate([
+                'moduleId' => 'required'
+            ]);
+            $listById = new ApiMaster();
+            $list  = $listById->listApiByModuleId($req);
+
+            return responseMsg(true, "Api List", $list);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+    /**
+     * | List Api by Module Id
+     */
+    public function ApiDetailsbyeId(Request $req)
+    {
+        try {
+            $req->validate([
+                'id' => 'required'
+            ]);
+            $listById = new ApiMaster();
+            $list  = $listById->apiDetails($req);
+
+            return responseMsg(true, "Api List", $list);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }

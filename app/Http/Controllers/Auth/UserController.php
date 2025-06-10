@@ -133,12 +133,6 @@ class UserController extends Controller
                 $role = collect($menuRoleDetails)->pluck('roles');
                 $roleId = collect($menuRoleDetails)->pluck('roleId');
     
-                // ✅ Add Redis-based session activity timestamp
-                $citizenUserType = Config::get('workflow-constants.USER_TYPES.1');
-                $key = $user->user_type == $citizenUserType
-                    ? 'last_activity_citizen_' . $user->id
-                    : 'last_activity_' . $user->id;
-                Redis::set($key, Carbon::now());
     
                 if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Mobile user not login as web user");
@@ -1294,7 +1288,7 @@ class UserController extends Controller
     public function encrypted(Request $req)
     {
         try {
-            $secretKey = "abcd";
+            $secretKey = Config::get('constants.SECRETKEY');
 
             $method = "AES-256-CBC";
             $key = hash('sha256', $secretKey, true);

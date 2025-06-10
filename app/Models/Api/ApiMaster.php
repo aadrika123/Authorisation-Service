@@ -17,8 +17,10 @@ class ApiMaster extends Model
     {
         $data = new ApiMaster;
         $data->description      = $req->description;
+        $data->module_id        = $req->module_id;
+        $data->description      = $req->description;
         $data->category         = $req->category;
-        $data->end_point        = $req->endPoint;
+        $data->end_point        = $req->api_endpoint;
         $data->usage            = $req->usage;
         $data->pre_condition    = $req->preCondition;
         $data->request_payload  = $req->requestPayload;
@@ -28,10 +30,12 @@ class ApiMaster extends Model
         $data->created_by       = $req->createdBy;
         $data->revision_no      = $req->revisionNo ?? 1;
         $data->remarks          = $req->remarks;
-        $data->tags             = implode(',', $req->tags);
+        $data->method          = $req->method;
+        // $data->tags             = implode(',', $req->tags);
         $data->category_id      = $req->categoryId;
         $data->developer_id     = $req->developerId;
         $data->save();
+        return $data;
     }
 
     /**
@@ -74,6 +78,22 @@ class ApiMaster extends Model
     public function listApi()
     {
         $data = ApiMaster::where('discontinued', false)
+            ->orderbydesc('id')
+            ->get();
+        return $data;
+    }
+    public function listApiByModuleId($request)
+    {
+        $data = ApiMaster::where('module_id', $request->moduleId)
+            ->orderbydesc('id')
+            ->get();
+        return $data;
+    }
+    public function apiDetails($request)
+    {
+        $data = ApiMaster::select('api_masters.*', 'api_screen_mappings.screen_name', 'api_screen_mappings.url', 'api_screen_mappings.description')
+            ->join('api_screen_mappings', 'api_screen_mappings.api_id', '=', 'api_masters.id')
+            ->where('api_masters.id', $request->id)
             ->orderbydesc('id')
             ->get();
         return $data;
