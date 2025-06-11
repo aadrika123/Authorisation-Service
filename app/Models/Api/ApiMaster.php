@@ -82,20 +82,38 @@ class ApiMaster extends Model
             ->get();
         return $data;
     }
-    public function listApiByModuleId($request)
+    /**
+     * | List Api by module id
+     */
+    public function listApiByModuleId($moduleId)
     {
-        $data = ApiMaster::where('module_id', $request->moduleId)
-            ->orderbydesc('id')
-            ->get();
+        $data = ApiMaster::where('module_id', $moduleId)
+            ->orderbydesc('id');
         return $data;
     }
+
     public function apiDetails($request)
     {
-        $data = ApiMaster::select('api_masters.*', 'api_screen_mappings.screen_name', 'api_screen_mappings.url', 'api_screen_mappings.description')
-            ->join('api_screen_mappings', 'api_screen_mappings.api_id', '=', 'api_masters.id')
+        $data = ApiMaster::select(
+            'api_masters.id',
+            'api_masters.end_point',
+            'api_masters.description',
+            'api_masters.category',
+            'api_masters.usage',
+            'api_masters.pre_condition',
+            'api_masters.request_payload',
+            'api_masters.response_payload',
+            'api_masters.post_condition',
+            'api_masters.version',
+            'api_masters.revision_no',
+            'api_masters.created_by',
+            'api_masters.method',
+            'api_masters.category_id',
+            'api_masters.developer_id'
+        )
             ->where('api_masters.id', $request->id)
             ->orderbydesc('id')
-            ->get();
+            ->first();
         return $data;
     }
 

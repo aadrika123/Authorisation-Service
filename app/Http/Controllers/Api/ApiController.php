@@ -170,16 +170,31 @@ class ApiController extends Controller
     {
         try {
             $req->validate([
-                'moduleId' => 'required'
+                'moduleId' => 'required',
+                'page' => 'sometimes|integer|min:1',
+                'perPage' => 'sometimes|integer|min:1'
             ]);
+
+            $page = $req->input('page', 1);
+            $perPage = $req->input('perPage', 10);
+
             $listById = new ApiMaster();
-            $list  = $listById->listApiByModuleId($req);
+            $list = $listById->listApiByModuleId($req->moduleId);;
+
+            $paginator = $list->paginate($perPage);
+            $list = [
+                "current_page"  => $paginator->currentPage(),
+                "last_page"     => $paginator->lastPage(),
+                "data"          => $paginator->items(),
+                "total"         => $paginator->total(),
+            ];
 
             return responseMsg(true, "Api List", $list);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
     /**
      * | List Api by Module Id
      */
@@ -190,9 +205,14 @@ class ApiController extends Controller
                 'id' => 'required'
             ]);
             $listById = new ApiMaster();
-            $list  = $listById->apiDetails($req);
+            $api  = $listById->apiDetails($req);
+            $list = ApiScreenMapping::where('api_id', $api->id)->get();
+            $details = [
+                'api' => $api,
+                'screens' => $list
+            ];
 
-            return responseMsg(true, "Api List", $list);
+            return responseMsg(true, "Api List", $details);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
