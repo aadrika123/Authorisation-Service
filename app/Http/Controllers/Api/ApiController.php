@@ -217,4 +217,109 @@ class ApiController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    public function update(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer|exists:api_masters,id',
+                'api_endpoint' => 'required|string',
+                'method' => 'required|in:GET,POST,PUT,DELETE',
+                'description' => 'nullable|string',
+                'category' => 'nullable|string',
+                'usage' => 'nullable|string',
+                'pre_condition' => 'nullable|string',
+                'request_payload' => 'nullable|string',
+                'response_payload' => 'nullable|string',
+                'post_condition' => 'nullable|string',
+                'version' => 'nullable|string',
+                'revision_no' => 'nullable|string',
+                'remarks' => 'nullable|string',
+                'tags' => 'nullable|string',
+                'category_id' => 'nullable|integer',
+                'developer_id' => 'nullable|integer',
+                'screens' => 'required|array',
+                'screens.*.id' => 'nullable|integer|exists:api_screen_mappings,id',
+                'screens.*.screen_name' => 'required|string',
+                'screens.*.screen_url' => 'required|string',
+                'screens.*.description' => 'nullable|string',
+            ]);
+
+            // Step 1: Update ApiMaster
+            $api = ApiMaster::find($validated['id']);
+            $api->update([
+                'description'       => $validated['description'] ?? $api->description,
+                'category'          => $validated['category'] ?? $api->category,
+                'end_point'         => $validated['api_endpoint'],
+                'method'            => $validated['method'],
+                'usage'             => $validated['usage'] ?? $api->usage,
+                'pre_condition'     => $validated['pre_condition'] ?? $api->pre_condition,
+                'request_payload'   => $validated['request_payload'] ?? $api->request_payload,
+                'response_payload'  => $validated['response_payload'] ?? $api->response_payload,
+                'post_condition'    => $validated['post_condition'] ?? $api->post_condition,
+                'version'           => $validated['version'] ?? $api->version,
+                'revision_no'       => $validated['revision_no'] ?? $api->revision_no,
+                'remarks'           => $validated['remarks'] ?? $api->remarks,
+                'tags'              => $validated['tags'] ?? $api->tags,
+                'category_id'       => $validated['category_id'] ?? $api->category_id,
+                'developer_id'      => $validated['developer_id'] ?? $api->developer_id,
+            ]);
+
+            // Step 2: Update or Create Screen Mappings
+            $existingScreenIds = [];
+
+            foreach ($validated['screens'] as $screenData) {
+                if (!empty($screenData['id'])) {
+                    // Update existing
+                    $screen = ApiScreenMapping::find($screenData['id']);
+                    $screen->update([
+                        'screen_name' => $screenData['screen_name'],
+                        'url' => $screenData['screen_url'],
+                        'description' => $screenData['description'] ?? null,
+                    ]);
+                    $existingScreenIds[] = $screen->id;
+                } else {
+                    // Create new
+                    $newScreen = ApiScreenMapping::create([
+                        'api_id' => $api->id,
+                        'screen_name' => $screenData['screen_name'],
+                        'url' => $screenData['screen_url'],
+                        'description' => $screenData['description'] ?? null,
+                    ]);
+                    $existingScreenIds[] = $newScreen->id;
+                }
+            }
+
+            // Optional: Delete removed screen mappings
+            ApiScreenMapping::where('api_id', $api->id)
+                ->whereNotIn('id', $existingScreenIds)
+                ->delete();
+
+            return responseMsgs(true, "API and screens updated successfully", $api);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
+
+    public function deleteScreen(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required|integer|exists:api_screen_mappings,id',
+                'status' => 'required|boolean',
+            ]);
+
+            $screen = ApiMaster::find($request->id);
+            if (!$screen) {
+                return responseMsgs(false, "Screen not found", null);
+            };
+            $screen->update([
+                'discontinued' => $request->status,
+            ]);
+
+            return responseMsgs(true, "Screen deleted successfully", null);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "");
+        }
+    }
 }

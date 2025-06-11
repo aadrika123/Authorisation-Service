@@ -322,6 +322,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/api-category', 'listCategory');                       // Category List
         Route::post('user-managment/v1/api-list-module-id', 'ApiByModuleId');                       // Api List
         Route::post('user-managment/v1/api-details-by-id', 'ApidetailsbyeId');                       // Api details List
+        Route::post('user-managment/v1/update-api-details', 'update');                       //update Api details List
+        Route::post('user-managment/v1/delete-api', 'deleteScreen');                       //deleteScreen Api details List
     });
 
     /**

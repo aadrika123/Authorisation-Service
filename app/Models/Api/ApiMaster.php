@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class ApiMaster extends Model
 {
     use HasFactory;
-
+    protected $table = 'api_masters';
+    protected $guarded = [];
     /**
      * | Create Api
      */
@@ -112,6 +113,7 @@ class ApiMaster extends Model
             'api_masters.developer_id'
         )
             ->where('api_masters.id', $request->id)
+            ->where('api_masters.discontinued', false)
             ->orderbydesc('id')
             ->first();
         return $data;
