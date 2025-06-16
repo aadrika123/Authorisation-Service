@@ -172,14 +172,18 @@ class ApiController extends Controller
             $req->validate([
                 'moduleId' => 'required',
                 'page' => 'sometimes|integer|min:1',
-                'perPage' => 'sometimes|integer|min:1'
+                'perPage' => 'sometimes|integer|min:1',
+                'q' => 'nullable|string|max:255',
             ]);
 
             $page = $req->input('page', 1);
             $perPage = $req->input('perPage', 10);
 
             $listById = new ApiMaster();
-            $list = $listById->listApiByModuleId($req->moduleId);;
+            $list = $listById->listApiByModuleId($req->moduleId);
+            if ($req->has('q') && !empty($req->q)) {
+                $list = $list->where('end_point', 'like', '%' . $req->q . '%');
+            }
 
             $paginator = $list->paginate($perPage);
             $list = [
