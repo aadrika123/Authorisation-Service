@@ -599,7 +599,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/reports/mpl2", "unAuthApis");
         Route::post("property/map/level1", "unAuthApis");
         Route::post("property/map/level2", "unAuthApis");
-         Route::post("property/m-list-of-all-blog", "unAuthApis");
+        Route::post("property/m-list-of-all-blog", "unAuthApis");
         # Property UnAuth Api
         Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
@@ -613,6 +613,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/prop-payment-receipt', 'unAuthApis');
         Route::post('property/details/get-owner-details', 'unAuthApis');
         Route::get('property/prop-road-type', 'unAuthApis');
+        Route::post('property/m-get-blog-by-Id', 'unAuthApis');
+        Route::post('property/m-get-active-blog', 'unAuthApis');
 
 
 
