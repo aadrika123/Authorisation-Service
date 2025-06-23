@@ -10,6 +10,7 @@ use App\Models\ApiScreenMapping;
 use App\Models\DeveloperList;
 use Exception;
 use Illuminate\Http\Request;
+use Spatie\FlareClient\Api;
 
 class ApiController extends Controller
 {
@@ -141,6 +142,12 @@ class ApiController extends Controller
             ]);
 
             // Create or find the API endpoint
+            $checkApi = ApiMaster::where('end_point', $validated['api_endpoint'])
+                ->where('method', $validated['method'])
+                ->first();
+            if ($checkApi) {
+                return responseMsgs(false, "API endpoint already exists", "");
+            }
             $create = new ApiMaster();
             $apimaster = $create->addApi($request);
             // Collect screen IDs
@@ -309,14 +316,22 @@ class ApiController extends Controller
     {
         try {
             $request->validate([
-                'id' => 'required|integer|exists:api_screen_mappings,id',
+                'id' => 'required',
             ]);
 
-            $screen = ApiMaster::find($request->id);
-            if (!$screen) {
+            $apimaster = ApiMaster::find($request->id);
+
+            if (!$apimaster) {
                 return responseMsgs(false, "Screen not found", null);
             };
-            $screen->delete();
+            $screen = ApiScreenMapping::where('api_id', $apimaster->id)->get();
+            if ($screen->isEmpty()) {
+                return responseMsgs(false, "No screens found for this API", null);
+            }
+            $apimaster->delete();
+            $screen->each(function ($s) {
+                $s->delete();
+            });
 
             return responseMsgs(true, "Screen deleted successfully", null);
         } catch (Exception $e) {
