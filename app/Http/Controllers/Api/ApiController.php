@@ -310,16 +310,13 @@ class ApiController extends Controller
         try {
             $request->validate([
                 'id' => 'required|integer|exists:api_screen_mappings,id',
-                'status' => 'required|boolean',
             ]);
 
             $screen = ApiMaster::find($request->id);
             if (!$screen) {
                 return responseMsgs(false, "Screen not found", null);
             };
-            $screen->update([
-                'discontinued' => $request->status,
-            ]);
+            $screen->delete();
 
             return responseMsgs(true, "Screen deleted successfully", null);
         } catch (Exception $e) {
