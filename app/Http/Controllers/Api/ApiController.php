@@ -137,6 +137,7 @@ class ApiController extends Controller
             $validated = $request->validate([
                 'api_endpoint' => 'required|string',
                 'method' => 'required|in:GET,POST,PUT,DELETE',
+                'module_id' => 'required|',
                 'description' => 'nullable|string',
                 'request_payload' => 'nullable|string',
                 'response_payload' => 'nullable|string',
@@ -149,6 +150,7 @@ class ApiController extends Controller
             // Create or find the API endpoint
             $checkApi = ApiMaster::where('end_point', $validated['api_endpoint'])
                 ->where('method', $validated['method'])
+                ->where('module_id', $validated['module_id'])
                 ->first();
             if ($checkApi) {
                 return responseMsgs(false, "API endpoint already exists", "");
@@ -225,8 +227,8 @@ class ApiController extends Controller
             $api  = $listById->apiDetails($req);
 
             // Decode request & response JSON if valid
-            $api->request = $this->tryParseJson($api->request);
-            $api->response = $this->tryParseJson($api->response);
+            $api->request = $this->ParseJson($api->request);
+            $api->response = $this->ParseJson($api->response);
 
             $list = ApiScreenMapping::where('api_id', $api->id)->get();
 
@@ -242,7 +244,7 @@ class ApiController extends Controller
     }
 
     // Helper method
-    private function tryParseJson($value)
+    private function ParseJson($value)
     {
         $value = trim($value);
 
