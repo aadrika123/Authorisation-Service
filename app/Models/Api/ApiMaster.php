@@ -35,6 +35,8 @@ class ApiMaster extends Model
         // $data->tags             = implode(',', $req->tags);
         $data->category_id      = $req->categoryId;
         $data->developer_id     = $req->developerId;
+        $data->request          = $req->request_payload;
+        $data->response         = $req->response_payload;
         $data->save();
         return $data;
     }
@@ -110,7 +112,9 @@ class ApiMaster extends Model
             'api_masters.created_by',
             'api_masters.method',
             'api_masters.category_id',
-            'api_masters.developer_id'
+            'api_masters.developer_id',
+            'api_masters.request',
+            'api_masters.response'
         )
             ->where('api_masters.id', $request->id)
             ->where('api_masters.discontinued', false)

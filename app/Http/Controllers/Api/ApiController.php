@@ -128,6 +128,9 @@ class ApiController extends Controller
         }
     }
 
+    /**
+     * | Store API Endpoint and Screens
+     */
     public function store(Request $request)
     {
         try {
@@ -135,6 +138,8 @@ class ApiController extends Controller
                 'api_endpoint' => 'required|string',
                 'method' => 'required|in:GET,POST,PUT,DELETE',
                 'description' => 'nullable|string',
+                'request_payload' => 'nullable|string',
+                'response_payload' => 'nullable|string',
                 'screens' => 'required|array',
                 'screens.*.screen_name' => 'required|string',
                 'screens.*.screen_url' => 'required|string',
