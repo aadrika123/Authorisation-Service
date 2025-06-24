@@ -220,9 +220,16 @@ class ApiController extends Controller
             $req->validate([
                 'id' => 'required'
             ]);
+
             $listById = new ApiMaster();
             $api  = $listById->apiDetails($req);
+
+            // Decode request & response JSON if valid
+            $api->request = $this->tryParseJson($api->request);
+            $api->response = $this->tryParseJson($api->response);
+
             $list = ApiScreenMapping::where('api_id', $api->id)->get();
+
             $details = [
                 'api' => $api,
                 'screens' => $list
@@ -233,6 +240,29 @@ class ApiController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    // Helper method
+    private function tryParseJson($value)
+    {
+        $value = trim($value);
+
+        // Try decoding the JSON
+        $decoded = json_decode($value, true);
+
+        // Check if decoding was successful
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
+        }
+
+        // Try fixing escaped slashes or trailing commas
+        $value = preg_replace('/,\s*([\]}])/m', '$1', $value); // remove trailing commas
+        $value = str_replace('\/', '/', $value); // unescape slashes
+
+        $decoded = json_decode($value, true);
+        return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
+    }
+
+
 
     public function update(Request $request)
     {
