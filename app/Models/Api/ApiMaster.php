@@ -104,8 +104,6 @@ class ApiMaster extends Model
             'api_masters.category',
             'api_masters.usage',
             'api_masters.pre_condition',
-            'api_masters.request_payload',
-            'api_masters.response_payload',
             'api_masters.post_condition',
             'api_masters.version',
             'api_masters.revision_no',
