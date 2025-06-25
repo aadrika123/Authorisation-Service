@@ -194,34 +194,35 @@ class ApiController extends Controller
             $perPage = $req->input('perPage', 10);
 
             $listById = new ApiMaster();
-            $list = $listById->listApiByModuleId($req->moduleId);
-            $ApiScreenMapping = new ApiScreenMapping();
-            $list = $list->leftJoin('api_screen_mappings', 'api_masters.id', '=', 'api_screen_mappings.api_id')
-                ->select(
-                    'api_masters.*',
-                    'api_screen_mappings.screen_name',
-                    'api_screen_mappings.url',
-                    'api_screen_mappings.description'
-                )
-                ->where('api_masters.discontinued', false)
-                ->orderByDesc('api_masters.id');
-            if ($req->has('q') && !empty($req->q)) {
-                $list = $list->where('end_point', 'like', '%' . $req->q . '%');
+
+            // Get query builder from listApiByModuleId
+            $query = $listById->listApiByModuleId($req->moduleId)
+                ->where('discontinued', false)
+                ->orderByDesc('id');
+
+            if ($req->filled('q')) {
+                $query->where('end_point', 'like', '%' . $req->q . '%');
             }
 
-            $paginator = $list->paginate($perPage);
-            $list = [
-                "current_page"  => $paginator->currentPage(),
-                "last_page"     => $paginator->lastPage(),
-                "data"          => $paginator->items(),
-                "total"         => $paginator->total(),
-            ];
+            $paginator = $query->paginate($perPage);
+            $data = $paginator->items();
 
-            return responseMsg(true, "Api List", $list);
+            // Attach screen mapping to each API item
+            foreach ($data as $api) {
+                $api->screen_mappings = (new ApiScreenMapping())->getScreenByModuleId($api->id);
+            }
+
+            return responseMsg(true, "Api List", [
+                "current_page" => $paginator->currentPage(),
+                "last_page"    => $paginator->lastPage(),
+                "data"         => $data,
+                "total"        => $paginator->total(),
+            ]);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
 
     /**
      * | List Api by Module Id

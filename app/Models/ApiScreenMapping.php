@@ -10,4 +10,10 @@ class ApiScreenMapping extends Model
     use HasFactory;
     protected $table = 'api_screen_mappings';
     protected $fillable = ['api_id', 'screen_name', 'url', 'description'];
+
+    public function getScreenByModuleId($apiId)
+    {
+        return ApiScreenMapping::where('api_id', $apiId)
+            ->get();
+    }
 }
