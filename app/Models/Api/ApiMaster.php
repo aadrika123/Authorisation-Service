@@ -24,8 +24,8 @@ class ApiMaster extends Model
         $data->end_point        = $req->api_endpoint;
         $data->usage            = $req->usage;
         $data->pre_condition    = $req->preCondition;
-        $data->request_payload  = $req->requestPayload;
-        $data->response_payload = $req->responsePayload;
+        // $data->request_payload  = $req->requestPayload;
+        // $data->response_payload = $req->responsePayload;
         $data->post_condition   = $req->postCondition;
         $data->version          = $req->version;
         $data->created_by       = $req->createdBy;
@@ -91,7 +91,7 @@ class ApiMaster extends Model
     public function listApiByModuleId($moduleId)
     {
         $data = ApiMaster::where('module_id', $moduleId)
-            ->orderbydesc('id');
+            ->orderbydesc('api_masters.id');
         return $data;
     }
 
