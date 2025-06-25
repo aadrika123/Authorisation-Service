@@ -195,6 +195,16 @@ class ApiController extends Controller
 
             $listById = new ApiMaster();
             $list = $listById->listApiByModuleId($req->moduleId);
+            $ApiScreenMapping = new ApiScreenMapping();
+            $list = $list->leftJoin('api_screen_mappings', 'api_masters.id', '=', 'api_screen_mappings.api_id')
+                ->select(
+                    'api_masters.*',
+                    'api_screen_mappings.screen_name',
+                    'api_screen_mappings.url',
+                    'api_screen_mappings.description'
+                )
+                ->where('api_masters.discontinued', false)
+                ->orderByDesc('api_masters.id');
             if ($req->has('q') && !empty($req->q)) {
                 $list = $list->where('end_point', 'like', '%' . $req->q . '%');
             }
@@ -302,8 +312,8 @@ class ApiController extends Controller
                 'method'            => $validated['method'],
                 'usage'             => $validated['usage'] ?? $api->usage,
                 'pre_condition'     => $validated['pre_condition'] ?? $api->pre_condition,
-                'request_payload'   => $validated['request_payload'] ?? $api->request_payload,
-                'response_payload'  => $validated['response_payload'] ?? $api->response_payload,
+                'request'           => $validated['request_payload'] ?? $api->request_payload,
+                'response'          => $validated['response_payload'] ?? $api->response_payload,
                 'post_condition'    => $validated['post_condition'] ?? $api->post_condition,
                 'version'           => $validated['version'] ?? $api->version,
                 'revision_no'       => $validated['revision_no'] ?? $api->revision_no,
