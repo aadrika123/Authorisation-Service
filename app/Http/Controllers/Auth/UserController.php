@@ -76,7 +76,7 @@ class UserController extends Controller
         );
         if ($validated->fails())
             return validationError($validated);
-    
+
         try {
             // ✅ Rate Limiting: Allow 5 attempts per 60 seconds per IP
             $rateKey = Str::lower('login|' . $req->ip());
@@ -84,10 +84,10 @@ class UserController extends Controller
                 $seconds = RateLimiter::availableIn($rateKey);
                 return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
             }
-    
+
             // Hit the rate limiter
             RateLimiter::hit($rateKey, 60); // expires in 60 seconds
-    
+
             $secretKey = Config::get('constants.SECRETKEY');
             $email = $req->email;
             $encrypted = $req->password;
@@ -95,54 +95,54 @@ class UserController extends Controller
             $method = 'AES-256-CBC';
             $key = hash('sha256', $secretKey, true);
             $iv = substr(hash('sha256', $secretKey), 0, 16);
-    
+
             $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
             if ($decrypted === false) {
                 throw new Exception("Password decryption failed or tampered data");
             }
             $password = $decrypted;
-    
+
             $mWfRoleusermap = new WfRoleusermap();
             $mUlbMaster = new UlbMaster();
             $user = $this->_mUser->getUserByEmail($email);
-    
+
             if (!$user)
                 throw new Exception("Invalid Credentials");
-    
+
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
-    
+
             $checkUlbStatus = $mUlbMaster->checkUlb($user);
             if (!$checkUlbStatus) {
                 throw new Exception('This Ulb is Restricted SuperAdmin!');
             }
-    
+
             if ($req->moduleId) {
                 $checkModule = $this->_UlbModulePermission->check($user, $req);
                 if (!$checkModule) {
                     throw new Exception('Module is Restricted For This ulb!');
                 }
             }
-    
+
             if (Hash::check($password, $user->password)) {
                 // ✅ Clear rate limit on success
                 RateLimiter::clear($rateKey);
-    
+
                 $token = $user->createToken('my-app-token')->plainTextToken;
                 $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
                 $role = collect($menuRoleDetails)->pluck('roles');
                 $roleId = collect($menuRoleDetails)->pluck('roleId');
-    
-    
+
+
                 if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Mobile user not login as web user");
                 }
-    
+
                 $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
                 if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
                     throw new Exception("Web user not login as mobile user");
                 }
-    
+
                 if (in_array($user->user_type, ['TC', 'TL'])) {
                     $userlog = new UserLoginDetail();
                     $userlog->user_id = $user->id;
@@ -151,16 +151,16 @@ class UserController extends Controller
                     $userlog->ip_address = $req->ip();
                     $userlog->save();
                 }
-    
+
                 $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
                 $data['token'] = $token;
                 $data['userDetails'] = $user;
                 $data['userDetails']['role'] = $role;
                 $data['userDetails']['roleId'] = $roleId;
-    
+
                 return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
             }
-    
+
             throw new Exception("Invalid Credentials");
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 401);
@@ -559,30 +559,59 @@ class UserController extends Controller
     }
 
 
-    /**
-     * |
-     */
-    // Changing Password
+    
+
     public function changePass(ChangePassRequest $request)
     {
         try {
             $id = auth()->user()->id;
             $user = User::find($id);
-            $validPassword = Hash::check($request->password, $user->password);
-            if ($validPassword) {
 
-                $user->password = Hash::make($request->newPassword);
-                $user->save();
-                $token = $request->user()->currentAccessToken();
-                $token->expires_at = Carbon::now();
-                $token->save();
-                return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
+            // 🔐 AES Decryption of Old Password
+            $secretKey = Config::get('constants.SECRETKEY');
+            $encryptedOld = $request->password;
+            $encryptedOldData = base64_decode($encryptedOld);
+            $method = 'AES-256-CBC';
+            $key = hash('sha256', $secretKey, true);
+            $iv = substr(hash('sha256', $secretKey), 0, 16);
+
+            $decryptedOld = openssl_decrypt($encryptedOldData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            if ($decryptedOld === false) {
+                throw new Exception("Old password decryption failed or tampered data");
             }
-            throw new Exception("Old Password dosen't Match!");
+
+            // 🔁 Hash (SHA256) after decryption
+            // $hashedOldPassword = Hash::make($decryptedOld);
+            // ✅ Validate old password
+            if (!Hash::check($decryptedOld, $user->password)) {
+                throw new Exception("Old Password doesn't Match!");
+            }
+
+            // 🔐 AES Decryption of New Password
+            $encryptedNew = $request->newPassword;
+            $encryptedNewData = base64_decode($encryptedNew);
+
+            $decryptedNew = openssl_decrypt($encryptedNewData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            if ($decryptedNew === false) {
+                throw new Exception("New password decryption failed or tampered data");
+            }
+
+            // 🔁 Hash (SHA256) and then Hash::make for DB
+            // $hashedNewPassword = hash('sha256', $decryptedNew);
+            $user->password = Hash::make($decryptedNew);
+            $user->save();
+
+            // 🔒 Optionally expire current token
+            $token = $request->user()->currentAccessToken();
+            $token->expires_at = Carbon::now();
+            $token->save();
+
+            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "", "02", responseTime(), "POST", $request->deviceId);
         }
     }
+
 
     /**
      * | Change Password by OTP 
@@ -1285,22 +1314,47 @@ class UserController extends Controller
     //     }
     // }
 
-    public function encrypted(Request $req)
-    {
-        try {
-            $secretKey = Config::get('constants.SECRETKEY');
+    // public function encrypted(Request $req)
+    // {
+    //     try {
+    //         $secretKey = Config::get('constants.SECRETKEY');
 
-            $method = "AES-256-CBC";
-            $key = hash('sha256', $secretKey, true);
-            $iv = substr(hash('sha256', $secretKey), 0, 16);
+    //         $method = "AES-256-CBC";
+    //         $key = hash('sha256', $secretKey, true);
+    //         $iv = substr(hash('sha256', $secretKey), 0, 16);
 
-            $plainText = "Admin1#";
+    //         $plainText = "Admin1@";
 
-            $encrypted = openssl_encrypt($plainText, $method, $key, OPENSSL_RAW_DATA, $iv);
-                $encryptedBase64 = base64_encode($encrypted);
-            return responseMsgs(true, "Data Retrieved", $encryptedBase64, "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
-        }
-    }
+    //         $encrypted = openssl_encrypt($plainText, $method, $key, OPENSSL_RAW_DATA, $iv);
+    //         $encryptedBase64 = base64_encode($encrypted);
+    //         return responseMsgs(true, "Data Retrieved", $encryptedBase64, "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "120503", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     }
+    // }
+
+    /**
+     * |
+     */
+    // OLD Changing Password
+    // public function changePass(ChangePassRequest $request)
+    // {
+    //     try {
+    //         $id = auth()->user()->id;
+    //         $user = User::find($id);
+    //         $validPassword = Hash::check($request->password, $user->password);
+    //         if ($validPassword) {
+
+    //             $user->password = Hash::make($request->newPassword);
+    //             $user->save();
+    //             $token = $request->user()->currentAccessToken();
+    //             $token->expires_at = Carbon::now();
+    //             $token->save();
+    //             return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
+    //         }
+    //         throw new Exception("Old Password dosen't Match!");
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "", "02", responseTime(), "POST", $request->deviceId);
+    //     }
+    // }
 }
