@@ -163,9 +163,62 @@ class UserController extends Controller
 
             throw new Exception("Invalid Credentials");
         } catch (Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 401);
+            return responseMsg(false, $e->getMessage(), '');
         }
     }
+
+
+    public function changePass(ChangePassRequest $request)
+    {
+        try {
+            $id = auth()->user()->id;
+            $user = User::find($id);
+
+            // 🔐 AES Decryption of Old Password
+            $secretKey = Config::get('constants.SECRETKEY');
+            $encryptedOld = $request->password;
+            $encryptedOldData = base64_decode($encryptedOld);
+            $method = 'AES-256-CBC';
+            $key = hash('sha256', $secretKey, true);
+            $iv = substr(hash('sha256', $secretKey), 0, 16);
+
+            $decryptedOld = openssl_decrypt($encryptedOldData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            if ($decryptedOld === false) {
+                throw new Exception("Old password decryption failed or tampered data");
+            }
+
+            // 🔁 Hash (SHA256) after decryption
+            // $hashedOldPassword = Hash::make($decryptedOld);
+            // ✅ Validate old password
+            if (!Hash::check($decryptedOld, $user->password)) {
+                throw new Exception("Old Password doesn't Match!");
+            }
+
+            // 🔐 AES Decryption of New Password
+            $encryptedNew = $request->newPassword;
+            $encryptedNewData = base64_decode($encryptedNew);
+
+            $decryptedNew = openssl_decrypt($encryptedNewData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            if ($decryptedNew === false) {
+                throw new Exception("New password decryption failed or tampered data");
+            }
+
+            // 🔁 Hash (SHA256) and then Hash::make for DB
+            // $hashedNewPassword = hash('sha256', $decryptedNew);
+            $user->password = Hash::make($decryptedNew);
+            $user->save();
+
+            // 🔒 Optionally expire current token
+            $token = $request->user()->currentAccessToken();
+            $token->expires_at = Carbon::now();
+            $token->save();
+
+            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", responseTime(), "POST", $request->deviceId);
+        }
+    }
+
     /**
      * | User role details by User Id
      */
@@ -559,58 +612,8 @@ class UserController extends Controller
     }
 
 
-    
 
-    public function changePass(ChangePassRequest $request)
-    {
-        try {
-            $id = auth()->user()->id;
-            $user = User::find($id);
 
-            // 🔐 AES Decryption of Old Password
-            $secretKey = Config::get('constants.SECRETKEY');
-            $encryptedOld = $request->password;
-            $encryptedOldData = base64_decode($encryptedOld);
-            $method = 'AES-256-CBC';
-            $key = hash('sha256', $secretKey, true);
-            $iv = substr(hash('sha256', $secretKey), 0, 16);
-
-            $decryptedOld = openssl_decrypt($encryptedOldData, $method, $key, OPENSSL_RAW_DATA, $iv);
-            if ($decryptedOld === false) {
-                throw new Exception("Old password decryption failed or tampered data");
-            }
-
-            // 🔁 Hash (SHA256) after decryption
-            // $hashedOldPassword = Hash::make($decryptedOld);
-            // ✅ Validate old password
-            if (!Hash::check($decryptedOld, $user->password)) {
-                throw new Exception("Old Password doesn't Match!");
-            }
-
-            // 🔐 AES Decryption of New Password
-            $encryptedNew = $request->newPassword;
-            $encryptedNewData = base64_decode($encryptedNew);
-
-            $decryptedNew = openssl_decrypt($encryptedNewData, $method, $key, OPENSSL_RAW_DATA, $iv);
-            if ($decryptedNew === false) {
-                throw new Exception("New password decryption failed or tampered data");
-            }
-
-            // 🔁 Hash (SHA256) and then Hash::make for DB
-            // $hashedNewPassword = hash('sha256', $decryptedNew);
-            $user->password = Hash::make($decryptedNew);
-            $user->save();
-
-            // 🔒 Optionally expire current token
-            $token = $request->user()->currentAccessToken();
-            $token->expires_at = Carbon::now();
-            $token->save();
-
-            return responseMsgs(true, 'Successfully Changed the Password', "", "", "02", responseTime(), "POST", $request->deviceId);
-        } catch (Exception $e) {
-            return responseMsgs(false, $e->getMessage(), "", "", "02", responseTime(), "POST", $request->deviceId);
-        }
-    }
 
 
     /**
