@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Api\ApiMaster;
+use App\Models\Api\ApiRegistry;
 use App\Models\Api\ApiRole;
 use App\Models\ApiCategory;
 use App\Models\ApiScreenMapping;
@@ -148,7 +149,7 @@ class ApiController extends Controller
             ]);
 
             // Create or find the API endpoint
-            $checkApi = ApiMaster::where('end_point', $validated['api_endpoint'])
+            $checkApi = ApiRegistry::where('end_point', $validated['api_endpoint'])
                 ->where('method', $validated['method'])
                 ->where('module_id', $validated['module_id'])
                 ->first();
@@ -193,7 +194,7 @@ class ApiController extends Controller
             $page = $req->input('page', 1);
             $perPage = $req->input('perPage', 10);
 
-            $listById = new ApiMaster();
+            $listById = new ApiRegistry();
 
             // Get query builder from listApiByModuleId
             $query = $listById->listApiByModuleId($req->moduleId)
@@ -234,7 +235,7 @@ class ApiController extends Controller
                 'id' => 'required'
             ]);
 
-            $listById = new ApiMaster();
+            $listById = new ApiRegistry();
             $api  = $listById->apiDetails($req);
 
             // Decode request & response JSON if valid
@@ -305,7 +306,7 @@ class ApiController extends Controller
             ]);
 
             // Step 1: Update ApiMaster
-            $api = ApiMaster::find($validated['id']);
+            $api = ApiRegistry::find($validated['id']);
             $api->update([
                 'description'       => $validated['description'] ?? $api->description,
                 'category'          => $validated['category'] ?? $api->category,
@@ -367,7 +368,7 @@ class ApiController extends Controller
                 'id' => 'required',
             ]);
 
-            $apimaster = ApiMaster::find($request->id);
+            $apimaster = ApiRegistry::find($request->id);
 
             if (!$apimaster) {
                 return responseMsgs(false, "Screen not found", null);
