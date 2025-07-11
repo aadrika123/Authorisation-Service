@@ -64,31 +64,31 @@ class ApiRegistry extends Model
     public function listApiByModuleId($moduleId)
     {
         $data = ApiRegistry::where('module_id', $moduleId)
-            ->orderbydesc('api_masters.id');
+            ->orderbydesc('api_registries.id');
         return $data;
     }
 
     public function apiDetails($request)
     {
         $data = ApiRegistry::select(
-            'api_masters.id',
-            'api_masters.end_point',
-            'api_masters.description',
-            'api_masters.category',
-            'api_masters.usage',
-            'api_masters.pre_condition',
-            'api_masters.post_condition',
-            'api_masters.version',
-            'api_masters.revision_no',
-            'api_masters.created_by',
-            'api_masters.method',
-            'api_masters.category_id',
-            'api_masters.developer_id',
-            'api_masters.request',
-            'api_masters.response'
+            'api_registries.id',
+            'api_registries.end_point',
+            'api_registries.description',
+            'api_registries.category',
+            'api_registries.usage',
+            'api_registries.pre_condition',
+            'api_registries.post_condition',
+            'api_registries.version',
+            'api_registries.revision_no',
+            'api_registries.created_by',
+            'api_registries.method',
+            'api_registries.category_id',
+            'api_registries.developer_id',
+            'api_registries.request',
+            'api_registries.response'
         )
-            ->where('api_masters.id', $request->id)
-            ->where('api_masters.discontinued', false)
+            ->where('api_registries.id', $request->id)
+            ->where('api_registries.discontinued', false)
             ->orderbydesc('id')
             ->first();
         return $data;
