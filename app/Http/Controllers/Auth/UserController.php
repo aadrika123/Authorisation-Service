@@ -750,7 +750,7 @@ class UserController extends Controller
                 'roleName'         => $lastLogin->role_name,
             ];
 
-            return responseMsgs(true, "User Details", $response, "", "01", responseTime(), "POST", "");
+            return responseMsgsv1(true,  true, "User Details", $response, "", "01", responseTime(), "POST", "");
         } catch (\Exception $e) {
             return responseMsgs(false, $e->getMessage(), [], "", "01", responseTime(), "POST", "");
         }
