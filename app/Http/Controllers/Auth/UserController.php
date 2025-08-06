@@ -760,6 +760,12 @@ class UserController extends Controller
     public function getUserv2(Request $req)
     {
         try {
+
+            $user = auth()->user();
+            if (!$user) {
+                return responseMsgs(false, "Unauthorized access", [], "", "01", responseTime(), "POST", "");
+            }
+            $ulbId = $user->ulb_id;
             $users = User::select(
                 'users.*',
                 'ulb_masters.ulb_name',
@@ -770,6 +776,7 @@ class UserController extends Controller
                 ->leftJoin('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
                 ->leftJoin('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
                 ->whereIn('wf_roles.id', [75, 76])
+                ->where('users.ulb_id', $ulbId)
                 ->where('users.suspended', false)
                 ->get();
 
