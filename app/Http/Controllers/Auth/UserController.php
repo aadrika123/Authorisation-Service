@@ -755,6 +755,69 @@ class UserController extends Controller
             return responseMsgs(false, $e->getMessage(), [], "", "01", responseTime(), "POST", "");
         }
     }
+    // get user which role are in judge or advocate
+
+    public function getUserv2(Request $req)
+    {
+        try {
+            $users = User::select(
+                'users.*',
+                'ulb_masters.ulb_name',
+                'wf_roles.id as wfRoleId',
+                'wf_roles.role_name'
+            )
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
+                ->leftJoin('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                ->leftJoin('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
+                ->whereIn('wf_roles.id', [75, 76])
+                ->where('users.suspended', false)
+                ->get();
+
+            if ($users->isEmpty()) {
+                return responseMsgs(false, "No users found for the specified roles", [], "", "01", responseTime(), "POST", "");
+            }
+
+            $docUpload = new DocUpload();
+            $response = [];
+
+            foreach ($users as $user) {
+                $docDetails = $docUpload->getSingleDocUrl($user);
+                $docUrl = $docDetails['doc_path'] ?? null;
+
+                $response[] = [
+                    '_id'              => $user->id,
+                    'ulbId'            => $user->ulb_id,
+                    'userName'         => $user->user_name,
+                    'mobile'           => $user->mobile,
+                    'alternateMobile'  => $user->alternate_mobile,
+                    'email'            => $user->email,
+                    'name'             => $user->name,
+                    'address'          => $user->address,
+                    'ulbName'          => $user->ulb_name,
+                    'suspended'        => $user->suspended,
+                    'referenceNo'      => $user->reference_no,
+                    'imgFullPath'      => $docUrl,
+                    'fullName'         => $user->name,
+                    'designation'      => $user->user_type,
+                    'status'           => $user->status,
+                    'lastVisitedTime'  => $user->login_time,
+                    'lastVisitedDate'  => $user->login_date ? date('d-m-Y', strtotime($user->login_date)) : null,
+                    'lastIpAddress'    => $user->ip_address,
+                    'role'             => $user->user_type,
+                    'userTypeId'       => $user->user_type_id ?? $user->wfRoleId,
+                    'routes'           => collect(), // or populate if needed
+                    'permittedWard'    => [],        // or populate if needed
+                    'roleId'           => $user->wfRoleId,
+                    'roleName'         => $user->role_name,
+                ];
+            }
+
+            return responseMsgsv1(true, true, "User Details List", $response, "", "01", responseTime(), "POST", "");
+        } catch (\Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "", "01", responseTime(), "POST", "");
+        }
+    }
+
 
 
     /**

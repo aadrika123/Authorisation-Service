@@ -515,6 +515,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user/password-reset', 'resetPassword');
 
         Route::post('user-managment/get-user-dtls', 'getUserv1');
+        Route::post('user-managment/get-user-dtls-v2', 'getUserv2');
 
         Route::post('user-managment/v1/update-client-by-user-id', 'updateClintIdByUser');            #_role details  by user Id
     });
