@@ -671,6 +671,7 @@ Route::middleware(['apiPermission'])->group(function () {
 
         // swm
         Route::post("swm/getReprintData-v2", "unAuthApis");
+        Route::post("swm/getReprintData-v3", "unAuthApis");
         Route::post("swm/getConsumerDetailsByIdv1/{id}", "unAuthApis");
 
         // water 
