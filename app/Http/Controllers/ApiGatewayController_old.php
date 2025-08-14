@@ -197,6 +197,7 @@ class ApiGatewayController extends Controller
                 [
                     "Authorization" => "Bearer $bearerToken",
                     'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",
+                    'ULB-ID' => collect($req->headers)->toArray()['ulb-id'] ?? "",
                 ]
             );
             $fileName = [];
