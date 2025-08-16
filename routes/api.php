@@ -676,6 +676,9 @@ Route::middleware(['apiPermission'])->group(function () {
 
         // water 
         Route::post("water/consumer/get-owner-details", "unAuthApis");
+        //legal
+        Route::post("legal/guest/get-detail-case-citizen", "unAuthApis");
+        Route::post("legal/guest/get-cases-by-case-no", "unAuthApis");
     });
 });
 
