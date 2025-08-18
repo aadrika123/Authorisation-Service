@@ -26,9 +26,9 @@ class CitizenController extends Controller
     {
         try {
             $request->validate([
-                'name'     => 'required',
-                'mobile'   => 'required|numeric|digits:10',
-                "photo"    => "nullable|mimes:jpeg,png,jpg",
+                'name' => 'required',
+                'mobile' => 'required|numeric|digits:10',
+                "photo" => "nullable|mimes:jpeg,png,jpg",
                 "aadharDoc" => "nullable|mimes:pdf,jpeg,png,jpg",
                 "speciallyAbledDoc" => ($request->isSpeciallyAbled ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
                 "armedForceDoc" => ($request->armedForceDoc ? "required" : "nullable") . "|mimes:pdf,jpeg,png,jpg",
@@ -177,7 +177,7 @@ class CitizenController extends Controller
     public function citizenLogout(Request $req)
     {
         // token();
-        $id =  auth()->user()->id;
+        $id = auth()->user()->id;
 
         $user = ActiveCitizen::where('id', $id)->first();
         $user->remember_token = null;
@@ -196,7 +196,7 @@ class CitizenController extends Controller
         try {
             $citizen = ActiveCitizen::find($id);
 
-            return responseMsgs(true, "Citizen Details", $citizen,  '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
+            return responseMsgs(true, "Citizen Details", $citizen, '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         }
@@ -210,7 +210,7 @@ class CitizenController extends Controller
         try {
             $citizen = ActiveCitizen::get();
 
-            return responseMsgs(true, "Citizen Details", $citizen,  '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
+            return responseMsgs(true, "Citizen Details", $citizen, '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         }
@@ -222,7 +222,7 @@ class CitizenController extends Controller
     public function citizenEditProfile(Request $request)
     {
         $validator = Validator::make(request()->all(), [
-            'id'     => 'required'
+            'id' => 'required'
         ]);
 
         if ($validator->fails())
@@ -234,7 +234,7 @@ class CitizenController extends Controller
             $citizen->email = $request->email;
             $citizen->mobile = $request->mobile;
             $citizen->gender = $request->gender;
-            $citizen->dob    = $request->dob;
+            $citizen->dob = $request->dob;
             $citizen->aadhar = $request->aadhar;
             $citizen->is_specially_abled = $request->isSpeciallyAbled;
             $citizen->is_armed_force = $request->isArmedForce;
@@ -242,9 +242,9 @@ class CitizenController extends Controller
 
             $this->docUpload($request, $citizen->id);
 
-            return responseMsgs(true, "Successful Updated", "",  '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
+            return responseMsgs(true, "Successful Updated", "", '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "",  '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
+            return responseMsg(false, $e->getMessage(), "", '', "1.0", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
 
@@ -308,9 +308,63 @@ class CitizenController extends Controller
         }
     }
 
+    // public function detachCitizenFromUndercare(Request $request)
+    // {
+
+    //     try {
+    //         $user = auth()->user();
+    //         if (!$user) {
+    //             return response()->json(['message' => 'Unauthorized'], 401);
+    //         }
+
+    //         $validated = $request->validate([
+    //             'recordId' => 'required|integer',
+    //         ]);
+
+    //         $record = ActiveCitizenUndercare::where('citizen_id', $user->id)
+    //             ->where('property_id', $validated['recordId'])
+    //             ->first();
+
+    //         if (!$record) {
+    //             return response()->json(['message' => 'You are not authorized for this property'], 403);
+    //         }
+
+    //         if ($record->deactive_status) {
+    //             return responseMsgs(true, "Citizen already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
+    //         }
+
+    //         DB::beginTransaction();
+            
+    //         // Save to log table BEFORE deleting
+    //         LogActiveCitizenUndercare::create([
+    //             'property_id' => $record->property_id,
+    //             'consumer_id' => $record->consumer_id,
+    //             'license_id' => $record->license_id,
+    //             'date_of_attachment' => $record->date_of_attachment,
+    //             'mobile_no' => $record->mobile_no,
+    //             'citizen_id' => $record->citizen_id,
+    //             'deactive_status' => true,
+    //             'detached_by' => $user->id,
+    //             'created_at' => $record->created_at,
+    //             'updated_at' => now(),
+    //         ]);
+
+    //         // Delete from main table
+    //         $record->delete();
+
+    //         DB::commit();
+
+    //         return responseMsgs(true, "Citizen detached and removed successfully", "", "1.0", "", "POST", $request->deviceId ?? "");
+
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return responseMsgs(false, $e->getMessage(), [], "1.0", "", "POST", $request->deviceId ?? "");
+    //     }
+    // }
+
+
     public function detachCitizenFromUndercare(Request $request)
     {
-        DB::beginTransaction();
         try {
             $user = auth()->user();
             if (!$user) {
@@ -318,22 +372,33 @@ class CitizenController extends Controller
             }
 
             $validated = $request->validate([
-                'recordId' => 'required|integer',
+                'recordId' => 'required',
+                'type'     => 'required|string|in:property,water,trade',
             ]);
 
+            // Map type → column name
+            $columnMap = [
+                'property' => 'property_id',
+                'water'    => 'consumer_id',
+                'trade'    => 'license_id',
+            ];
+            $column = $columnMap[$validated['type']];
+            
             $record = ActiveCitizenUndercare::where('citizen_id', $user->id)
-                ->where('property_id', $validated['recordId'])
+                ->where($column, $validated['recordId'])
                 ->first();
 
             if (!$record) {
-                return response()->json(['message' => 'You are not authorized for this property'], 403);
+                return response()->json(['message' => 'Record not found or you are not authorized'], 403);
             }
 
             if ($record->deactive_status) {
                 return responseMsgs(true, "Citizen already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
             }
 
-            // 1. Save to log table BEFORE deleting
+            DB::beginTransaction();
+
+            // Save to log table BEFORE deleting
             LogActiveCitizenUndercare::create([
                 'property_id'        => $record->property_id,
                 'consumer_id'        => $record->consumer_id,
@@ -347,7 +412,7 @@ class CitizenController extends Controller
                 'updated_at'         => now(),
             ]);
 
-            // 2. Delete from main table
+            // Delete from main table
             $record->delete();
 
             DB::commit();
