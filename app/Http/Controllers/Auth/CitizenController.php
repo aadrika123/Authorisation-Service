@@ -373,7 +373,7 @@ class CitizenController extends Controller
 
             $validated = $request->validate([
                 'recordId' => 'required',
-                'type'     => 'required|string|in:property,water,trade',
+                'type'     => 'required|string|in:property,water,trade,swm,fines',
             ]);
 
             // Map type → column name
@@ -381,9 +381,11 @@ class CitizenController extends Controller
                 'property' => 'property_id',
                 'water'    => 'consumer_id',
                 'trade'    => 'license_id',
+                'swm'      => 'swm_id',
+                'fines'    => 'challan_id',
             ];
             $column = $columnMap[$validated['type']];
-            
+
             $record = ActiveCitizenUndercare::where('citizen_id', $user->id)
                 ->where($column, $validated['recordId'])
                 ->first();
@@ -393,7 +395,7 @@ class CitizenController extends Controller
             }
 
             if ($record->deactive_status) {
-                return responseMsgs(true, "Citizen already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
+                return responseMsgs(true, "Record already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
             }
 
             DB::beginTransaction();
@@ -417,7 +419,7 @@ class CitizenController extends Controller
 
             DB::commit();
 
-            return responseMsgs(true, "Citizen detached and removed successfully", "", "1.0", "", "POST", $request->deviceId ?? "");
+            return responseMsgs(true, "Record detached successfully", "", "1.0", "", "POST", $request->deviceId ?? "");
 
         } catch (Exception $e) {
             DB::rollBack();
