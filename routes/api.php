@@ -73,8 +73,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(UserController::class)->group(function () {
     Route::post('login', 'loginAuth');                                                        #API_ID = 4161
     Route::post('register', 'store');
-    Route::post('logout', 'logout')->middleware('auth:sanctum');
-    Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum');
+    Route::post('logout', 'logout')->middleware('auth:sanctum', 'ExpireBearerToken');
+    Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum', 'ExpireBearerToken');
     Route::post('e_pramaanCheck', 'ePramanCheck');
 
     Route::post('user-managment/v1/crud/get/admin-list-v1', 'searchUsers');            #_List Admin by ulb Id
@@ -520,6 +520,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
         Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
         Route::post('citizen-profile-details', 'profileDetails');
+        Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');
     });
 
     Route::controller(PermissionController::class)->group(function () {
@@ -554,6 +555,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("public-transport/agent/login", "unAuthApis");
         Route::post("public-transport/agent/logout", "unAuthApis");
         Route::get("public-transport/ticket/verify/{id}", "unAuthApis");
+        Route::post("property/m-list-of-all-blog", "unAuthApis");
 
 
         # Grievance UnAuth Api
