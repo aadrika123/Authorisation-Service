@@ -7,6 +7,8 @@ use App\Http\Requests\Auth\ChangePassRequest;
 use App\Http\Requests\Auth\OtpChangePass;
 use App\MicroServices\DocUpload;
 use App\Models\Auth\ActiveCitizen;
+use App\Models\Auth\ActiveCitizenUndercare;
+use App\Models\Auth\LogActiveCitizenUndercare;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -305,4 +307,59 @@ class CitizenController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
+
+    public function detachCitizenFromUndercare(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+
+            $validated = $request->validate([
+                'recordId' => 'required|integer',
+            ]);
+
+            $record = ActiveCitizenUndercare::where('citizen_id', $user->id)
+                ->where('property_id', $validated['recordId'])
+                ->first();
+
+            if (!$record) {
+                return response()->json(['message' => 'You are not authorized for this property'], 403);
+            }
+
+            if ($record->deactive_status) {
+                return responseMsgs(true, "Citizen already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
+            }
+
+            // 1. Save to log table BEFORE deleting
+            LogActiveCitizenUndercare::create([
+                'property_id'        => $record->property_id,
+                'consumer_id'        => $record->consumer_id,
+                'license_id'         => $record->license_id,
+                'date_of_attachment' => $record->date_of_attachment,
+                'mobile_no'          => $record->mobile_no,
+                'citizen_id'         => $record->citizen_id,
+                'deactive_status'    => true,
+                'detached_by'        => $user->id,
+                'created_at'         => $record->created_at,
+                'updated_at'         => now(),
+            ]);
+
+            // 2. Delete from main table
+            $record->delete();
+
+            DB::commit();
+
+            return responseMsgs(true, "Citizen detached and removed successfully", "", "1.0", "", "POST", $request->deviceId ?? "");
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), [], "1.0", "", "POST", $request->deviceId ?? "");
+        }
+    }
+
+
+
 }
