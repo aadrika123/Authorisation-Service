@@ -308,59 +308,52 @@ class CitizenController extends Controller
         }
     }
 
-    // public function detachCitizenFromUndercare(Request $request)
-    // {
+    public function listCitizenUnderCare(Request $request)
+    {
+        try {
+            $user = auth()->user();
+            if (!$user) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
 
-    //     try {
-    //         $user = auth()->user();
-    //         if (!$user) {
-    //             return response()->json(['message' => 'Unauthorized'], 401);
-    //         }
+            $validated = $request->validate([
+                'recordId' => 'required',
+                'type'     => 'required|string|in:property,water,trade,swm,fines',
+            ]);
 
-    //         $validated = $request->validate([
-    //             'recordId' => 'required|integer',
-    //         ]);
+            // Map type → column name (same as detach API)
+            $columnMap = [
+                'property' => 'property_id',
+                'water'    => 'consumer_id',
+                'trade'    => 'license_id',
+                'swm'      => 'swm_id',
+                'fines'    => 'challan_id',
+            ];
+            $column = $columnMap[$validated['type']];
 
-    //         $record = ActiveCitizenUndercare::where('citizen_id', $user->id)
-    //             ->where('property_id', $validated['recordId'])
-    //             ->first();
+            // Fetch all citizens attached to this recordId
+            $records = ActiveCitizenUndercare::select(
+                    'active_citizens.id',
+                    'active_citizens.user_name',
+                    DB::raw('DATE(active_citizens.created_at) as created_date')
+                )
+                ->join('active_citizens', 'active_citizens.id', '=', 'active_citizen_undercares.citizen_id')
+                ->where("active_citizen_undercares.$column", $validated['recordId'])
+                ->where("active_citizen_undercares.citizen_id", $user->id)
+                ->get();
 
-    //         if (!$record) {
-    //             return response()->json(['message' => 'You are not authorized for this property'], 403);
-    //         }
+            if ($records->isEmpty()) {
+                return responseMsgs(false, "No citizen found for this {$validated['type']} ID", [], "1.0", "", "POST", $request->deviceId ?? "");
+            }
 
-    //         if ($record->deactive_status) {
-    //             return responseMsgs(true, "Citizen already detached", "", "1.0", "", "POST", $request->deviceId ?? "");
-    //         }
+            return responseMsgs(true, "Attached Citizens List", remove_null($records), "1.0", "", "POST", $request->deviceId ?? "");
 
-    //         DB::beginTransaction();
-            
-    //         // Save to log table BEFORE deleting
-    //         LogActiveCitizenUndercare::create([
-    //             'property_id' => $record->property_id,
-    //             'consumer_id' => $record->consumer_id,
-    //             'license_id' => $record->license_id,
-    //             'date_of_attachment' => $record->date_of_attachment,
-    //             'mobile_no' => $record->mobile_no,
-    //             'citizen_id' => $record->citizen_id,
-    //             'deactive_status' => true,
-    //             'detached_by' => $user->id,
-    //             'created_at' => $record->created_at,
-    //             'updated_at' => now(),
-    //         ]);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "1.0", "", "POST", $request->deviceId ?? "");
+        }
+    }
 
-    //         // Delete from main table
-    //         $record->delete();
 
-    //         DB::commit();
-
-    //         return responseMsgs(true, "Citizen detached and removed successfully", "", "1.0", "", "POST", $request->deviceId ?? "");
-
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         return responseMsgs(false, $e->getMessage(), [], "1.0", "", "POST", $request->deviceId ?? "");
-    //     }
-    // }
 
 
     public function detachCitizenFromUndercare(Request $request)

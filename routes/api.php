@@ -520,7 +520,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
         Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
         Route::post('citizen-profile-details', 'profileDetails');
-        Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');
+        Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');        
+        Route::post('list-citizen-undercare', 'listCitizenUnderCare');
     });
 
     Route::controller(PermissionController::class)->group(function () {
