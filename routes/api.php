@@ -73,8 +73,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::controller(UserController::class)->group(function () {
     Route::post('login', 'loginAuth');                                                        #API_ID = 4161
     Route::post('register', 'store');
-    Route::post('logout', 'logout')->middleware('auth:sanctum', 'ExpireBearerToken');
-    Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum', 'ExpireBearerToken');
+    Route::post('logout', 'logout')->middleware('auth:sanctum');
+    Route::post('get-citizen-dtl', 'citizenDtls')->middleware('auth:sanctum');
     Route::post('e_pramaanCheck', 'ePramanCheck');
 
     Route::post('user-managment/v1/crud/get/admin-list-v1', 'searchUsers');            #_List Admin by ulb Id
