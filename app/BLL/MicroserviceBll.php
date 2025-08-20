@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Bll;
+namespace App\BLL;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
