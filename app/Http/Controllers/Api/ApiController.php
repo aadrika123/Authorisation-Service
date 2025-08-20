@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Bll\MicroserviceBll;
+use App\BLL\MicroserviceBll;
 use App\Http\Controllers\Controller;
 use App\Models\Api\ApiMaster;
 use App\Models\Api\ApiRegistry;
