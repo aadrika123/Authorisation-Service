@@ -461,7 +461,7 @@ class UserController extends Controller
 
             // Base query
             $query = User::select(
-                'id',
+                'users.id',
                 'user_name',
                 'mobile',
                 'email',
@@ -471,11 +471,13 @@ class UserController extends Controller
                 'alternate_mobile',
                 'suspended',
                 'reference_no',
+                'wf_roleusermaps.wf_role_id as role_id',
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
-                ->where('ulb_id', $ulbId)
-                ->orderBy('id', 'desc');
+                ->leftjoin('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                ->where('users.ulb_id', $ulbId)
+                ->orderBy('users.id', 'desc');
 
             // Apply pipeline filters
             $filteredQuery = app(Pipeline::class)
@@ -511,6 +513,7 @@ class UserController extends Controller
                     'photo'          => $user->photo,
                     'signature'      => $user->signature,
                     'documentUrl'    => $docUrl, // Add document URL to response
+                    'role_id'        => $user->role_id,
                 ];
             });
 
