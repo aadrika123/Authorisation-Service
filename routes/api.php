@@ -325,7 +325,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/update-api-details', 'update');                       //update Api details List
         Route::post('user-managment/v1/delete-api', 'deleteScreen');                       //deleteScreen Api details List
         Route::get('health-check', 'index');
-
     });
 
     /**
@@ -499,6 +498,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/get/user-type', 'listUserType');          #_List User Type
         Route::post('user-managment/v1/crud/get/admin-list', 'listAdmin');            #_List Admin
         Route::post('user-managment/v1/crud/get/user-list-by-ulb-id', 'listUserByUlbId');            #_List Admin
+        Route::post('user-managment/v1/crud/get/user-list-by-ulb-id-v1', 'listUserByUlbIdv1');            #_List Admin
 
 
         Route::post('change-password', 'changePass');                       // Change password with login
@@ -530,7 +530,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
         Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
         Route::post('citizen-profile-details', 'profileDetails');
-        Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');        
+        Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');
         Route::post('list-citizen-undercare', 'listCitizenUnderCare');
     });
 
