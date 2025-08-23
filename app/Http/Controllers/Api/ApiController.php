@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\BLL\MicroserviceBll;
 use App\Http\Controllers\Controller;
 use App\Models\Api\ApiMaster;
 use App\Models\Api\ApiRegistry;
@@ -386,5 +387,11 @@ class ApiController extends Controller
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
         }
+    }
+
+    public function index(MicroserviceBll $microserviceBll)
+    {
+        $status = $microserviceBll->checkAllServices();
+        return response()->json($status);
     }
 }
