@@ -528,7 +528,8 @@ class UserController extends Controller
         }
     }
     /**
-     * | List User
+     * | List User 
+     * | Filter By Role Id 75,76,77
      */
     public function listUserByUlbIdv1(Request $req)
     {
@@ -539,7 +540,6 @@ class UserController extends Controller
         try {
             $perPage = $req->perPage ?? 10;
             $ulbId = $req->ulbId;
-            $moduleId = $req->moduleId ??2 ;
 
             if ($ulbId == null) {
                 throw new Exception('Please Provide Ulb Id!');
@@ -561,9 +561,11 @@ class UserController extends Controller
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
-                ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                ->leftjoin('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
                 ->where('users.ulb_id', $ulbId)
-                ->orderBy('users.id', 'desc');
+                ->whereIn('wf_roleusermaps.wf_role_id', [75, 76, 77]) // Filter roles to include only 75 and 76
+                ->where('wf_roleusermaps.is_suspended', false)
+                ->orderBy('id', 'desc');
 
             // Apply pipeline filters
             $filteredQuery = app(Pipeline::class)
