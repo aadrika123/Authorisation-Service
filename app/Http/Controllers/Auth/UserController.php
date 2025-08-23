@@ -471,7 +471,6 @@ class UserController extends Controller
                 'alternate_mobile',
                 'suspended',
                 'reference_no',
-                'wf_roleusermaps.wf_role_id as role_id',
                 DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
                 DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
             )
@@ -540,6 +539,7 @@ class UserController extends Controller
         try {
             $perPage = $req->perPage ?? 10;
             $ulbId = $req->ulbId;
+            $moduleId = $req->moduleId ??2 ;
 
             if ($ulbId == null) {
                 throw new Exception('Please Provide Ulb Id!');
