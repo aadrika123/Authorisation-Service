@@ -308,6 +308,8 @@ class CitizenController extends Controller
         }
     }
 
+
+    // List all citizens attached under a given record (property, water, trade, swm, fines).
     public function listCitizenUnderCare(Request $request)
     {
         try {
@@ -335,11 +337,10 @@ class CitizenController extends Controller
             $records = ActiveCitizenUndercare::select(
                     'active_citizens.id',
                     'active_citizens.user_name',
-                    DB::raw('DATE(active_citizen_undercares.created_at) as created_date')
+                    DB::raw('DATE(active_citizens.created_at) as created_date')
                 )
                 ->join('active_citizens', 'active_citizens.id', '=', 'active_citizen_undercares.citizen_id')
                 ->where("active_citizen_undercares.$column", $validated['recordId'])
-                ->where("active_citizen_undercares.citizen_id", $user->id)
                 ->get();
 
             if ($records->isEmpty()) {
@@ -352,6 +353,7 @@ class CitizenController extends Controller
             return responseMsgs(false, $e->getMessage(), [], "1.0", "", "POST", $request->deviceId ?? "");
         }
     }
+
 
     public function detachCitizenFromUndercare(Request $request)
     {
