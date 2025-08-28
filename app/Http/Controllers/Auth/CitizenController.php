@@ -337,7 +337,7 @@ class CitizenController extends Controller
             $records = ActiveCitizenUndercare::select(
                     'active_citizens.id',
                     'active_citizens.user_name',
-                    DB::raw('DATE(active_citizens.created_at) as created_date')
+                    DB::raw('DATE(active_citizen_undercares.created_at) as created_date')
                 )
                 ->join('active_citizens', 'active_citizens.id', '=', 'active_citizen_undercares.citizen_id')
                 ->where("active_citizen_undercares.$column", $validated['recordId'])
