@@ -59,7 +59,7 @@ class EpramaanController extends Controller
         switch ($type) {
             case 'citizen-page':
                 $serviceId    = '100001634';
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-new/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
                 break;
             case 'citizen':
                 // $serviceId    = '100001033';    #_staging
@@ -187,7 +187,7 @@ class EpramaanController extends Controller
 
             case 'citizen-page':
                 $serviceId    = '100001634';
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-new/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
                 break;
             #change by prity pandey 
             case 'citizen':
@@ -446,7 +446,7 @@ class EpramaanController extends Controller
 
             case 'citizen-page':
                 $serviceId    = '100001634';
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-new/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
                 break;
             case 'citizen':
                 $serviceId    = '100001511';    #_production
