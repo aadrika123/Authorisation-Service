@@ -8,6 +8,7 @@ use App\Http\Middleware\ExpireBearerToken;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 use App\Http\Middleware\LogRoute;
+use App\Http\Middleware\RoleApiPermissionMiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -71,6 +72,7 @@ class Kernel extends HttpKernel
         // 'expireBearerToken' => ExpireBearerToken::class,
         'api.gateway' => ApiGatewayMiddleware::class,
         'log.route' => LogRoute::class,
-        'apiPermission' => ApiPermission::class
+        'apiPermission' => ApiPermission::class,
+        'roleApiPermission' => RoleApiPermissionMiddleware::class
     ];
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Api\ApiRolemap;
+use App\Models\RoleApiMap;
 use Exception;
 use Illuminate\Http\Request;
 use Spatie\FlareClient\Api;
@@ -122,6 +123,46 @@ class ApiRoleMapController extends Controller
             $delete->deleteRoleMap($req);
 
             return responseMsg(true, "Data Deleted", '');
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+    /**
+     * |
+     */
+    public function createApiRoleMap(Request $req)
+    {
+        try {
+            $req->validate([
+                'roleId'      => 'required',
+                'apiId'       => 'required',
+                'isSuspended' => 'nullable|boolean'
+
+            ]);
+            $mapiRolemap = new RoleApiMap();
+            $checkExisting = $mapiRolemap->where('api_mstr_id', $req->apiId)
+                ->where('role_id', $req->roleId)
+                ->first();
+
+            if ($checkExisting) {
+                $req->merge([
+                    'id' => $checkExisting->id,
+                    'isSuspended' => $req->isSuspended
+                ]);
+                $mapiRolemap->updateRoleMap($req);
+            } else {
+                $mapiRolemap->addRoleMap($req);
+            }
+
+            // if ($checkExisting)
+            //     throw new Exception('Menu Already Maps to Menu Role');
+            // $mreqs = [
+            //     'menuId'     => $req->menuId,
+            //     'menuRoleId' => $req->menuRoleId
+            // ];
+            // $mMenuRolemap->addRoleMap($mreqs);
+
+            return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
