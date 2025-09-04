@@ -388,7 +388,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/api-role-map/list', 'getAllRoleMap');                    // Get All APIRole
         Route::post('user-managment/v1/crud/api-role-map/delete', 'deleteRoleMap');                  // Delete APIRole
         //
-        Route::post('user-managment/v1/crud/api-role-map/save', 'createApiRoleMap');
+        Route::post('user-managment/v1/crud/api-role-map/save-v1', 'createApiRoleMap');
         Route::post('user-managment/v1/crud/api-role-map/list-v1', 'apiRoleList');
     });
 
