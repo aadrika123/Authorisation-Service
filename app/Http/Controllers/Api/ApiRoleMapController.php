@@ -136,14 +136,16 @@ class ApiRoleMapController extends Controller
     {
         try {
             $req->validate([
-                'menuRoleId'      => 'required',
+                'roleId'      => 'required',
                 'apiId'       => 'required',
+                'moduleId'    => 'nullbale',
                 'isSuspended' => 'nullable|boolean'
 
             ]);
             $mapiRolemap = new RoleApiMap();
             $checkExisting = $mapiRolemap->where('api_mstr_id', $req->apiId)
                 ->where('role_id', $req->menuRoleId)
+                ->where('module_id', $req->moduleId)
                 ->first();
 
             if ($checkExisting) {
