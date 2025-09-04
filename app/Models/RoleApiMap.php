@@ -19,6 +19,7 @@ class RoleApiMap extends Model
         $data->role_id      = $req->menuRoleId;
         $data->api_mstr_id  = $req->apiId;
         $data->is_suspended = $req->isSuspended ?? false;
+        $data->module_id    = $req->moduleId;
         $data->save();
     }
 
@@ -31,6 +32,7 @@ class RoleApiMap extends Model
         $data->role_id      = $req->menuRoleId ?? $data->role_id;
         $data->api_mstr_id  = $req->apiId ?? $data->api_mstr_id;
         $data->is_suspended = $req->isSuspended ?? $data->is_suspended;
+        $data->module_id    = $req->moduleId ?? $data->module_id;
         $data->save();
     }
 }
