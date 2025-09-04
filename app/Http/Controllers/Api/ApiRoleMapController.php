@@ -136,16 +136,14 @@ class ApiRoleMapController extends Controller
     {
         try {
             $req->validate([
-                'roleId'      => 'required',
+                'menuRoleId'      => 'required',
                 'apiId'       => 'required',
-                'moduleId'    => 'nullable',
                 'isSuspended' => 'nullable|boolean'
 
             ]);
             $mapiRolemap = new RoleApiMap();
             $checkExisting = $mapiRolemap->where('api_mstr_id', $req->apiId)
-                ->where('role_id', $req->roleId)
-                ->where('module_id', $req->moduleId)
+                ->where('role_id', $req->menuRoleId)
                 ->first();
 
             if ($checkExisting) {
@@ -171,6 +169,52 @@ class ApiRoleMapController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    // public function apiRoleListy(Request $req)
+    // {
+    //     $validated = Validator::make(
+    //         $req->all(),
+    //         [
+    //             'menuRoleId' => 'required|int',
+    //             'moduleId'   => 'required|int'
+    //         ]
+    //     );
+
+    //     if ($validated->fails()) {
+    //         return validationError($validated);
+    //     }
+
+    //     try {
+    //         $user = authUser();
+
+    //         $query = "
+    //         SELECT 
+    //             ar.id,
+    //             ar.module_id,
+    //             ar.end_point,
+    //             CASE 
+    //                 WHEN rpm.api_mstr_id IS NULL THEN false 
+    //                 ELSE true  
+    //             END AS permission_status
+    //         FROM api_registries AS ar
+    //         LEFT JOIN (
+    //             SELECT * 
+    //             FROM role_api_maps 
+    //             WHERE role_id = $req->menuRoleId 
+    //               AND is_suspended = false
+    //               AND status = 1
+    //         ) AS rpm 
+    //         ON rpm.api_mstr_id = ar.id
+    //         WHERE ar.module_id = $req->moduleId
+    //         ORDER BY ar.id
+    //     ";
+
+    //         $data = DB::select($query);
+    //         return responseMsg(true, "API List of Module", $data);
+    //     } catch (Exception $e) {
+    //         return responseMsg(false, $e->getMessage(), []);
+    //     }
+    // }
 
     public function apiRoleList(Request $req)
     {
@@ -211,7 +255,7 @@ class ApiRoleMapController extends Controller
         ";
 
             $data = DB::select($query, [
-                'roleId'   => $req->menuRoleId,
+                'roleId'   => $req->roleId,
                 'moduleId' => $req->moduleId,
             ]);
 
