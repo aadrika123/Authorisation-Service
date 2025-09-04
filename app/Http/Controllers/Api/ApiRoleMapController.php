@@ -241,9 +241,9 @@ class ApiRoleMapController extends Controller
                 ar.module_id,
                 ar.end_point,
                 CASE 
-                    WHEN rpm.api_mstr_id IS NULL THEN false
-                    ELSE true
-                END AS permission_status
+                    WHEN rpm.api_mstr_id IS NULL THEN true
+                    ELSE false
+                END AS is_suspended
             FROM api_registries AS ar
             LEFT JOIN (
                 SELECT * 
