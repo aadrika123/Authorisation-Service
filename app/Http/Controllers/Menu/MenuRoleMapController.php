@@ -100,7 +100,7 @@ class MenuRoleMapController extends Controller
             $mMenuRolemap = new MenuRolemap();
             $menuRole = $mMenuRolemap->roleMaps()
                 ->where('menu_rolemaps.is_suspended', false)
-                ->get();
+                ->get();    
 
             return responseMsg(true, "Menu Role Map List", $menuRole);
         } catch (Exception $e) {

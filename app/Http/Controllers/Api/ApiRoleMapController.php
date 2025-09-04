@@ -7,6 +7,8 @@ use App\Models\Api\ApiRolemap;
 use App\Models\RoleApiMap;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Spatie\FlareClient\Api;
 
 class ApiRoleMapController extends Controller
@@ -165,6 +167,55 @@ class ApiRoleMapController extends Controller
             return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    public function apiRoleList(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'roleId' => 'required|int',
+                'moduleId'   => 'required|int',
+            ]
+        );
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $user = authUser();
+
+            $query = "
+            SELECT 
+                ar.id,
+                ar.module_id,
+                ar.end_point,
+                CASE 
+                    WHEN rpm.api_mstr_id IS NULL THEN false
+                    ELSE true
+                END AS permission_status
+            FROM api_registries AS ar
+            LEFT JOIN (
+                SELECT * 
+                FROM role_api_maps 
+                WHERE role_id = :roleId 
+                  AND is_suspended = false
+            ) AS rpm 
+              ON rpm.api_mstr_id = ar.id
+            WHERE ar.module_id = :moduleId
+            ORDER BY rpm.id NULLS LAST, ar.id ASC
+        ";
+
+            $data = DB::select($query, [
+                'roleId'   => $req->menuRoleId,
+                'moduleId' => $req->moduleId,
+            ]);
+
+            return responseMsg(true, "API List of Module", $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), []);
         }
     }
 }

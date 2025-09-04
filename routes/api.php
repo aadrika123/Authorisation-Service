@@ -389,6 +389,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/api-role-map/delete', 'deleteRoleMap');                  // Delete APIRole
         //
         Route::post('user-managment/v1/crud/api-role-map/save', 'createApiRoleMap');
+        Route::post('user-managment/v1/crud/api-role-map/list-v1', 'apiRoleList');
     });
 
     /**
@@ -618,7 +619,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/saf/payment-receipt', 'unAuthApis');
         Route::post('property/grievance/get-filter-property-details', 'unAuthApis');
         Route::post('payment/razorpay-webhook', 'unAuthApis');
-        Route::post('property/prop-payment-receipt', 'unAuthApis');
+        // Route::post('property/prop-payment-receipt', 'unAuthApis');
         Route::post('property/details/get-owner-details', 'unAuthApis');
         Route::get('property/prop-road-type', 'unAuthApis');
         Route::post('property/m-get-blog-by-Id', 'unAuthApis');
@@ -630,7 +631,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/independent/get-holding-dues", "unAuthApis");
         Route::post("property/independent/generate-prop-orderid", "unAuthApis");
         Route::post("property/saf/independent/generate-order-id", "unAuthApis");
-        Route::post("property/prop-payment-receipt", "unAuthApis");
+        // Route::post("property/prop-payment-receipt", "unAuthApis");
         Route::post("property/saf/list-apartment", "unAuthApis");
         Route::post("property/m-heading-list-master", "unAuthApis");
         Route::post("property/m-heading-list-master-desc", "unAuthApis");
