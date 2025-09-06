@@ -18,7 +18,7 @@ class RoleApiPermissionMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-     
+
         $this->_user = Auth::user();
 
         if (!$this->_user) {
@@ -33,7 +33,6 @@ class RoleApiPermissionMiddleware
             ->getRoleDetailsByUserId($this->_user->id)
             ->pluck("roleId")
             ->unique();
-            dd($roles);
 
         if ($roles->isEmpty()) {
             return response()->json(['message' => 'Forbidden: No roles assigned'], 403);

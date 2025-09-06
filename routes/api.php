@@ -691,7 +691,7 @@ Route::middleware(['apiPermission'])->group(function () {
 });
 
 # Autherisation middleware required= 'apiPermission',
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['roleApiPermission', 'auth:sanctum'])->group(function () {
     Route::controller(ApiGatewayController::class)->group(function () {
         Route::any('{any}', 'apiGatewayService')->where('any', '.*');
     });
