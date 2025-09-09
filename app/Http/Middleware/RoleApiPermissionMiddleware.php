@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RoleApiMap;
-use App\Models\ApiRegistry;
 use App\Models\Workflows\WfRoleusermap;
 
 class RoleApiPermissionMiddleware
@@ -18,7 +17,6 @@ class RoleApiPermissionMiddleware
 
     public function handle(Request $request, Closure $next)
     {
-
         $this->_user = Auth::user();
 
         if (!$this->_user) {
@@ -48,20 +46,20 @@ class RoleApiPermissionMiddleware
             ->first();
 
         if (!$api) {
-            return response()->json(['message' => 'Forbidden: API not registered'], 403);
+            // If API is not registered → allow access
+            return $next($request);
         }
 
-        // Verify mapping
-        $hasAccess = RoleApiMap::whereIn("role_id", $roles->toArray())
+        // ❌ Restrict if mapping exists (ignoring is_suspended now)
+        $isRestricted = RoleApiMap::whereIn("role_id", $roles->toArray())
             ->where("api_mstr_id", $api->id)
-            ->where("status", 1)
-            ->where("is_suspended", false)
             ->exists();
 
-        if (!$hasAccess) {
-            return response()->json(['message' => 'Forbidden: Access denied'], 403);
+        if ($isRestricted) {
+            return response()->json(['message' => 'Forbidden: This API is restricted for your role'], 403);
         }
 
+        // ✅ Allow if mapping does not exist
         return $next($request);
     }
 
@@ -75,9 +73,13 @@ class RoleApiPermissionMiddleware
         if (!$this->_roleApiCache) {
             Redis::del("ROLE_API_MAP");
 
-            $roleApiMaps = RoleApiMap::select("role_api_maps.*", "api_registries.end_point", "api_registries.method")
+            $roleApiMaps = RoleApiMap::select(
+                    "role_api_maps.role_id",
+                    "role_api_maps.api_mstr_id",
+                    "api_registries.end_point",
+                    "api_registries.method"
+                )
                 ->join("api_registries", "api_registries.id", "role_api_maps.api_mstr_id")
-                ->where("role_api_maps.status", 1)
                 ->get()
                 ->toArray();
 

@@ -132,6 +132,46 @@ class ApiRoleMapController extends Controller
     /**
      * |
      */
+    // public function createApiRoleMap(Request $req)
+    // {
+    //     try {
+    //         $req->validate([
+    //             'roleId'      => 'required',
+    //             'apiId'       => 'required',
+    //             'moduleId'    => 'nullable',
+    //             'isSuspended' => 'nullable|boolean'
+
+    //         ]);
+    //         $mapiRolemap = new RoleApiMap();
+    //         $checkExisting = $mapiRolemap->where('api_mstr_id', $req->apiId)
+    //             ->where('role_id', $req->roleId)
+    //             // ->where('module_id', $req->moduleId)
+    //             ->first();
+
+    //         if ($checkExisting) {
+    //             $req->merge([
+    //                 'id' => $checkExisting->id,
+    //                 'isSuspended' => $req->isSuspended
+    //             ]);
+    //             $mapiRolemap->updateRoleMap($req);
+    //         } else {
+    //             $mapiRolemap->addRoleMap($req);
+    //         }
+
+    //         // if ($checkExisting)
+    //         //     throw new Exception('Menu Already Maps to Menu Role');
+    //         // $mreqs = [
+    //         //     'menuId'     => $req->menuId,
+    //         //     'menuRoleId' => $req->menuRoleId
+    //         // ];
+    //         // $mMenuRolemap->addRoleMap($mreqs);
+
+    //         return responseMsg(true, "Data Saved", "");
+    //     } catch (Exception $e) {
+    //         return responseMsg(false, $e->getMessage(), "");
+    //     }
+    // }
+
     public function createApiRoleMap(Request $req)
     {
         try {
@@ -140,37 +180,29 @@ class ApiRoleMapController extends Controller
                 'apiId'       => 'required',
                 'moduleId'    => 'nullable',
                 'isSuspended' => 'nullable|boolean'
-
             ]);
+
             $mapiRolemap = new RoleApiMap();
+
+            // Check if mapping already exists
             $checkExisting = $mapiRolemap->where('api_mstr_id', $req->apiId)
                 ->where('role_id', $req->roleId)
-                // ->where('module_id', $req->moduleId)
                 ->first();
 
             if ($checkExisting) {
-                $req->merge([
-                    'id' => $checkExisting->id,
-                    'isSuspended' => $req->isSuspended
-                ]);
-                $mapiRolemap->updateRoleMap($req);
+                // ❌ If record exists → delete it
+                $checkExisting->delete();
+                return responseMsg(true, "Mapping removed successfully", "");
             } else {
+                // ✅ If not exists → create new mapping
                 $mapiRolemap->addRoleMap($req);
+                return responseMsg(true, "Mapping created successfully", "");
             }
-
-            // if ($checkExisting)
-            //     throw new Exception('Menu Already Maps to Menu Role');
-            // $mreqs = [
-            //     'menuId'     => $req->menuId,
-            //     'menuRoleId' => $req->menuRoleId
-            // ];
-            // $mMenuRolemap->addRoleMap($mreqs);
-
-            return responseMsg(true, "Data Saved", "");
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
 
     // public function apiRoleListy(Request $req)
     // {
