@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Menu;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
+use App\Models\Menu\Menu;
 use App\Models\Menu\MenuMaster;
 use App\Models\Menu\MenuRoleusermap;
 use App\Models\ModuleMaster;
@@ -406,5 +407,24 @@ class MenuController extends Controller
             $this->getParent($refvalue['parent_id']);
         }
         return $refvalue['id'];
+    }
+
+    /**
+     * get menu for citizen
+     */
+    public function getMenu()
+    {
+        $menus = Menu::whereNull('parent_id')
+            ->with(['subMenu' => function ($q) {
+                $q->select('id', 'parent_id', 'name', 'route', 'is_maintenance');
+            }])
+            ->get(['id', 'name', 'route', 'is_href', 'is_maintenance', 'hidden_for_small_screen']);
+
+        return response()->json(
+            ['mainMenu' => $menus],
+            200,
+            [],
+            JSON_UNESCAPED_SLASHES
+        );
     }
 }
