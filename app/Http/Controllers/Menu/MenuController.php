@@ -427,4 +427,36 @@ class MenuController extends Controller
             JSON_UNESCAPED_SLASHES
         );
     }
+
+    public function updateMaintenance(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'isMaintenance' => 'required|boolean'
+        ]);
+        if ($validator->fails())
+            return validationError($validator);
+
+
+        $menu = Menu::find($request->id);
+
+        if (!$menu) {
+            return response()->json([
+                'message' => 'Menu not found'
+            ], 404);
+        }
+
+        $menu->update([
+            'is_maintenance' => $request->isMaintenance
+        ]);
+
+        return response()->json([
+            'message' => 'Maintenance status updated successfully',
+            'menu' => [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'is_maintenance' => $menu->is_maintenance
+            ]
+        ]);
+    }
 }

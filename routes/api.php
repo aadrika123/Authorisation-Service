@@ -265,7 +265,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('menu/by-module', 'getMenuByModuleId');
         Route::post('sub-menu/get-children-node', 'getChildrenNode');
         Route::post('sub-menu/tree-structure', 'getTreeStructureMenu');
+
         Route::post('menu-submenu/tree-structure', 'getMenu');
+        Route::post('menu-submenu/update-by-id', 'updateMaintenance');
     });
 
     /**
