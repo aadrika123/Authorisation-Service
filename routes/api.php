@@ -696,8 +696,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::get("lams/v1/asset/assets-summary", "unAuthApis");
         Route::get("lams/v1/asset/get-all", "unAuthApis");
         Route::get("lams/v1/asset/get-lands", "unAuthApis");
-        Route::get("lams/v1/asset/get-land/:id", "unAuthApis");
-        Route::get("lams/v1/asset/get-by-id/:id", "unAuthApis");
+        Route::get("lams/v1/asset/get-land", "unAuthApis");
+        Route::get("lams/v1/asset/get-by-id", "unAuthApis");
     });
 });
 
