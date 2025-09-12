@@ -690,6 +690,14 @@ Route::middleware(['apiPermission'])->group(function () {
         //legal
         Route::post("legal/guest/get-detail-case-citizen", "unAuthApis");
         Route::post("legal/guest/get-cases-by-case-no", "unAuthApis");
+
+        //lams
+        Route::post("lams/v1/asset/asset-type", "unAuthApis");
+        Route::post("lams/v1/asset/assets-summary", "unAuthApis");
+        Route::post("lams/v1/asset/get-all", "unAuthApis");
+        Route::post("lams/v1/asset/get-lands", "unAuthApis");
+        Route::post("lams/v1/asset/get-land/:id", "unAuthApis");
+        Route::post("lams/v1/asset/get-by-id/:id", "unAuthApis");
     });
 });
 
