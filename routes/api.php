@@ -692,12 +692,12 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("legal/guest/get-cases-by-case-no", "unAuthApis");
 
         //lams
-        Route::post("lams/v1/asset/asset-type", "unAuthApis");
-        Route::post("lams/v1/asset/assets-summary", "unAuthApis");
-        Route::post("lams/v1/asset/get-all", "unAuthApis");
-        Route::post("lams/v1/asset/get-lands", "unAuthApis");
-        Route::post("lams/v1/asset/get-land/:id", "unAuthApis");
-        Route::post("lams/v1/asset/get-by-id/:id", "unAuthApis");
+        Route::get("lams/v1/asset/asset-type", "unAuthApis");
+        Route::get("lams/v1/asset/assets-summary", "unAuthApis");
+        Route::get("lams/v1/asset/get-all", "unAuthApis");
+        Route::get("lams/v1/asset/get-lands", "unAuthApis");
+        Route::get("lams/v1/asset/get-land/:id", "unAuthApis");
+        Route::get("lams/v1/asset/get-by-id/:id", "unAuthApis");
     });
 });
 
