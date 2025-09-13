@@ -808,4 +808,18 @@ class UlbController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | Get all ULB logos with full URL
+     */
+    public function getAllUlbLogos()
+    {
+        try {
+            $mUlbMasters = $this->_ulbMasters;
+            $data = $mUlbMasters->getAllUlbLogos();
+            return responseMsg(true, "ULB Logos retrieved successfully", $data);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 }

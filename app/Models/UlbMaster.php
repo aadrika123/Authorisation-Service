@@ -156,4 +156,21 @@ class UlbMaster extends Model
         $ulb->save();
         return $ulb;
     }
+
+    /**
+     * | Get all ULB logos with full URL
+     */
+    public function getAllUlbLogos()
+    {
+        $appUrl = config('app.url');
+        $ulbs = UlbMaster::select('id', 'ulb_name', 'logo')
+            ->whereNotNull('logo')
+            ->get();
+        
+        return $ulbs->map(function($ulb) use ($appUrl) {
+            $ulb->logo_url = rtrim($appUrl, '/') . '/' . ltrim($ulb->logo, '/');
+            unset($ulb->logo);
+            return $ulb;
+        });
+    }
 }
