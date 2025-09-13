@@ -754,4 +754,58 @@ class UlbController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | Upload ULB logo from ULB ID
+     * | Path: public/upload/Icon
+     */
+    public function uploadUlbLogo(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'ulbId' => 'required|integer',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]
+        );
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $ulbId = $req->ulbId;
+            $mUlbMasters = $this->_ulbMasters;
+
+            $checkExisting = $mUlbMasters::where('id', $ulbId)->first();
+            if (!$checkExisting) {
+                throw new Exception('ULB not found');
+            }
+
+            // Delete previous logo if exists
+            if ($checkExisting->logo && file_exists(public_path($checkExisting->logo))) {
+                unlink(public_path($checkExisting->logo));
+            }
+
+            // Handle file upload
+            if ($req->hasFile('logo')) {
+                $file = $req->file('logo');
+                $fileName = 'ulb_' . $ulbId . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('Uploads/Icon'), $fileName);
+                $logoPath = 'Uploads/Icon/' . $fileName;
+            } else {
+                throw new Exception('Logo file not found');
+            }
+
+            $updateReq = new Request([
+                'id' => $checkExisting->id,
+                'logoPath' => $logoPath,
+            ]);
+            $mUlbMasters->updateUlbLogo($updateReq);
+
+            return responseMsg(true, "Logo uploaded successfully", ['logoPath' => $logoPath]);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 }

@@ -465,6 +465,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('create/ulb-wise-services', 'createServicesUlb');
         Route::post('get/services-b-ulb-id', 'ulbServicesList');
         Route::post('get/services-by-module', 'checkUlbModuleServices');
+        Route::post('upload/ulb-logo-by-id', 'uploadUlbLogo');
     });
 
     /**

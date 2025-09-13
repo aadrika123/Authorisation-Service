@@ -145,4 +145,15 @@ class UlbMaster extends Model
             ->whereRaw('active_status::boolean = TRUE')
             ->first();
     }
+
+    /**
+     * | Update ULB logo
+     */
+    public function updateUlbLogo($req)
+    {
+        $ulb = UlbMaster::find($req->id);
+        $ulb->logo = $req->logoPath;
+        $ulb->save();
+        return $ulb;
+    }
 }
