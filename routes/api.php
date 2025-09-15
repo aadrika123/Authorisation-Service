@@ -459,7 +459,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(UlbController::class)->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
-        Route::post('list-ulb-by-district', 'districtWiseUlb');f
+        Route::post('list-ulb-by-district', 'districtWiseUlb');
         Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
         Route::post('v2/get-newward-by-oldward', 'getNewWardByOldWard')->withoutMiddleware('auth:sanctum');
         Route::post('create/ulb-wise-services', 'createServicesUlb');
