@@ -76,8 +76,8 @@ class EpramaanController extends Controller
 
             #change by prity pandey  
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             // case 'mobile':
             //     $serviceId    = '100001513';
@@ -200,8 +200,8 @@ class EpramaanController extends Controller
                 break;
             #change by prity pandey 
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             // case 'mobile':
             //     $serviceId    = '100001513';
@@ -455,8 +455,8 @@ class EpramaanController extends Controller
 
             #change by prity pandey 
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             // case 'mobile':
             //     $serviceId    = '100001513';
@@ -584,7 +584,7 @@ class EpramaanController extends Controller
         // Step 4: Extract necessary parameters
 
         // $clientId = "100001511"; // Please make changes if needed
-        $clientId = "100001513"; // Please make changes if needed
+        $clientId = "100001360"; // Please make changes if needed
 
         $sessionId =  $json['session_id'] ?? '';
 
