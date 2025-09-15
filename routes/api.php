@@ -459,7 +459,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(UlbController::class)->group(function () {
         Route::post('city/state/auth/ulb-id', 'getCityStateByUlb');
-        Route::post('list-ulb-by-district', 'districtWiseUlb');
+        Route::post('list-ulb-by-district', 'districtWiseUlb');f
         Route::post('get-newward-by-oldward', 'getNewWardByOldWard');
         Route::post('v2/get-newward-by-oldward', 'getNewWardByOldWard')->withoutMiddleware('auth:sanctum');
         Route::post('create/ulb-wise-services', 'createServicesUlb');
@@ -695,7 +695,7 @@ Route::middleware(['apiPermission'])->group(function () {
 
         //lams
         Route::get("lams/v1/asset/asset-type", "unAuthApis");
-        Route::get("lams/v1/asset/assets-summary", "unAuthApis");
+        Route::get("lams/asset/assets-summary-citizen", "unAuthApis");
         Route::get("lams/v1/asset/get-all", "unAuthApis");
         Route::get("lams/v1/asset/get-lands", "unAuthApis");
         Route::get("lams/v1/asset/get-land/{id}", "unAuthApis");
