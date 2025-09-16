@@ -957,7 +957,7 @@ class UlbController extends Controller
         }
 
         try {
-            $req->merge(["document" => $req->assetFile]);
+            $req->merge(["document" => $req->asset_file]);
             $docUpload = new DocUpload;
             $data = $docUpload->checkDoc($req);
             if (!$data["status"]) {
