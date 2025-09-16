@@ -436,6 +436,7 @@ class EpramaanController extends Controller
         switch ($type) {
 
             // case 'citizen':
+                
             //     // $serviceId    = '100001033';    #_staging
             //     // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
 
