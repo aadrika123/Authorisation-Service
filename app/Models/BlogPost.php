@@ -52,7 +52,7 @@ class BlogPost extends Model
         $data->short_description = $req->shortDescription ?? $data->short_description;
         $data->long_description = $req->longDescription ?? $data->long_description;
         $data->by_officer_name = $req->officerName ?? $data->by_officer_name;
-        $data->asset_file = $req->assetFile ?? $data->asset_file;
+        // $data->asset_file = $req->assetFile ?? $data->asset_file;
         $data->unique_id = $req->uniqueId ?? $data->unique_id;
         $data->reference_no = $req->ReferenceNo ?? $data->reference_no;
 
