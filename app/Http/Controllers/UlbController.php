@@ -842,7 +842,7 @@ class UlbController extends Controller
             Redis::expire($cacheKeyToday, now()->endOfDay()->diffInSeconds());
 
             // Fetch blogs
-            $blogs = $blogModel->getActiveBlogsList()->map(function ($val) use ($docUpload) {
+             $blogs = $blogModel->getActiveBlogsList()->map(function ($val) use ($docUpload) {
                 $url = $docUpload->getSingleDocUrl($val);
                 $val->is_suspended = $val->status;
                 $val->asset_file = $url["doc_path"] ?? null;
