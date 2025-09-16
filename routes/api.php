@@ -135,6 +135,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('update/service-by-id', 'updateSeviceMater');
 
     Route::post('permissions/ulb-by-id', 'createUlbPermissions');
+
+    Route::post('m-get-active-blog', 'activeBlogsList');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {

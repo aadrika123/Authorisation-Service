@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\MicroServices\DocUpload;
+use App\Models\BlogPost;
 use App\Models\DistrictMaster;
 use App\Models\MCity;
 use App\Models\ServiceMapping;
@@ -14,6 +15,7 @@ use App\Models\UlbService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class UlbController extends Controller
@@ -820,6 +822,52 @@ class UlbController extends Controller
             return responseMsg(true, "ULB Logos retrieved successfully", $data);
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
+        }
+    }
+
+    public function activeBlogsList(Request $req)
+    {
+        try {
+            $blogModel = new BlogPost();
+            $docUpload = new DocUpload();
+
+            // Increment API hit count using Redis
+            $today = now()->toDateString();
+
+            $cacheKeyTotal = "dashboard_hits_total";
+            $cacheKeyToday = "dashboard_hits_" . $today;
+
+            $totalHits = Redis::incr($cacheKeyTotal);
+            $todayHits = Redis::incr($cacheKeyToday);
+            Redis::expire($cacheKeyToday, now()->endOfDay()->diffInSeconds());
+
+            // Fetch blogs
+            $blogs = $blogModel->getActiveBlogsList()->map(function ($val) use ($docUpload) {
+                $url = $docUpload->getSingleDocUrl($val);
+                $val->is_suspended = $val->status;
+                $val->asset_file = $url["doc_path"] ?? null;
+                return $val;
+            });
+
+            $response = [
+                "status"   => true,
+                "message"  => "All Blog List",
+                "code"     => "BLOG002",
+                "version"  => "01",
+                "responseTime" => responseTime(),
+                "method"   => $req->getMethod(),
+                "deviceId" => $req->deviceId,
+                "data"     => $blogs,   // 
+                "hits"     => [         // 
+                    "totalHits" => $totalHits,
+                    "todayHits" => $todayHits
+                ]
+            ];
+
+
+            return response()->json($response, 200);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
