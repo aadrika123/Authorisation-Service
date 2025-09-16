@@ -702,7 +702,7 @@ Route::middleware(['apiPermission'])->group(function () {
 
         //lams
         Route::get("lams/v1/asset/asset-type", "unAuthApis");
-        Route::get("lams/V1/asset/assets-summary-citizen", "unAuthApis");
+        Route::get("lams/v1/asset/assets-summary-citizen", "unAuthApis");
         Route::get("lams/v1/asset/get-all-citizen", "unAuthApis");
         Route::get("lams/v1/asset/get-lands-citizen", "unAuthApis");
         Route::get("lams/v1/asset/get-land/{id}", "unAuthApis");
