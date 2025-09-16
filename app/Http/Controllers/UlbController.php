@@ -945,7 +945,7 @@ class UlbController extends Controller
             [
                 "id" => "required|numeric",
                 "title" => "required|string",
-                "assetFile" => "required|mimes:pdf,jpeg,png,jpg",
+                "asset_file" => "required|mimes:pdf,jpeg,png,jpg",
                 "shortDescription" => "required|string",
                 "longDescription" => "required|string",
                 "officerName" => "required|string"
