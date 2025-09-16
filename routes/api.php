@@ -137,6 +137,11 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('permissions/ulb-by-id', 'createUlbPermissions');
 
     Route::post('m-get-active-blog', 'activeBlogsList');
+    Route::post('m-store-blog-post', 'storeBlogPost');
+    Route::post('m-list-of-all-blog', 'allBlogs');
+    Route::post('m-update-blog', 'editBlog');
+    Route::post('m-delete-blog', 'deleteBlog');
+    Route::post('m-get-blog-by-Id', 'blogById');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {

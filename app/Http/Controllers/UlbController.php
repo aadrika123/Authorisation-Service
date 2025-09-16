@@ -842,7 +842,7 @@ class UlbController extends Controller
             Redis::expire($cacheKeyToday, now()->endOfDay()->diffInSeconds());
 
             // Fetch blogs
-             $blogs = $blogModel->getActiveBlogsList()->map(function ($val) use ($docUpload) {
+            $blogs = $blogModel->getActiveBlogsList()->map(function ($val) use ($docUpload) {
                 $url = $docUpload->getSingleDocUrl($val);
                 $val->is_suspended = $val->status;
                 $val->asset_file = $url["doc_path"] ?? null;
@@ -868,6 +868,157 @@ class UlbController extends Controller
             return response()->json($response, 200);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "BLOG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function storeBlogPost(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                'title' => 'required',
+                'assetFile' => 'required|mimes:pdf,jpeg,png,jpg',
+                'shortDescription' => 'required|nullable',
+                'longDescription' => 'required|nullable',
+                'officerName' => 'nullable',
+            ]
+        );
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $req->merge(["document" => $req->assetFile]);
+            $docUpload = new DocUpload();
+            $data = $docUpload->checkDoc($req);
+
+            if (!$data["status"]) {
+                throw new Exception("Document not uploaded");
+            }
+            $req->merge($data["data"]);
+
+            // Use model's custom store() method
+            $create = new BlogPost();
+            $stored = $create->store($req);
+
+            if (!$stored) {
+                throw new Exception("Blog post not stored");
+            }
+
+            return responseMsgs(true, "Blog created successfully", $stored, "BLOG001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+    /* 
+     * | get all blog post list
+     */
+    public function allBlogs(Request $req)
+    {
+        try {
+            $blogModel = new BlogPost();
+            $docUpload = new DocUpload();
+
+            $data = $blogModel->allList()->map(function ($val) use ($docUpload) {
+                $url = $docUpload->getSingleDocUrl($val);
+                $val->is_suspended = $val->status;
+                $val->asset_file = $url["doc_path"] ?? null;
+                // unset($val->asset_file);
+                return $val;
+            });
+
+
+            return responseMsgs(true, "All Blog List", $data, "BLOG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    /* 
+     * | update blog 
+     */
+    public function editBlog(Request $req)
+    {
+        $validated = Validator::make(
+            $req->all(),
+            [
+                "id" => "required|numeric",
+                "title" => "required|string",
+                "assetFile" => "required|mimes:pdf,jpeg,png,jpg",
+                "shortDescription" => "required|string",
+                "longDescription" => "required|string",
+                "officerName" => "required|string"
+            ]
+        );
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $req->merge(["document" => $req->assetFile]);
+            $docUpload = new DocUpload;
+            $data = $docUpload->checkDoc($req);
+            if (!$data["status"]) {
+                throw new Exception("Document Not uploaded");
+            }
+
+            $req->merge($data["data"]);
+
+            $blog = new BlogPost();
+            if (!$blog->edit($req)) {
+                throw new Exception("Data not updated");
+            }
+
+            return responseMsgs(true, "Blog updated", "", "BLOG003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    /* 
+     * | delete blog post
+     */
+    public function deleteBlog(Request $req)
+    {
+        try {
+            $req->validate([
+                'id' => 'required',
+                'status' => 'required'
+            ]);
+
+            $delete = new BlogPost();
+            $message = $delete->deleteBlog($req);
+
+            return responseMsgs(true, "", $message, "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    /* 
+     * | get blog by id
+     */
+    public function blogById(Request $req)
+    {
+        try {
+            $req->validate([
+                'id' => 'required'
+            ]);
+
+            $blog = new BlogPost();
+            $message = $blog->getById($req);
+            $docUpload = new DocUpload();
+            $url = $docUpload->getSingleDocUrl($message);
+
+            $message->is_suspended = $message->status;
+            $message->blogFile = $url["doc_path"] ?? null;
+
+            unset($message->document);
+            return responseMsgs(true, "Blog Details", $message, "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
