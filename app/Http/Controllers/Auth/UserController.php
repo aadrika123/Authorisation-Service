@@ -262,7 +262,7 @@ class UserController extends Controller
     {
 
         foreach ($menuRoleDetails as $role) {
-            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "ctor", "PARKING INCHARGE", "LAMS FieldOfficer","BUS CONDUCTOR"])) {
+            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer","BUS CONDUCTOR"])) {
 
                 return true;
             }
