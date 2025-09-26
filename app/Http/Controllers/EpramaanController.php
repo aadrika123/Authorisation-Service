@@ -50,670 +50,670 @@ class EpramaanController extends Controller
     /**
      * | Login with e-pramaan
      */
-    // public function loginEpramaan(Request $req)
-    // {
-    //     setcookie("verifier_c", "", time() - 3600, "/");
-    //     setcookie("nonce_c", "", time() - 3600, "/");
-    //     $type  = $req->type;
-
-    //     switch ($type) {
-    //         case 'citizen-page':
-    //             $serviceId    = '100001634';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
-    //             break;
-    //         case 'citizen':
-    //             // $serviceId    = '100001033';    #_staging
-    //             // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-
-    //             #change by prity pandey 
-    //             $serviceId    = '100001511';    #_production
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //             break;
-
-    //         // $serviceId    = '100001511';    #_production
-    //         // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //         // break;
-
-    //         #change by prity pandey  
-    //         case 'mobile':
-    //             $serviceId    = '100001513';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //             break;
-    //         // case 'mobile':
-    //         //     $serviceId    = '100001513';
-    //         //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //         //     break;
-
-    //         case 'property':
-    //             $serviceId    = '100001034';
-    //             $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
-    //             break;
-
-    //         case 'water':
-    //             $serviceId    = '100001035';
-    //             $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
-    //             break;
-
-    //         case 'trade':
-    //             $serviceId    = '100001036';
-    //             $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
-    //             break;
-
-    //         case 'advertisement':
-    //             $serviceId    = '100001037';
-    //             $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
-    //             break;
-
-    //         case 'pet':
-    //             $serviceId    = '100001038';
-    //             $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
-    //             break;
-
-    //         case 'marriage':
-    //             $serviceId    = '100001039';
-    //             $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
-    //             break;
-
-    //         case 'agency':
-    //             $serviceId    = '100001041';
-    //             $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
-    //             break;
-
-    //         default:
-    //             // $serviceId    = '100001033';    #_staging
-    //             // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-    //             #serviceId change by prity pandey
-    //             //$serviceId    = '100001332';    #_production
-    //             $serviceId    = '100001511';
-    //             $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
-    //             break;
-    //     }
-
-    //     $scope                 = 'openid';
-    //     $response_type         = 'code';
-    //     $code_challenge_method = 'S256';
-    //     // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
-    //     $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
-    //     $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-    //     $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-
-    //     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
-
-    //     //nonce
-    //     $nonce = bin2hex(random_bytes(16));
-
-    //     setcookie("nonce_c", "$nonce", time() + 3600, "/");
-
-    //     //verifier
-    //     $verifier_bytes = random_bytes(64);
-    //     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
-
-
-    //     setcookie("verifier_c", "$code_verifier", time() + 3600, "/");
-
-
-    //     //code challenge
-    //     $challenge_bytes = hash("sha256", $code_verifier, true);
-    //     $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
-
-    //     $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
-
-    //     //apiHmac
-    //     $apiHmac = hash_hmac('sha256', $input, $aeskey, true);
-    //     $apiHmac = base64_encode($apiHmac);
-    //     $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
-
-    //     $data['url']           = $finalUrl;
-    //     $data['nonce']         = $nonce;
-    //     $data['code_verifier'] = $code_verifier;
-    //     return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
-    // }
-
     public function loginEpramaan(Request $req)
     {
-        // Reset old cookies
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
+        $type  = $req->type;
 
-        $type = $req->type;
+        switch ($type) {
+            case 'citizen-page':
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
+                break;
+            case 'citizen':
+                // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
 
-        $services = config('epramaan.services');
+                #change by prity pandey 
+                $serviceId    = '100001511';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
 
-        if (!array_key_exists($type, $services)) {
-            $type = 'citizen'; // default
+            // $serviceId    = '100001511';    #_production
+            // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+            // break;
+
+            #change by prity pandey  
+            case 'mobile':
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                break;
+            // case 'mobile':
+            //     $serviceId    = '100001513';
+            //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+            //     break;
+
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
+                break;
+
+            default:
+                // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
+                #serviceId change by prity pandey
+                //$serviceId    = '100001332';    #_production
+                $serviceId    = '100001511';
+                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
+                break;
         }
 
-        $serviceId = $services[$type]['id'];
-        $redirect_uri = $services[$type]['redirect'];
-
-        $scope                 = config('epramaan.scope');
-        $response_type         = config('epramaan.response_type');
-        $code_challenge_method = config('epramaan.code_method');
-        $aeskey                = config('epramaan.aes_key');
-        $url                   = config('epramaan.url');
-        $request_uri           = config('epramaan.request_uri');
+        $scope                 = 'openid';
+        $response_type         = 'code';
+        $code_challenge_method = 'S256';
+        // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
+        $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
+        $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
         $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
 
-        // nonce
+        //nonce
         $nonce = bin2hex(random_bytes(16));
-        setcookie("nonce_c", $nonce, time() + 3600, "/");
 
-        // verifier
+        setcookie("nonce_c", "$nonce", time() + 3600, "/");
+
+        //verifier
         $verifier_bytes = random_bytes(64);
         $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
-        setcookie("verifier_c", $code_verifier, time() + 3600, "/");
 
-        // challenge
+
+        setcookie("verifier_c", "$code_verifier", time() + 3600, "/");
+
+
+        //code challenge
         $challenge_bytes = hash("sha256", $code_verifier, true);
         $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
 
-        $input   = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
-        $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
+        $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
 
-        $finalUrl = $url
-            . "?&scope={$scope}"
-            . "&response_type={$response_type}"
-            . "&redirect_uri={$redirect_uri}"
-            . "&state={$state}"
-            . "&code_challenge_method={$code_challenge_method}"
-            . "&nonce={$nonce}"
-            . "&client_id={$serviceId}"
-            . "&code_challenge={$code_challenge}"
-            . "&request_uri={$request_uri}"
-            . "&apiHmac={$apiHmac}";
+        //apiHmac
+        $apiHmac = hash_hmac('sha256', $input, $aeskey, true);
+        $apiHmac = base64_encode($apiHmac);
+        $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
 
-        $data = [
-            'url'           => $finalUrl,
-            'nonce'         => $nonce,
-            'code_verifier' => $code_verifier,
-        ];
-
+        $data['url']           = $finalUrl;
+        $data['nonce']         = $nonce;
+        $data['code_verifier'] = $code_verifier;
         return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
     }
+
+    // public function loginEpramaan(Request $req)
+    // {
+    //     // Reset old cookies
+    //     setcookie("verifier_c", "", time() - 3600, "/");
+    //     setcookie("nonce_c", "", time() - 3600, "/");
+
+    //     $type = $req->type;
+
+    //     $services = config('epramaan.services');
+
+    //     if (!array_key_exists($type, $services)) {
+    //         $type = 'citizen'; // default
+    //     }
+
+    //     $serviceId = $services[$type]['id'];
+    //     $redirect_uri = $services[$type]['redirect'];
+
+    //     $scope                 = config('epramaan.scope');
+    //     $response_type         = config('epramaan.response_type');
+    //     $code_challenge_method = config('epramaan.code_method');
+    //     $aeskey                = config('epramaan.aes_key');
+    //     $url                   = config('epramaan.url');
+    //     $request_uri           = config('epramaan.request_uri');
+
+    //     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
+
+    //     // nonce
+    //     $nonce = bin2hex(random_bytes(16));
+    //     setcookie("nonce_c", $nonce, time() + 3600, "/");
+
+    //     // verifier
+    //     $verifier_bytes = random_bytes(64);
+    //     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
+    //     setcookie("verifier_c", $code_verifier, time() + 3600, "/");
+
+    //     // challenge
+    //     $challenge_bytes = hash("sha256", $code_verifier, true);
+    //     $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
+
+    //     $input   = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
+    //     $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
+
+    //     $finalUrl = $url
+    //         . "?&scope={$scope}"
+    //         . "&response_type={$response_type}"
+    //         . "&redirect_uri={$redirect_uri}"
+    //         . "&state={$state}"
+    //         . "&code_challenge_method={$code_challenge_method}"
+    //         . "&nonce={$nonce}"
+    //         . "&client_id={$serviceId}"
+    //         . "&code_challenge={$code_challenge}"
+    //         . "&request_uri={$request_uri}"
+    //         . "&apiHmac={$apiHmac}";
+
+    //     $data = [
+    //         'url'           => $finalUrl,
+    //         'nonce'         => $nonce,
+    //         'code_verifier' => $code_verifier,
+    //     ];
+
+    //     return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
+    // }
 
 
     /**
      * | Dashboard
      */
-    // public function dashboardEpramaan(Request $req)
-    // {
-    //     $a = getcwd() . '/epramaanprod2016.cer';
-    //     $type          = $req->type;
-    //     $code          = $req->code;
-    //     $nonce         = $req->nonce;
-    //     $code_verifier = $req->codeVerifier;
-    //     $scope         = 'openid';
-    //     $grant_type    = 'authorization_code';
-    //     $epramaanTokenRequestUrl = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
-
-    //     switch ($type) {
-
-    //         case 'citizen-page':
-    //             $serviceId    = '100001634';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
-    //             break;
-    //         #change by prity pandey 
-    //         case 'citizen':
-    //             //     // $serviceId    = '100001033';    #_staging
-    //             $serviceId    = '100001511';    #_production
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //             //     break;
-    //             // $serviceId    = '100001511';    #_production
-    //             // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //             break;
-    //         #change by prity pandey 
-    //         case 'mobile':
-    //             $serviceId    = '100001513';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //             break;
-    //         // case 'mobile':
-    //         //     $serviceId    = '100001513';
-    //         //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //         //     break;
-    //         case 'property':
-    //             $serviceId    = '100001034';
-    //             $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
-    //             break;
-
-    //         case 'water':
-    //             $serviceId    = '100001035';
-    //             $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
-    //             break;
-
-    //         case 'trade':
-    //             $serviceId    = '100001036';
-    //             $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
-    //             break;
-
-    //         case 'advertisement':
-    //             $serviceId    = '100001037';
-    //             $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
-    //             break;
-
-    //         case 'pet':
-    //             $serviceId    = '100001038';
-    //             $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
-    //             break;
-
-    //         case 'marriage':
-    //             $serviceId    = '100001039';
-    //             $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
-    //             break;
-
-    //         case 'agency':
-    //             $serviceId    = '100001041';
-    //             $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
-    //             break;
-
-    //         default:
-    //             // $serviceId    = '100001033';    #_staging
-    //             #serviceId change by prity pandey
-    //             //$serviceId    = '100001332';    #_production
-    //             $serviceId    = '100001511';
-    //             $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
-    //             break;
-    //     }
-
-    //     $curl = curl_init();
-    //     curl_setopt_array(
-    //         $curl,
-    //         array(
-    //             CURLOPT_URL            => $epramaanTokenRequestUrl,
-    //             CURLOPT_RETURNTRANSFER => true,
-    //             //CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-    //             CURLOPT_SSL_VERIFYHOST => 0,
-    //             CURLOPT_SSL_VERIFYPEER => 0,
-    //             CURLOPT_CUSTOMREQUEST  => 'POST',
-    //             CURLOPT_POSTFIELDS     => '{
-    // 				"code"          : ["' . $code . '"],
-    // 				"grant_type"    : ["' . $grant_type . '"],
-    // 				"scope"         : ["' . $scope . '"],
-    // 				"redirect_uri"  : ["' . $redirect_uri . '"],
-    // 				"request_uri"   : ["' . $epramaanTokenRequestUrl . '"],
-    // 				"code_verifier" : ["' . $code_verifier . '"],
-    // 				"client_id"     : ["' . $serviceId . '"]}',
-    //             CURLOPT_HTTPHEADER     => array(
-    //                 'Content-Type: application/json'
-    //             ),
-    //         )
-    //     );
-
-    //     $response = curl_exec($curl);
-    //     curl_close($curl);
-
-    //     //---------processing token-decrypt--------------
-    //     // The key encryption algorithm manager with the A256KW algorithm.
-    //     $keyEncryptionAlgorithmManager = new AlgorithmManager([
-    //         new A256KW(),
-    //     ]);
-    //     // The content encryption algorithm manager with the A256CBC-HS256 algorithm.
-    //     $contentEncryptionAlgorithmManager = new AlgorithmManager([
-    //         new A256GCM(),
-    //     ]);
-    //     $compressionMethodManager = new CompressionMethodManager([
-    //         new Deflate(),
-
-    //     ]);
-
-    //     // AES key Generation.
-    //     $sha25 = hash('SHA256', $nonce, true);
-    //     $jwk = new JWK([
-    //         'kty' => 'oct',
-    //         'k' => $this->base64url_encode($sha25),
-    //     ]);
-
-    //     //decryption
-    //     $jweDecrypter = new JWEDecrypter(
-    //         $keyEncryptionAlgorithmManager,
-    //         $contentEncryptionAlgorithmManager,
-    //         $compressionMethodManager
-    //     );
-    //     // The serializer manager(JWE Compact Serialization Mode)
-    //     $serializerManager = new JWESerializerManager([
-    //         new CompactSerializer(),
-    //     ]);
-    //     // return $response;
-    //     // print_r($response);
-    //     // exit();
-    //     // load the token.
-    //     $jwe = $serializerManager->unserialize($response);
-    //     //decrypt the token
-    //     $success = $jweDecrypter->decryptUsingKey($jwe, $jwk, 0);
-
-    //     if ($success) {
-    //         $jweLoader = new JWELoader($serializerManager, $jweDecrypter, null);
-    //         $jwe = $jweLoader->loadAndDecryptWithKey($response, $jwk, $recipient);
-    //         $decryptedtoken = $jwe->getPayload();
-    //         setcookie("decryptedtoken_c", "$decryptedtoken", time() + 3600, "/");
-    //     } else {
-    //         throw new RuntimeException('Error Decrypting JWE');
-    //     }
-    //     //Verifying token with the certificate shared by epramaan
-    //     // The algorithm manager with the HS256 algorithm.
-    //     $algorithmManager = new AlgorithmManager([
-    //         new RS256(),
-    //     ]);
-    //     // JWS Verifier.
-    //     $jwsVerifier = new JWSVerifier($algorithmManager);
-    //     $key = JWKFactory::createFromCertificateFile(
-    //         getcwd() . '/epramaanprod2016.cer',
-    //         // getcwd() . '/epramaan.crt',      #_staging
-    //         // '/var/www/html/Authorisation-Service/storage/app/public/epramaanprod2016.cer', // The path where the certificate has been stored
-    //         // 'D:\epramaan.crt', // The path where the certificate has been stored
-    //         [
-    //             'use' => 'sig', // Additional parameters
-    //         ]
-    //     );
-
-    //     $serializerManager = new JWSSerializerManager([
-    //         new SignatureCompactSerializer(),
-    //     ]);
-
-    //     $jws = $serializerManager->unserialize($decryptedtoken);
-    //     $isVerified = $jwsVerifier->verifyWithKey($jws, $key, 0);
-
-    //     $jwsLoader = new JWSLoader(
-    //         $serializerManager,
-    //         $jwsVerifier,
-    //         null
-    //     );
-
-    //     $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
-    //     $payload = $jws->getPayload();
-    //     $responseJson = $payload;
-    //     $jsonres = $payload;
-    //     // $payload = '{"sub":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","pwd_auth_status":"true","gender":"M","iss":"ePramaan","session_id":"b670d78a-1234-45b1-953d-87ea5d3459c9","sso_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","loginMode":"CITIZEN","aud":"100001033","unique_user_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","dob":"26\/04\/1998","name":"Mrinal","exp":1701347884,"mobile_number":"8797770238","iat":1701261484,"jti":"b670d78a-1234-45b1-953d-87ea5d3459c9","username":"mrinal9911"}';
-    //     $payload = json_decode($payload);
-    //     $mEpramaanLogin = new EpramaanLogin();
-    //     $epReqs = [
-    //         "unique_user_id"    => $payload->sub,
-    //         "single_signon_id"  => $payload->sso_id,
-    //         "token_identifier"  => $payload->jti,
-    //         "token_issue_time"  => Carbon::createFromTimestamp($payload->iat),
-    //         "token_expiry_time" => Carbon::createFromTimestamp($payload->exp),
-    //         "service_id"        => $payload->aud,
-    //         "session_id"        => $payload->session_id,
-    //         "name"              => $payload->name ?? "",
-    //         "email"             => $payload->email ?? "",
-    //         "mobile"            => $payload->mobile_number ?? "",
-    //         "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
-    //         "gender"            => $payload->gender ?? "",
-    //         "house"             => $payload->house ?? "",
-    //         "locality"          => $payload->locality ?? "",
-    //         "pincode"           => $payload->pincode ?? "",
-    //         "district"          => $payload->district ?? "",
-    //         "state"             => $payload->state ?? "",
-    //         "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
-    //         "user_name"         => $payload->user_name ?? "",
-    //         "respose_json"      => $responseJson,
-    //     ];
-    //     $epramaanDtl = $mEpramaanLogin->store($epReqs);
-
-    //     if ($type = 'citizen') {
-    //         $mActiveCitizen = new ActiveCitizen();
-    //         $citizenInfo = $mActiveCitizen->getCitizenByUniqueId($payload->sub);
-
-    //         if (!$citizenInfo) {
-    //             #_save citizen data
-    //             $saveReqs = [
-    //                 "user_name"         => $payload->name ?? "",
-    //                 "mobile"            => $payload->mobile_number ?? "",
-    //                 "email"             => $payload->email ?? "",
-    //                 "gender"            => $payload->gender ?? "",
-    //                 "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
-    //                 "unique_user_id"    => $payload->sub,
-    //                 "token_identifier"  => $payload->jti,
-    //                 "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
-    //                 "user_type"         => "Citizen",
-    //             ];
-    //             $citizenInfo =  $mActiveCitizen->citizenRegistration($saveReqs);
-    //         }
-
-    //         #_update token
-    //         $token = $citizenInfo->createToken('my-app-token')->plainTextToken;
-    //         $citizenInfo->remember_token = $token;
-    //         $citizenInfo->save();
-
-    //         #_login details
-    //         $userDetails['id']        = $citizenInfo->id;
-    //         $userDetails['userName']  = $citizenInfo->user_name;
-    //         $userDetails['mobile']    = $citizenInfo->mobile;
-    //         $userDetails['userType']  = $citizenInfo->user_type;
-    //         $userDetails['user_type'] = $citizenInfo->user_type;
-    //         $userDetails['token']     = $token;
-    //         $userDetails['payload']     = $payload;
-    //         $userDetails['eparmanToken']     = $epReqs;
-    //         return responseMsgs(true, "Login Successfully", $userDetails, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
-    //     }
-    // }
-
     public function dashboardEpramaan(Request $req)
     {
-        $a             = getcwd() . '/epramaanprod2016.cer';
-        $type          = $req->type ?? 'citizen'; // default to citizen
+        $a = getcwd() . '/epramaanprod2016.cer';
+        $type          = $req->type;
         $code          = $req->code;
         $nonce         = $req->nonce;
         $code_verifier = $req->codeVerifier;
+        $scope         = 'openid';
+        $grant_type    = 'authorization_code';
+        $epramaanTokenRequestUrl = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtTokenRequest.do';
 
-        $scope       = config('epramaan.scope');
-        $grant_type  = 'authorization_code';
-        $tokenUrl    = config('epramaan.token_url');
-        $services    = config('epramaan.services');
+        switch ($type) {
 
-        // validate service
-        if (!array_key_exists($type, $services)) {
-            return responseMsgs(false, "Invalid service type: $type", [], "", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            case 'citizen-page':
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
+                break;
+            #change by prity pandey 
+            case 'citizen':
+                //     // $serviceId    = '100001033';    #_staging
+                $serviceId    = '100001511';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                //     break;
+                // $serviceId    = '100001511';    #_production
+                // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+            #change by prity pandey 
+            case 'mobile':
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                break;
+            // case 'mobile':
+            //     $serviceId    = '100001513';
+            //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+            //     break;
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
+                break;
+
+            default:
+                // $serviceId    = '100001033';    #_staging
+                #serviceId change by prity pandey
+                //$serviceId    = '100001332';    #_production
+                $serviceId    = '100001511';
+                $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
+                break;
         }
 
-        $serviceId    = $services[$type]['id'];
-        $redirect_uri = $services[$type]['redirect'];
-
-        // 🔹 Call ePramaan Token API
         $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL            => $tokenUrl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_POSTFIELDS     => json_encode([
-                "code"          => [$code],
-                "grant_type"    => [$grant_type],
-                "scope"         => [$scope],
-                "redirect_uri"  => [$redirect_uri],
-                "request_uri"   => [$tokenUrl],
-                "code_verifier" => [$code_verifier],
-                "client_id"     => [$serviceId],
-            ]),
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        ]);
+        curl_setopt_array(
+            $curl,
+            array(
+                CURLOPT_URL            => $epramaanTokenRequestUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                //CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_CUSTOMREQUEST  => 'POST',
+                CURLOPT_POSTFIELDS     => '{
+    				"code"          : ["' . $code . '"],
+    				"grant_type"    : ["' . $grant_type . '"],
+    				"scope"         : ["' . $scope . '"],
+    				"redirect_uri"  : ["' . $redirect_uri . '"],
+    				"request_uri"   : ["' . $epramaanTokenRequestUrl . '"],
+    				"code_verifier" : ["' . $code_verifier . '"],
+    				"client_id"     : ["' . $serviceId . '"]}',
+                CURLOPT_HTTPHEADER     => array(
+                    'Content-Type: application/json'
+                ),
+            )
+        );
 
         $response = curl_exec($curl);
         curl_close($curl);
 
-        // ---------- decrypting logic (same as your code) ----------
-        // (keep your existing JWE + JWS verification logic here, unchanged)
-        // ----------------------------------------------------------
+        //---------processing token-decrypt--------------
+        // The key encryption algorithm manager with the A256KW algorithm.
+        $keyEncryptionAlgorithmManager = new AlgorithmManager([
+            new A256KW(),
+        ]);
+        // The content encryption algorithm manager with the A256CBC-HS256 algorithm.
+        $contentEncryptionAlgorithmManager = new AlgorithmManager([
+            new A256GCM(),
+        ]);
+        $compressionMethodManager = new CompressionMethodManager([
+            new Deflate(),
 
-        // final step: return success/failure
+        ]);
+
+        // AES key Generation.
+        $sha25 = hash('SHA256', $nonce, true);
+        $jwk = new JWK([
+            'kty' => 'oct',
+            'k' => $this->base64url_encode($sha25),
+        ]);
+
+        //decryption
+        $jweDecrypter = new JWEDecrypter(
+            $keyEncryptionAlgorithmManager,
+            $contentEncryptionAlgorithmManager,
+            $compressionMethodManager
+        );
+        // The serializer manager(JWE Compact Serialization Mode)
+        $serializerManager = new JWESerializerManager([
+            new CompactSerializer(),
+        ]);
+        // return $response;
+        // print_r($response);
+        // exit();
+        // load the token.
+        $jwe = $serializerManager->unserialize($response);
+        //decrypt the token
+        $success = $jweDecrypter->decryptUsingKey($jwe, $jwk, 0);
+
+        if ($success) {
+            $jweLoader = new JWELoader($serializerManager, $jweDecrypter, null);
+            $jwe = $jweLoader->loadAndDecryptWithKey($response, $jwk, $recipient);
+            $decryptedtoken = $jwe->getPayload();
+            setcookie("decryptedtoken_c", "$decryptedtoken", time() + 3600, "/");
+        } else {
+            throw new RuntimeException('Error Decrypting JWE');
+        }
+        //Verifying token with the certificate shared by epramaan
+        // The algorithm manager with the HS256 algorithm.
+        $algorithmManager = new AlgorithmManager([
+            new RS256(),
+        ]);
+        // JWS Verifier.
+        $jwsVerifier = new JWSVerifier($algorithmManager);
+        $key = JWKFactory::createFromCertificateFile(
+            getcwd() . '/epramaanprod2016.cer',
+            // getcwd() . '/epramaan.crt',      #_staging
+            // '/var/www/html/Authorisation-Service/storage/app/public/epramaanprod2016.cer', // The path where the certificate has been stored
+            // 'D:\epramaan.crt', // The path where the certificate has been stored
+            [
+                'use' => 'sig', // Additional parameters
+            ]
+        );
+
+        $serializerManager = new JWSSerializerManager([
+            new SignatureCompactSerializer(),
+        ]);
+
+        $jws = $serializerManager->unserialize($decryptedtoken);
+        $isVerified = $jwsVerifier->verifyWithKey($jws, $key, 0);
+
+        $jwsLoader = new JWSLoader(
+            $serializerManager,
+            $jwsVerifier,
+            null
+        );
+
+        $jws = $jwsLoader->loadAndVerifyWithKey($decryptedtoken, $key, $signature);
+        $payload = $jws->getPayload();
+        $responseJson = $payload;
+        $jsonres = $payload;
+        // $payload = '{"sub":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","pwd_auth_status":"true","gender":"M","iss":"ePramaan","session_id":"b670d78a-1234-45b1-953d-87ea5d3459c9","sso_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","loginMode":"CITIZEN","aud":"100001033","unique_user_id":"767067e5-28b7-4a74-a23e-ad1a8aaa1dd5","dob":"26\/04\/1998","name":"Mrinal","exp":1701347884,"mobile_number":"8797770238","iat":1701261484,"jti":"b670d78a-1234-45b1-953d-87ea5d3459c9","username":"mrinal9911"}';
+        $payload = json_decode($payload);
+        $mEpramaanLogin = new EpramaanLogin();
+        $epReqs = [
+            "unique_user_id"    => $payload->sub,
+            "single_signon_id"  => $payload->sso_id,
+            "token_identifier"  => $payload->jti,
+            "token_issue_time"  => Carbon::createFromTimestamp($payload->iat),
+            "token_expiry_time" => Carbon::createFromTimestamp($payload->exp),
+            "service_id"        => $payload->aud,
+            "session_id"        => $payload->session_id,
+            "name"              => $payload->name ?? "",
+            "email"             => $payload->email ?? "",
+            "mobile"            => $payload->mobile_number ?? "",
+            "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
+            "gender"            => $payload->gender ?? "",
+            "house"             => $payload->house ?? "",
+            "locality"          => $payload->locality ?? "",
+            "pincode"           => $payload->pincode ?? "",
+            "district"          => $payload->district ?? "",
+            "state"             => $payload->state ?? "",
+            "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
+            "user_name"         => $payload->user_name ?? "",
+            "respose_json"      => $responseJson,
+        ];
+        $epramaanDtl = $mEpramaanLogin->store($epReqs);
+
+        if ($type = 'citizen') {
+            $mActiveCitizen = new ActiveCitizen();
+            $citizenInfo = $mActiveCitizen->getCitizenByUniqueId($payload->sub);
+
+            if (!$citizenInfo) {
+                #_save citizen data
+                $saveReqs = [
+                    "user_name"         => $payload->name ?? "",
+                    "mobile"            => $payload->mobile_number ?? "",
+                    "email"             => $payload->email ?? "",
+                    "gender"            => $payload->gender ?? "",
+                    "dob"               => Carbon::createFromFormat("d/m/Y", $payload->dob) ?? "",
+                    "unique_user_id"    => $payload->sub,
+                    "token_identifier"  => $payload->jti,
+                    "aadhar_ref_no"     => $payload->aadhar_ref_no ?? "",
+                    "user_type"         => "Citizen",
+                ];
+                $citizenInfo =  $mActiveCitizen->citizenRegistration($saveReqs);
+            }
+
+            #_update token
+            $token = $citizenInfo->createToken('my-app-token')->plainTextToken;
+            $citizenInfo->remember_token = $token;
+            $citizenInfo->save();
+
+            #_login details
+            $userDetails['id']        = $citizenInfo->id;
+            $userDetails['userName']  = $citizenInfo->user_name;
+            $userDetails['mobile']    = $citizenInfo->mobile;
+            $userDetails['userType']  = $citizenInfo->user_type;
+            $userDetails['user_type'] = $citizenInfo->user_type;
+            $userDetails['token']     = $token;
+            $userDetails['payload']     = $payload;
+            $userDetails['eparmanToken']     = $epReqs;
+            return responseMsgs(true, "Login Successfully", $userDetails, "", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
     }
+
+    // public function dashboardEpramaan(Request $req)
+    // {
+    //     $a             = getcwd() . '/epramaanprod2016.cer';
+    //     $type          = $req->type ?? 'citizen'; // default to citizen
+    //     $code          = $req->code;
+    //     $nonce         = $req->nonce;
+    //     $code_verifier = $req->codeVerifier;
+
+    //     $scope       = config('epramaan.scope');
+    //     $grant_type  = 'authorization_code';
+    //     $tokenUrl    = config('epramaan.token_url');
+    //     $services    = config('epramaan.services');
+
+    //     // validate service
+    //     if (!array_key_exists($type, $services)) {
+    //         return responseMsgs(false, "Invalid service type: $type", [], "", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     }
+
+    //     $serviceId    = $services[$type]['id'];
+    //     $redirect_uri = $services[$type]['redirect'];
+
+    //     // 🔹 Call ePramaan Token API
+    //     $curl = curl_init();
+    //     curl_setopt_array($curl, [
+    //         CURLOPT_URL            => $tokenUrl,
+    //         CURLOPT_RETURNTRANSFER => true,
+    //         CURLOPT_SSL_VERIFYHOST => 0,
+    //         CURLOPT_SSL_VERIFYPEER => 0,
+    //         CURLOPT_CUSTOMREQUEST  => 'POST',
+    //         CURLOPT_POSTFIELDS     => json_encode([
+    //             "code"          => [$code],
+    //             "grant_type"    => [$grant_type],
+    //             "scope"         => [$scope],
+    //             "redirect_uri"  => [$redirect_uri],
+    //             "request_uri"   => [$tokenUrl],
+    //             "code_verifier" => [$code_verifier],
+    //             "client_id"     => [$serviceId],
+    //         ]),
+    //         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+    //     ]);
+
+    //     $response = curl_exec($curl);
+    //     curl_close($curl);
+
+    //     // ---------- decrypting logic (same as your code) ----------
+    //     // (keep your existing JWE + JWS verification logic here, unchanged)
+    //     // ----------------------------------------------------------
+
+    //     // final step: return success/failure
+    // }
 
 
     /**
      * | Logout Epramaan
      */
-    // public function logoutEpramaan(Request $req)
-    // {
-    //     setcookie("verifier_c", "", time() - 3600, "/");
-    //     setcookie("nonce_c", "", time() - 3600, "/");
-    //     $type  = $req->type;
-
-    //     switch ($type) {
-
-    //         // case 'citizen':
-
-    //         //     // $serviceId    = '100001033';    #_staging
-    //         //     // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-
-    //         #change by prity pandey 
-    //         //     $serviceId    = '100001332';    #_production
-    //         //     $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
-    //         //     break;
-
-    //         case 'citizen-page':
-    //             $serviceId    = '100001634';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
-    //             break;
-    //         case 'citizen':
-    //             $serviceId    = '100001511';    #_production
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //             break;
-
-    //         #change by prity pandey 
-    //         case 'mobile':
-    //             $serviceId    = '100001513';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //             break;
-    //         // case 'mobile':
-    //         //     $serviceId    = '100001513';
-    //         //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-    //         // break;
-    //         case 'property':
-    //             $serviceId    = '100001034';
-    //             $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
-    //             break;
-
-    //         case 'water':
-    //             $serviceId    = '100001035';
-    //             $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
-    //             break;
-
-    //         case 'trade':
-    //             $serviceId    = '100001036';
-    //             $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
-    //             break;
-
-    //         case 'advertisement':
-    //             $serviceId    = '100001037';
-    //             $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
-    //             break;
-
-    //         case 'pet':
-    //             $serviceId    = '100001038';
-    //             $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
-    //             break;
-
-    //         case 'marriage':
-    //             $serviceId    = '100001039';
-    //             $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
-    //             break;
-
-    //         case 'agency':
-    //             $serviceId    = '100001041';
-    //             $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
-    //             break;
-
-    //         default:
-    //             // $serviceId    = '100001033';    #_staging
-    //             // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-
-    //             #serviceId change by prity pandey
-    //             //$serviceId    = '100001332';    #_production
-    //             $serviceId    = '100001511';
-    //             $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-    //             break;
-    //     }
-
-    //     $scope                 = 'openid';
-    //     $response_type         = 'code';
-    //     $code_challenge_method = 'S256';
-    //     // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
-    //     $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
-    //     $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-    //     $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-
-    //     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
-
-    //     //nonce
-    //     $nonce = bin2hex(random_bytes(16));
-
-    //     setcookie("nonce_c", "$nonce", time() + 3600, "/");
-
-    //     //verifier
-    //     $verifier_bytes = random_bytes(64);
-    //     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
-
-
-    //     setcookie("verifier_c", "$code_verifier", time() + 3600, "/");
-
-
-    //     //code challenge
-    //     $challenge_bytes = hash("sha256", $code_verifier, true);
-    //     $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
-
-    //     $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
-
-    //     //apiHmac
-    //     $apiHmac = hash_hmac('sha256', $input, $aeskey, true);
-    //     $apiHmac = base64_encode($apiHmac);
-    //     $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
-
-    //     $data['url']           = $finalUrl;
-    //     $data['nonce']         = $nonce;
-    //     $data['code_verifier'] = $code_verifier;
-    //     return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
-    // }
-
     public function logoutEpramaan(Request $req)
     {
         setcookie("verifier_c", "", time() - 3600, "/");
         setcookie("nonce_c", "", time() - 3600, "/");
+        $type  = $req->type;
 
-        $type = $req->type ?? 'citizen';
-        $services = config('epramaan.services');
-        $serviceId = $services[$type]['id'] ?? $services['citizen']['id'];
-        $redirect_uri = $services[$type]['redirect'] ?? $services['citizen']['redirect'];
+        switch ($type) {
 
-        $scope = config('epramaan.scope');
-        $response_type = config('epramaan.response_type');
-        $code_challenge_method = config('epramaan.code_method');
-        $aeskey = config('epramaan.aes_key');
-        $url = config('epramaan.url');
-        $request_uri = config('epramaan.request_uri');
+            // case 'citizen':
+
+            //     // $serviceId    = '100001033';    #_staging
+            //     // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
+
+            #change by prity pandey 
+            //     $serviceId    = '100001332';    #_production
+            //     $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
+            //     break;
+
+            case 'citizen-page':
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
+                break;
+            case 'citizen':
+                $serviceId    = '100001511';    #_production
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+
+            #change by prity pandey 
+            case 'mobile':
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                break;
+            // case 'mobile':
+            //     $serviceId    = '100001513';
+            //     $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+            // break;
+            case 'property':
+                $serviceId    = '100001034';
+                $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
+                break;
+
+            case 'water':
+                $serviceId    = '100001035';
+                $redirect_uri = 'https://egov.rsccl.in/water/login/e-pramaan';
+                break;
+
+            case 'trade':
+                $serviceId    = '100001036';
+                $redirect_uri = 'https://egov.rsccl.in/trade/login/e-pramaan';
+                break;
+
+            case 'advertisement':
+                $serviceId    = '100001037';
+                $redirect_uri = 'https://egov.rsccl.in/advertisement/login/e-pramaan';
+                break;
+
+            case 'pet':
+                $serviceId    = '100001038';
+                $redirect_uri = 'https://egov.rsccl.in/pet/login/e-pramaan';
+                break;
+
+            case 'marriage':
+                $serviceId    = '100001039';
+                $redirect_uri = 'https://egov.rsccl.in/marriage/login/e-pramaan';
+                break;
+
+            case 'agency':
+                $serviceId    = '100001041';
+                $redirect_uri = 'https://egov.rsccl.in/agency/login/e-pramaan';
+                break;
+
+            default:
+                // $serviceId    = '100001033';    #_staging
+                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
+
+                #serviceId change by prity pandey
+                //$serviceId    = '100001332';    #_production
+                $serviceId    = '100001511';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
+                break;
+        }
+
+        $scope                 = 'openid';
+        $response_type         = 'code';
+        $code_challenge_method = 'S256';
+        // $aeskey                = 'fddbb838-b6b1-44c4-93b3-dc9ee91f174a';    #_staging
+        $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';    #_production
+        $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
+        $request_uri           = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
         $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
-        $nonce = bin2hex(random_bytes(16));
-        setcookie("nonce_c", $nonce, time() + 3600, "/");
 
+        //nonce
+        $nonce = bin2hex(random_bytes(16));
+
+        setcookie("nonce_c", "$nonce", time() + 3600, "/");
+
+        //verifier
         $verifier_bytes = random_bytes(64);
         $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
-        setcookie("verifier_c", $code_verifier, time() + 3600, "/");
 
+
+        setcookie("verifier_c", "$code_verifier", time() + 3600, "/");
+
+
+        //code challenge
         $challenge_bytes = hash("sha256", $code_verifier, true);
         $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
 
         $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
-        $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
 
-        $finalUrl = $url
-            . "?&scope={$scope}"
-            . "&response_type={$response_type}"
-            . "&redirect_uri={$redirect_uri}"
-            . "&state={$state}"
-            . "&code_challenge_method={$code_challenge_method}"
-            . "&nonce={$nonce}"
-            . "&client_id={$serviceId}"
-            . "&code_challenge={$code_challenge}"
-            . "&request_uri={$request_uri}"
-            . "&apiHmac={$apiHmac}";
+        //apiHmac
+        $apiHmac = hash_hmac('sha256', $input, $aeskey, true);
+        $apiHmac = base64_encode($apiHmac);
+        $finalUrl = $url . "?&scope=" . $scope . "&response_type=" . $response_type . "&redirect_uri=" . $redirect_uri . "&state=" . $state . "&code_challenge_method=" . $code_challenge_method . "&nonce=" . $nonce . "&client_id=" . $serviceId . "&code_challenge=" . $code_challenge . "&request_uri=" . $request_uri . "&apiHmac=" . $apiHmac;
 
-        return responseMsgs(true, "Success", [
-            'url' => $finalUrl,
-            'nonce' => $nonce,
-            'code_verifier' => $code_verifier
-        ], "", "01", responseTime(), "POST", "");
+        $data['url']           = $finalUrl;
+        $data['nonce']         = $nonce;
+        $data['code_verifier'] = $code_verifier;
+        return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
     }
+
+    // public function logoutEpramaan(Request $req)
+    // {
+    //     setcookie("verifier_c", "", time() - 3600, "/");
+    //     setcookie("nonce_c", "", time() - 3600, "/");
+
+    //     $type = $req->type ?? 'citizen';
+    //     $services = config('epramaan.services');
+    //     $serviceId = $services[$type]['id'] ?? $services['citizen']['id'];
+    //     $redirect_uri = $services[$type]['redirect'] ?? $services['citizen']['redirect'];
+
+    //     $scope = config('epramaan.scope');
+    //     $response_type = config('epramaan.response_type');
+    //     $code_challenge_method = config('epramaan.code_method');
+    //     $aeskey = config('epramaan.aes_key');
+    //     $url = config('epramaan.url');
+    //     $request_uri = config('epramaan.request_uri');
+
+    //     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
+    //     $nonce = bin2hex(random_bytes(16));
+    //     setcookie("nonce_c", $nonce, time() + 3600, "/");
+
+    //     $verifier_bytes = random_bytes(64);
+    //     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
+    //     setcookie("verifier_c", $code_verifier, time() + 3600, "/");
+
+    //     $challenge_bytes = hash("sha256", $code_verifier, true);
+    //     $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
+
+    //     $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
+    //     $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
+
+    //     $finalUrl = $url
+    //         . "?&scope={$scope}"
+    //         . "&response_type={$response_type}"
+    //         . "&redirect_uri={$redirect_uri}"
+    //         . "&state={$state}"
+    //         . "&code_challenge_method={$code_challenge_method}"
+    //         . "&nonce={$nonce}"
+    //         . "&client_id={$serviceId}"
+    //         . "&code_challenge={$code_challenge}"
+    //         . "&request_uri={$request_uri}"
+    //         . "&apiHmac={$apiHmac}";
+
+    //     return responseMsgs(true, "Success", [
+    //         'url' => $finalUrl,
+    //         'nonce' => $nonce,
+    //         'code_verifier' => $code_verifier
+    //     ], "", "01", responseTime(), "POST", "");
+    // }
 
 
     // chages by imran alma
