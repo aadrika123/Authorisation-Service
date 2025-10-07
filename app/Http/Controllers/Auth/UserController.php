@@ -86,7 +86,7 @@ class UserController extends Controller
             }
 
             // Hit the rate limiter
-            RateLimiter::hit($rateKey, 120); // expires in 120 seconds
+            RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
 
             $secretKey = Config::get('constants.SECRETKEY');
             $email = $req->email;
