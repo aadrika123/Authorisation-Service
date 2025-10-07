@@ -78,7 +78,7 @@ class UserController extends Controller
             return validationError($validated);
 
         try {
-            // ✅ Rate Limiting: Allow 5 attempts per 60 seconds per IP
+            // ✅ Rate Limiting: Allow 5 attempts per 120 seconds per IP
             $rateKey = Str::lower('login|' . $req->ip());
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
@@ -86,7 +86,7 @@ class UserController extends Controller
             }
 
             // Hit the rate limiter
-            RateLimiter::hit($rateKey, 60); // expires in 60 seconds
+            RateLimiter::hit($rateKey, 120); // expires in 120 seconds
 
             $secretKey = Config::get('constants.SECRETKEY');
             $email = $req->email;
@@ -262,7 +262,7 @@ class UserController extends Controller
     {
 
         foreach ($menuRoleDetails as $role) {
-            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer"])) {
+            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer", "BUS CONDUCTOR"])) {
 
                 return true;
             }
