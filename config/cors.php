@@ -19,7 +19,9 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['*'],
+
+     'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://www.jharkhandegovernance.com')),
 
     'allowed_origins_patterns' => [],
 
