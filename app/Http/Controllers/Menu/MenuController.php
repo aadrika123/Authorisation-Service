@@ -29,7 +29,8 @@ class MenuController extends Controller
                 'menuName'      => 'required',
                 'moduleId'      => 'required',
                 'route'         => 'nullable',
-                'workflowId'    => 'nullable'
+                'workflowId'    => 'nullable',
+                'isSidebar'     => 'nullable',
             ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->store($request);
@@ -52,6 +53,7 @@ class MenuController extends Controller
                 'route'        => 'nullable',
                 'delete'       => 'nullable|boolean',
                 'workflowId'   => 'nullable|int',
+                'isSidebar'    => 'nullable',
             ]);
             $mMenuMaster = new MenuMaster();
             $mMenuMaster->edit($request);
@@ -352,6 +354,7 @@ class MenuController extends Controller
             $return['icon']     = $docUrl . '/' . $value['icon'];
             $return['name']     = $value['menu_string'];
             $return['order']    = $value['serial'];
+            $return['is_sidebar']    = $value['is_sidebar'];
             $return['children'] = array();
             return ($return);
         });

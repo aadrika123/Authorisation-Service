@@ -25,6 +25,7 @@ class MenuMaster extends Model
             'wf_workflows.alt_name as workflow_name',
             'module_masters.module_name',
             'module_masters.id as module_id',
+            'menu_masters.is_sidebar'
         )
             ->leftjoin('wf_workflows', 'wf_workflows.id', 'menu_masters.workflow_id')
             ->leftjoin('module_masters', 'module_masters.id', 'menu_masters.module_id')
@@ -68,7 +69,8 @@ class MenuMaster extends Model
     {
         $a = MenuMaster::select(
             'menu_masters.id',
-            'menu_masters.parent_id'
+            'menu_masters.parent_id',
+            'menu_masters.is_sidebar'
         )
             ->join('menu_rolemaps', 'menu_rolemaps.menu_id', '=', 'menu_masters.id')
             ->where('menu_masters.is_deleted', false)
@@ -94,6 +96,7 @@ class MenuMaster extends Model
         $newMenues->icon          = $request->icon;
         $newMenues->module_id     = $request->moduleId;
         $newMenues->workflow_id   = $request->workflowId;
+        $newMenues->is_sidebar    = $request->is_sidebar ?? false;
         $newMenues->save();
     }
 
@@ -115,6 +118,7 @@ class MenuMaster extends Model
                     'is_deleted'    => $request->delete         ?? $refValues->is_deleted,
                     'module_id'     => $request->moduleId       ?? $refValues->module_id,
                     'workflow_id'   => $request->workflowId     ?? $refValues->workflow_id,
+                    'is_sidebar'   => $request->isSidebar       ?? $refValues->is_sidebar,
                 ]
             );
     }
