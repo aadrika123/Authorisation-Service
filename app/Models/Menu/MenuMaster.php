@@ -96,7 +96,7 @@ class MenuMaster extends Model
         $newMenues->icon          = $request->icon;
         $newMenues->module_id     = $request->moduleId;
         $newMenues->workflow_id   = $request->workflowId;
-        $newMenues->is_sidebar    = $request->is_sidebar ?? false;
+        $newMenues->is_sidebar    = $request->isSidebar ?? false;
         $newMenues->save();
     }
 
