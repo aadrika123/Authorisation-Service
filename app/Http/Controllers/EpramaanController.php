@@ -59,6 +59,7 @@ class EpramaanController extends Controller
         switch ($type) {
             case 'citizen-page':
                 $serviceId    = '100001634';
+                //
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
                 break;
             case 'citizen':
