@@ -158,7 +158,18 @@ class UserController extends Controller
                 $data['userDetails']['role'] = $role;
                 $data['userDetails']['roleId'] = $roleId;
 
-                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId);
+                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId)
+                    ->cookie(
+                        'auth_token',                // cookie name
+                        $token,                      // cookie value
+                        120,                         // expiration in minutes
+                        '/',                          // path
+                        '.jharkhandegovernance.com', // domain
+                        true,                        // secure (HTTPS only)
+                        true,                        // HttpOnly
+                        false,                       // raw
+                        'Strict'                     // SameSite
+                    );
             }
 
             throw new Exception("Invalid Credentials");
@@ -262,7 +273,7 @@ class UserController extends Controller
     {
 
         foreach ($menuRoleDetails as $role) {
-            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer", "BUS CONDUCTOR","Municipal Rental Tc"])) {
+            if (in_array($role->roles, ['TAX COLLECTOR', 'ULB TAX COLLECTOR', 'TAX DAROGA', 'DRIVER', 'SEPTIC TANKER DRIVER', 'ENFORCEMENT OFFICER', "CONDUCTOR", "PARKING INCHARGE", "LAMS FieldOfficer", "BUS CONDUCTOR", "Municipal Rental Tc"])) {
 
                 return true;
             }
