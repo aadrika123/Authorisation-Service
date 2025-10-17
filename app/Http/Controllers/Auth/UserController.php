@@ -98,7 +98,7 @@ class UserController extends Controller
 
             $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
             if ($decrypted === false) {
-                throw new Exception("Password decryption failed or tampered data");
+                throw new Exception("Invalid Credentials");
             }
             $password = $decrypted;
 
