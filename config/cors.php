@@ -18,8 +18,8 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
-    'supports_credentials' => true,
-    'allowed_origins' => ['https://www.jharkhandegovernance.com'],
+    // 'supports_credentials' => true,
+    // 'allowed_origins' => ['https://www.jharkhandegovernance.com'],
 
     // 'allowed_origins' => ['*'],
 
