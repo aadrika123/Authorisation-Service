@@ -81,6 +81,7 @@ Route::controller(UserController::class)->group(function () {
 
     Route::post('user-managment/v1/get-user-roles-dtls', 'getUserRoleId');            #_role details  by user Id
     Route::post('user-managment/v1/encrypted', 'encrypted');            #_role details  by user Id
+    Route::post('login-Captcha', 'getCaptcha');            #_role details  by user Id
 
 
 
