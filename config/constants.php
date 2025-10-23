@@ -59,7 +59,8 @@ return [
     'MODULES_WITH_CAPTCHA' => [
         25, // LEGAL
         21, // LAMS
-        14 // Fines
+        14, // Fines
+        15  // RIG
 
         // Add more module IDs here
     ],

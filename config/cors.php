@@ -19,14 +19,14 @@ return [
 
     'allowed_methods' => ['*'],
     // 'supports_credentials' => true,
-    // 'allowed_origins' => ['https://www.jharkhandegovernance.com'],
+    'allowed_origins' => ['https://www.jharkhandegovernance.com'],
     // 'allowed_origins' => [
     //     'https://www.jharkhandegovernance.com',
     //     'https://www.aadrikainfomedia.com',
     //     'https://www.egov.rsccl.in'
     // ],
 
-    'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['*'],
 
     // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://aadrikainfomedia.com')),
 
