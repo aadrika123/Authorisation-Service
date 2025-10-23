@@ -58,6 +58,7 @@ return [
     // Optional: List of modules that require captcha
     'MODULES_WITH_CAPTCHA' => [
         25, // LEGAL
+        21, // LAMS
         // Add more module IDs here
     ],
 ];
