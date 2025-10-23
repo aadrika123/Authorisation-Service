@@ -79,14 +79,14 @@ class UserController extends Controller
 
     //     try {
     //         // ✅ Rate Limiting: Allow 5 attempts per 120 seconds per IP
-    //         $rateKey = Str::lower('login|' . $req->ip());
-    //         if (RateLimiter::tooManyAttempts($rateKey, 5)) {
-    //             $seconds = RateLimiter::availableIn($rateKey);
-    //             return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
-    //         }
+    //         // $rateKey = Str::lower('login|' . $req->ip());
+    //         // if (RateLimiter::tooManyAttempts($rateKey, 5)) {
+    //         //     $seconds = RateLimiter::availableIn($rateKey);
+    //         //     return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
+    //         // }
 
-    //         // Hit the rate limiter
-    //         RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
+    //         // // Hit the rate limiter
+    //         // RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
 
     //         $secretKey = Config::get('constants.SECRETKEY');
     //         $email = $req->email;
@@ -96,7 +96,7 @@ class UserController extends Controller
     //         $key = hash('sha256', $secretKey, true);
     //         $iv = substr(hash('sha256', $secretKey), 0, 16);
 
-    //         $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
+    //      return    $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
     //         if ($decrypted === false) {
     //             throw new Exception("Invalid Credentials");
     //         }
@@ -185,23 +185,24 @@ class UserController extends Controller
             [
                 'email' => 'required|email',
                 'password' => 'required',
-                'type' => "nullable|in:mobile",
-                'moduleId' => "nullable|int",
+                'type' => 'nullable|in:mobile',
+                'moduleId' => 'nullable|int',
                 'captcha_code' => 'nullable|string',
                 'captcha_id' => 'nullable|string',
             ]
         );
+
         if ($validated->fails())
             return validationError($validated);
 
         try {
-            // ✅ Verify captcha from Redis (AES-256-CBC decryption)
+            // ✅ Common encryption setup
             $secretKey = Config::get('constants.SECRETKEY');
             $method = 'AES-256-CBC';
             $key = hash('sha256', $secretKey, true);
             $iv = substr(hash('sha256', $secretKey), 0, 16);
-            // ✅ Verify captcha from Redis
 
+            // ✅ Captcha verification (only for modules requiring captcha)
             $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
             if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
 
@@ -209,16 +210,17 @@ class UserController extends Controller
                 if (!$storedCode) {
                     throw new Exception("Captcha expired or not found");
                 }
-                // Decrypt stored captcha using same key/iv
+
+                // Decrypt the frontend-provided captcha
                 $decryptedCaptcha = openssl_decrypt(
-                    base64_decode(base64_encode(openssl_encrypt($storedCode, $method, $key, OPENSSL_RAW_DATA, $iv))), // redundant encoding guard
+                    base64_decode($req->captcha_code),
                     $method,
                     $key,
                     OPENSSL_RAW_DATA,
                     $iv
                 );
 
-                // Compare user-entered code
+                // Compare the decrypted frontend captcha with stored Redis captcha
                 if (strtoupper(trim($storedCode)) !== strtoupper(trim($decryptedCaptcha))) {
                     throw new Exception("Incorrect captcha code");
                 }
@@ -226,27 +228,27 @@ class UserController extends Controller
                 // Delete used captcha
                 Redis::del("CAPTCHA:{$req->captcha_id}");
             }
+
+            // ✅ Rate Limiting: max 5 attempts per 120 seconds per IP
             $rateKey = Str::lower('login|' . $req->ip());
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
                 return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
             }
 
-            // Hit the rate limiter
-            RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
-            $email = $req->email;
-            $encrypted = $req->password;
-            $encryptedData = base64_decode($encrypted);
+            RateLimiter::hit($rateKey, 120); // 2 minutes limit window
 
-            $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
-            if ($decrypted === false) {
+            // ✅ Decrypt user password
+            $encryptedData = base64_decode($req->password);
+            $password = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            if ($password === false) {
                 throw new Exception("Invalid Credentials");
             }
-            $password = $decrypted;
 
+            // ✅ User lookup and checks
             $mWfRoleusermap = new WfRoleusermap();
             $mUlbMaster = new UlbMaster();
-            $user = $this->_mUser->getUserByEmail($email);
+            $user = $this->_mUser->getUserByEmail($req->email);
 
             if (!$user)
                 throw new Exception("Invalid Credentials");
@@ -256,18 +258,20 @@ class UserController extends Controller
 
             $checkUlbStatus = $mUlbMaster->checkUlb($user);
             if (!$checkUlbStatus) {
-                throw new Exception('This Ulb is Restricted SuperAdmin!');
+                throw new Exception('This ULB is restricted for SuperAdmin!');
             }
 
             if ($req->moduleId) {
                 $checkModule = $this->_UlbModulePermission->check($user, $req);
                 if (!$checkModule) {
-                    throw new Exception('Module is Restricted For This ulb!');
+                    throw new Exception('Module is restricted for this ULB!');
                 }
             }
 
+            // ✅ Password validation
             if (Hash::check($password, $user->password)) {
-                // ✅ Clear rate limit on success
+
+                // ✅ Clear rate limiter after successful login
                 RateLimiter::clear($rateKey);
 
                 $token = $user->createToken('my-app-token')->plainTextToken;
@@ -275,23 +279,23 @@ class UserController extends Controller
                 $role = collect($menuRoleDetails)->pluck('roles');
                 $roleId = collect($menuRoleDetails)->pluck('roleId');
 
-
                 if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Mobile user not login as web user");
+                    throw new Exception("Mobile user cannot login as web user");
                 }
 
                 $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
                 if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Web user not login as mobile user");
+                    throw new Exception("Web user cannot login as mobile user");
                 }
 
+                // ✅ Log login for TC/TL users
                 if (in_array($user->user_type, ['TC', 'TL'])) {
-                    $userlog = new UserLoginDetail();
-                    $userlog->user_id = $user->id;
-                    $userlog->login_date = now()->format("Y-m-d");
-                    $userlog->login_time = now()->format("h:i:s a");
-                    $userlog->ip_address = $req->ip();
-                    $userlog->save();
+                    UserLoginDetail::create([
+                        'user_id' => $user->id,
+                        'login_date' => now()->format('Y-m-d'),
+                        'login_time' => now()->format('h:i:s a'),
+                        'ip_address' => $req->ip(),
+                    ]);
                 }
 
                 $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
@@ -300,17 +304,17 @@ class UserController extends Controller
                 $data['userDetails']['role'] = $role;
                 $data['userDetails']['roleId'] = $roleId;
 
-                return responseMsgs(true, "You have Logged In Successfully", $data, 010101, "1.0", responseTime(), "POST", $req->deviceId)
+                return responseMsgs(true, "You have logged in successfully", $data, 10101, "1.0", responseTime(), "POST", $req->deviceId)
                     ->cookie(
-                        'auth_token',                // cookie name
-                        $token,                      // cookie value
-                        120,                         // expiration in minutes
-                        '/',                          // path
-                        '.jharkhandegovernance.com', // domain
-                        true,                        // secure (HTTPS only)
-                        true,                        // HttpOnly
-                        false,                       // raw
-                        'Strict'                     // SameSite
+                        'auth_token',
+                        $token,
+                        120,
+                        '/',
+                        '.jharkhandegovernance.com',
+                        true,
+                        true,
+                        false,
+                        'Strict'
                     );
             }
 
@@ -319,6 +323,7 @@ class UserController extends Controller
             return responseMsg(false, $e->getMessage(), '');
         }
     }
+
 
 
     public function changePass(ChangePassRequest $request)
