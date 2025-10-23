@@ -50,5 +50,14 @@ return [
     ],
 
     "ADMIN_ROLE" => 1,
+    "MODULE" =>
+    [
+        "LEGAL"      => "1",
+    ],
 
+    // Optional: List of modules that require captcha
+    'MODULES_WITH_CAPTCHA' => [
+        25, // LEGAL
+        // Add more module IDs here
+    ],
 ];
