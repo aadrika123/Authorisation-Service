@@ -195,36 +195,48 @@ class UserController extends Controller
             return validationError($validated);
 
         try {
-
-            // ✅ Verify captcha from Redis
-            $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
-            if (in_array($req->moduleId, $captchaModules)) {
-                $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
-                if (!$storedCode || $storedCode != $req->captcha_code) {
-                    throw new Exception("Invalid or expired captcha code");
-                }
-
-                // Remove used captcha
-                Redis::del("CAPTCHA:{$req->captcha_id}");
-            }
-                // ✅ Rate Limiting: Allow 5 attempts per 120 seconds per IP
-                $rateKey = Str::lower('login|' . $req->ip());
-                if (RateLimiter::tooManyAttempts($rateKey, 5)) {
-                    $seconds = RateLimiter::availableIn($rateKey);
-                    return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
-                }
-
-                // Hit the rate limiter
-                RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
-            
-
+            // ✅ Verify captcha from Redis (AES-256-CBC decryption)
             $secretKey = Config::get('constants.SECRETKEY');
-            $email = $req->email;
-            $encrypted = $req->password;
-            $encryptedData = base64_decode($encrypted);
             $method = 'AES-256-CBC';
             $key = hash('sha256', $secretKey, true);
             $iv = substr(hash('sha256', $secretKey), 0, 16);
+            // ✅ Verify captcha from Redis
+
+            $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
+            if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
+
+                $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
+                if (!$storedCode) {
+                    throw new Exception("Captcha expired or not found");
+                }
+                // Decrypt stored captcha using same key/iv
+                $decryptedCaptcha = openssl_decrypt(
+                    base64_decode(base64_encode(openssl_encrypt($storedCode, $method, $key, OPENSSL_RAW_DATA, $iv))), // redundant encoding guard
+                    $method,
+                    $key,
+                    OPENSSL_RAW_DATA,
+                    $iv
+                );
+
+                // Compare user-entered code
+                if (strtoupper(trim($storedCode)) !== strtoupper(trim($decryptedCaptcha))) {
+                    throw new Exception("Incorrect captcha code");
+                }
+
+                // Delete used captcha
+                Redis::del("CAPTCHA:{$req->captcha_id}");
+            }
+            $rateKey = Str::lower('login|' . $req->ip());
+            if (RateLimiter::tooManyAttempts($rateKey, 5)) {
+                $seconds = RateLimiter::availableIn($rateKey);
+                return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
+            }
+
+            // Hit the rate limiter
+            RateLimiter::hit($rateKey, 120); // expires IN 2 MIN
+            $email = $req->email;
+            $encrypted = $req->password;
+            $encryptedData = base64_decode($encrypted);
 
             $decrypted = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
             if ($decrypted === false) {
@@ -1668,19 +1680,58 @@ class UserController extends Controller
     /***
      * |captcha generation
      */
+    // public function getCaptcha()
+    // {
+    //     $secretKey = "c2ec6f788fb85720bf48c8cc7c2db572596c585a15df18583e1234f147b1c2897aad12e7bebbc4c03c765d0e878427ba6370439d38f39340d7e";
+    //     // Generate 6-character alphanumeric code
+    //     $captchaCode = strtoupper(Str::random(6)); // e.g., "A1B2C3"
+
+    //     $captchaId = Str::uuid()->toString();
+
+    //     // Store in Redis for 5 minutes (300 seconds)
+    //     Redis::setex("CAPTCHA:$captchaId", 300, $captchaCode);
+
+    //     return response()->json([
+    //         'captcha_id' => $captchaId,
+    //         'captcha_code' => $captchaCode, // For testing; in production display in UI
+    //     ]);
+    // }
+
     public function getCaptcha()
     {
+        $secretKey = Config::get('constants.SECRETKEY');
+
         // Generate 6-character alphanumeric code
-        $captchaCode = strtoupper(Str::random(6)); // e.g., "A1B2C3"
+        $captchaCode = strtoupper(Str::random(6)); // Example: "A1B2C3"
 
         $captchaId = Str::uuid()->toString();
 
-        // Store in Redis for 5 minutes (300 seconds)
+        // Store plain captcha in Redis for 5 minutes
         Redis::setex("CAPTCHA:$captchaId", 300, $captchaCode);
 
-        return response()->json([
+        // Encrypt captcha before sending to frontend
+        $method = 'AES-256-CBC';
+        $key = hash('sha256', $secretKey, true);
+        $iv = substr(hash('sha256', $secretKey), 0, 16);
+
+        $encryptedCaptcha = base64_encode(openssl_encrypt($captchaCode, $method, $key, OPENSSL_RAW_DATA, $iv));
+        $data = [
             'captcha_id' => $captchaId,
-            'captcha_code' => $captchaCode, // For testing; in production display in UI
-        ]);
+            'captcha_code' => $encryptedCaptcha, // ✅ send encrypted version
+        ];
+        return responseMsgs(true, "CAPTCHA", $data, 010101, "1.0", responseTime(), "POST", "");
     }
+
+    //
+    // $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
+    // if (in_array($req->moduleId, $captchaModules)) {
+    //     $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
+    //     if (!$storedCode || $storedCode != $req->captcha_code) {
+    //         throw new Exception("Invalid or expired captcha code");
+    //     }
+
+    //     // Remove used captcha
+    //     Redis::del("CAPTCHA:{$req->captcha_id}");
+    // }
+    // ✅ Rate Limiting: Allow 5 attempts per 120 seconds per IP
 }
