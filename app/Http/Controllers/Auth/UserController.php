@@ -1675,8 +1675,8 @@ class UserController extends Controller
 
         $captchaId = Str::uuid()->toString();
 
-        // Store in Redis for 2 minutes (120 seconds)
-        Redis::setex("CAPTCHA:$captchaId", 120, $captchaCode);
+        // Store in Redis for 5 minutes (300 seconds)
+        Redis::setex("CAPTCHA:$captchaId", 300, $captchaCode);
 
         return response()->json([
             'captcha_id' => $captchaId,
