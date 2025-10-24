@@ -64,7 +64,8 @@ return [
         11, // WATER TANKER
         18, // PTMS
         20, //FINANCE COMMISSION
-        30   //HRMS
+        30,   //HRMS,
+        16
         // Add more module IDs here
     ],
 ];
