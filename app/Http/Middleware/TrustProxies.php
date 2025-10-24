@@ -12,9 +12,9 @@ class TrustProxies extends Middleware
      *
      * @var array<int, string>|string|null
      */
-    // protected $proxies;
+    protected $proxies;
     // FOR ACCOUNT LOCK OUT SYSTEM BY IP ADDRESS
-     protected $proxies = '*'; // ✅ Trust all proxies (Nginx, Cloudflare, etc.)
+    //  protected $proxies = '*'; // ✅ Trust all proxies (Nginx, Cloudflare, etc.)
 
     /**
      * The headers that should be used to detect proxies.

@@ -228,9 +228,13 @@ class UserController extends Controller
                 // Delete used captcha
                 Redis::del("CAPTCHA:{$req->captcha_id}");
             }
+            $user = $this->_mUser->getUserByEmail($req->email);
 
+            if (!$user)
+                return responseMsgs(true, "Invalid Credentials", "", 10101, "1.0", responseTime(), "POST", $req->deviceId);
             // ✅ Rate Limiting: max 5 attempts per 120 seconds per IP
-            $rateKey = Str::lower('login|' . $req->ip());
+            // $rateKey = Str::lower('login|' . $user->ip());
+            $rateKey = 'login:' . $user->id;
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
                 return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
@@ -248,10 +252,6 @@ class UserController extends Controller
             // ✅ User lookup and checks
             $mWfRoleusermap = new WfRoleusermap();
             $mUlbMaster = new UlbMaster();
-            $user = $this->_mUser->getUserByEmail($req->email);
-
-            if (!$user)
-                throw new Exception("Invalid Credentials");
 
             if ($user->suspended == true)
                 throw new Exception("You are not authorized to log in!");
