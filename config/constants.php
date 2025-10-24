@@ -60,7 +60,8 @@ return [
         25, // LEGAL
         21, // LAMS
         14, // Fines
-        15  // RIG
+        15,  // RIG,
+        11 // WATER TANKER
 
         // Add more module IDs here
     ],
