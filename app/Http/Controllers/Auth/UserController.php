@@ -189,6 +189,7 @@ class UserController extends Controller
                 'moduleId' => 'nullable|int',
                 'captcha_code' => 'nullable|string',
                 'captcha_id' => 'nullable|string',
+                'systemUniqueId' => 'nullable|string',
             ]
         );
 
@@ -233,8 +234,8 @@ class UserController extends Controller
             // ✅ Rate Limiting: max 5 attempts per 120 seconds per IP
             // $rateKey = Str::lower('login|' . $user->ip());
             // $rateKey = 'login:' . $user->id;
-            $clientIp = $req->ip();
-            $rateKey = 'login:' . $clientIp;
+            $clientUniqueId = $req->systemUniqueId;
+            $rateKey = 'login:' . $clientUniqueId;
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
                 return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
