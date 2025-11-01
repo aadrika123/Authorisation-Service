@@ -66,7 +66,8 @@ return [
         20, //FINANCE COMMISSION
         30,   //HRMS,
         16,
-        19  // Parking
+        19,// Parking
+        17  // procurement
         // Add more module IDs here
     ],
 ];
