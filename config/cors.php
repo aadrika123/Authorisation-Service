@@ -17,7 +17,7 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    // 'allowed_methods' => ['*'],
     // 'supports_credentials' => true,
     // 'allowed_origins' => ['https://jharkhandegovernance.com'],
     // 'allowed_origins' => [
@@ -26,7 +26,7 @@ return [
     //     'https://www.egov.rsccl.in'
     // ],
 
-    'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['*'],
 
     // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://aadrikainfomedia.com')),
 
