@@ -1103,6 +1103,73 @@ class UserController extends Controller
     }
 
     /**
+     * | Search Users with filters
+     */
+    public function searchUsersDetails(Request $request)
+    {
+        try {
+            $request->validate([
+                'filterBy' => 'nullable|string',
+                'parameter' => 'nullable|string',
+                'perPage' => 'nullable|integer',
+            ]);
+
+            $perPage = $request->perPage ?? 10;
+            $filterBy = $request->filterBy;
+            $parameter = $request->parameter;
+
+            $ulbId = authUser()->ulb_id;
+            $mUser = new User();
+
+            $query = $mUser->getUserRoleDtls1($ulbId);
+
+            if ($filterBy && $parameter) {
+                switch ($filterBy) {
+                    case "email":
+                        $query->where('users.email', 'like', '%' . $parameter . '%');
+                        break;
+                    case "role":
+                        $query->where('wf_roles.id', $parameter);
+                        break;
+                    case "module":
+                        $query->where('ulb_module_permissions.module_id', $parameter);
+                        break;
+                }
+            }
+            $data = $query->orderbyDesc('users.id')->paginate($perPage);
+
+            if ($data->isEmpty()) throw new Exception('No User Found');
+
+            $list = ["current_page" => $data->currentPage(), "last_page" => $data->lastPage(), "data" => $data->items(), "total" => $data->total(),];
+            
+            return responseMsgs(true, "User Details", $list, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+
+    /**
+     * | Get Roles List
+     */
+    public function getRolesList()
+    {
+        try {
+            $data = DB::table('wf_roles')
+                ->select('id', 'role_name')
+                ->where('is_suspended', false)
+                ->orderBy('role_name')
+                ->get();
+
+            if ($data->isEmpty())
+                throw new Exception('No Roles Found');
+
+            return responseMsgs(true, "Roles List", $data, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
+
+    /**
      * |Employee Lis
      */
     public function employeeList()

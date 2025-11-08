@@ -80,4 +80,29 @@ class User extends Authenticatable
             ->where('suspended', false)
             ->where('wf_roleusermaps.is_suspended', false);
     }
+
+    public function getUserRoleDtls1($ulbId)
+    {
+        return  User::select(
+            'users.id',
+                'users.user_name',
+                'users.email',
+                'users.mobile',
+                'users.user_type',
+                'users.address',
+                'wf_role_id',
+                'role_name',
+                'module_masters.module_name',
+                'ulb_module_permissions.id as permission_id'
+            
+            )
+            ->leftjoin('wf_roleusermaps', 'wf_roleusermaps.user_id', 'users.id')
+            ->leftjoin('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
+            ->leftjoin('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
+            ->leftJoin('ulb_module_permissions', 'ulb_module_permissions.ulb_id', '=', 'users.ulb_id')
+            ->leftJoin('module_masters', 'module_masters.id', '=', 'ulb_module_permissions.module_id')
+            ->where('suspended', false)
+            ->where('users.ulb_id', $ulbId);
+            // ->where('wf_roleusermaps.is_suspended', false);
+    }
 }
