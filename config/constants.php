@@ -67,7 +67,8 @@ return [
         30,   //HRMS,
         16,
         19,// Parking
-        17  // procurement
+        17,  // procurement
+        2   // water
         // Add more module IDs here
     ],
 ];

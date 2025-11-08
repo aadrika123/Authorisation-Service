@@ -82,6 +82,8 @@ Route::controller(UserController::class)->group(function () {
     Route::post('user-managment/v1/get-user-roles-dtls', 'getUserRoleId');            #_role details  by user Id
     Route::post('user-managment/v1/encrypted', 'encrypted');            #_role details  by user Id
     Route::post('login-Captcha', 'getCaptcha');            #_role details  by user Id
+               
+               
 
 
 
@@ -536,6 +538,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/get-user-dtls-v2', 'getUserv2');
 
         Route::post('user-managment/v1/update-client-by-user-id', 'updateClintIdByUser');            #_role details  by user Id
+
+        // alok
+        Route::post('search-users-details', 'searchUsersDetails');
+        Route::post('get-roles-list', 'getRolesList');
     });
 
     // Citizen Register
