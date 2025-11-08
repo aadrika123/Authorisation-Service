@@ -69,7 +69,7 @@ return [
         19,  // Parking
         17,  // procurement
         2,   // water
-        5    // advertisement
+        5    // market advertisement
         // Add more module IDs here
     ],
 ];
