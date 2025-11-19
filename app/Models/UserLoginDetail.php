@@ -11,4 +11,11 @@ class UserLoginDetail extends Model
 
     public $timestamps = false;
     protected $table = 'tbl_user_login_details';
+
+    protected $fillable = [
+        'user_id',
+        'login_date',
+        'login_time',
+        'ip_address',
+    ];
 }
