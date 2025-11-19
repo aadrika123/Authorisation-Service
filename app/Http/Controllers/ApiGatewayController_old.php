@@ -63,7 +63,8 @@ class ApiGatewayController extends Controller
             $response = Http::withHeaders(
                 [
                     "Authorization" => "Bearer $bearerToken",
-                    'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",
+                    // 'API-KEY' => collect($req->headers)->toArray()['api-key'] ?? "",
+                    'API-KEY' => env('INTERNAL_MICROSERVICE_KEY'),
                 ]
             );
             $fileName = [];
