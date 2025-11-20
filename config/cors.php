@@ -19,7 +19,7 @@ return [
 
     // 'allowed_methods' => ['*'],
     // 'supports_credentials' => true,
-    'allowed_origins' => ['https://jharkhandegovernance.com'],
+    // 'allowed_origins' => ['https://jharkhandegovernance.com'],
     // 'allowed_origins' => [
     //     'https://www.jharkhandegovernance.com',
     //     'https://www.aadrikainfomedia.com',
