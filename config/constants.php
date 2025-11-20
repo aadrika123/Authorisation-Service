@@ -69,8 +69,9 @@ return [
         19,  // Parking
         17,  // procurement
         2,   // water
-        5,   // market advertisement
-        6,   // HRMS
+        5,   // market advertisement\
+        3,     //trade
+        6  // HRMS
         // Add more module IDs here
     ],
 ];
