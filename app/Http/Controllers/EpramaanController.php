@@ -172,26 +172,11 @@ class EpramaanController extends Controller
 
     public function loginEpramaan(Request $req)
 {
-    // Delete old cookies safely
-    setcookie("verifier_c", "", [
-        'expires'  => time() - 3600,
-        'path'     => '/',
-        'domain'   => '.jharkhandegovernance.com',
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'Strict'
-    ]);
+    // Properly delete old cookies
+    setcookie("verifier_c", "", time() - 3600, "/", ".jharkhandegovernance.com", true, true);
+    setcookie("nonce_c", "", time() - 3600, "/", ".jharkhandegovernance.com", true, true);
 
-    setcookie("nonce_c", "", [
-        'expires'  => time() - 3600,
-        'path'     => '/',
-        'domain'   => '.jharkhandegovernance.com',
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'Strict'
-    ]);
-
-    $type  = $req->type;
+    $type = $req->type;
 
     switch ($type) {
         case 'citizen-page':
@@ -250,65 +235,54 @@ class EpramaanController extends Controller
             break;
     }
 
-    $scope                 = 'openid';
-    $response_type         = 'code';
+     $scope = 'openid';
+    $response_type = 'code';
     $code_challenge_method = 'S256';
-    $aeskey                = 'e0681502-a91b-4868-b8c0-4274b0144e1a';
-    $url                   = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
-    $request_uri           = $url;
+    $aeskey = 'e0681502-a91b-4868-b8c0-4274b0144e1a';
+    $url = 'https://epramaan.meripehchaan.gov.in/openid/jwt/processJwtAuthGrantRequest.do';
 
-    // Generate values
     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
     $nonce = bin2hex(random_bytes(16));
+
+    // ✅ Secure cookie settings
+    $cookieOptions = [
+        'expires'  => time() + 3600,
+        'path'     => '/',
+        'domain'   => '.jharkhandegovernance.com',
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ];
+
+    setcookie("nonce_c", $nonce, $cookieOptions);
 
     $verifier_bytes = random_bytes(64);
     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
 
-    // Secure cookies ✅
-    setcookie("nonce_c", $nonce, [
-        'expires'  => time() + 3600,
-        'path'     => '/',
-        'domain'   => '.jharkhandegovernance.com',
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'Strict'
-    ]);
+    setcookie("verifier_c", $code_verifier, $cookieOptions);
 
-    setcookie("verifier_c", $code_verifier, [
-        'expires'  => time() + 3600,
-        'path'     => '/',
-        'domain'   => '.jharkhandegovernance.com',
-        'secure'   => true,
-        'httponly' => true,
-        'samesite' => 'Strict'
-    ]);
-
-    // Code challenge
+    // PKCE
     $challenge_bytes = hash("sha256", $code_verifier, true);
-    $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
+    $code_challenge = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
 
     $input = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
     $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
 
     $finalUrl = $url .
-        "?scope=" . $scope .
-        "&response_type=" . $response_type .
-        "&redirect_uri=" . $redirect_uri .
-        "&state=" . $state .
-        "&code_challenge_method=" . $code_challenge_method .
-        "&nonce=" . $nonce .
-        "&client_id=" . $serviceId .
-        "&code_challenge=" . $code_challenge .
-        "&request_uri=" . $request_uri .
-        "&apiHmac=" . $apiHmac;
+        "?&scope=$scope" .
+        "&response_type=$response_type" .
+        "&redirect_uri=$redirect_uri" .
+        "&state=$state" .
+        "&code_challenge_method=$code_challenge_method" .
+        "&nonce=$nonce" .
+        "&client_id=$serviceId" .
+        "&code_challenge=$code_challenge" .
+        "&request_uri=$url" .
+        "&apiHmac=$apiHmac";
 
-    $data = [
-        'url'           => $finalUrl,
-        'nonce'         => $nonce,
-        'code_verifier' => $code_verifier
-    ];
-
-    return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
+    return responseMsgs(true, "Success", [
+        "url" => $finalUrl
+    ], "", "01", responseTime(), "POST", "");
 }
 
 
