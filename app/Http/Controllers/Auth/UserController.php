@@ -307,7 +307,9 @@ class UserController extends Controller
                 $data['userDetails'] = $user;
                 $data['userDetails']['role'] = $role;
                 $data['userDetails']['roleId'] = $roleId;
-                $data['userDetails']['asset_type_id'] = $user->asset_type_id;    // Added only for LAMS module
+                if ($user->asset_type_id) {
+                    $data['userDetails']['asset_type_id'] = array_map('intval', explode(',', trim($user->asset_type_id, '{}'))); 
+                }
 
                 return responseMsgs(true, "You have logged in successfully", $data, 10101, "1.0", responseTime(), "POST", $req->deviceId)
                     ->cookie(
