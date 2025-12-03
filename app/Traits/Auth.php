@@ -40,7 +40,7 @@ trait Auth
         $user->email = $request->email;
         $user->alternate_mobile = $request->altMobile;
         $user->address = $request->address;
-        $user->asset_type_id = $request->assetTypeId;           // Added only for LAMS module
+        $user->asset_type_id = is_array($request->assetTypeId) ? '{' . implode(',', $request->assetTypeId) . '}' : ($request->assetTypeId ? '{' . $request->assetTypeId . '}' : null);           // Added only for LAMS module
         $user->ulb_id = $request->ulbId ?? authUser()->ulb_id;
         if ($request->userType) {
             $user->user_type = $request->userType;
