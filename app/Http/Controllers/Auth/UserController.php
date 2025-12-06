@@ -470,6 +470,7 @@ class UserController extends Controller
                 $this->assignRole($request->role, $user);
             }
             DB::commit();
+            $data['id'] = $user->id;
             $data['userName'] = $user->user_name;
             return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
             Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
