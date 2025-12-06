@@ -26,7 +26,7 @@ return [
     //     'https://www.egov.rsccl.in'
     // ],
 
-    // 'allowed_origins' => ['*'],
+    'allowed_origins' => ['*'],
 
     // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://aadrikainfomedia.com')),
     // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://jharkhandegovernance.com')),
