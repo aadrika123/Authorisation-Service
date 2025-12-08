@@ -517,6 +517,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/get/admin-list', 'listAdmin');            #_List Admin
         Route::post('user-managment/v1/crud/get/user-list-by-ulb-id', 'listUserByUlbId');            #_List Admin
         Route::post('user-managment/v1/crud/get/user-list-by-ulb-id-v1', 'listUserByUlbIdv1');            #_List Admin
+        Route::post('user-managment/v1/userListById', 'userListById');            #_List Admin
 
 
         Route::post('change-password', 'changePass');                       // Change password with login

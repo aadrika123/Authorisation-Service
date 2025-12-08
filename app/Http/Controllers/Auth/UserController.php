@@ -1814,4 +1814,87 @@ class UserController extends Controller
     //     Redis::del("CAPTCHA:{$req->captcha_id}");
     // }
     // ✅ Rate Limiting: Allow 5 attempts per 120 seconds per IP
+
+    public function userListById(Request $req)
+    {
+        $req->validate([
+            'id' => 'required'
+        ]);
+
+        try {
+            $perPage = $req->perPage ?? 100;
+            $id = $req->id;
+
+            if ($id == null) {
+                throw new Exception('Please Provide Ulb Id!');
+            }
+
+            // Base query
+            $query = User::select(
+                'id',
+                'user_name',
+                'mobile',
+                'email',
+                'user_type',
+                'name',
+                'address',
+                'alternate_mobile',
+                'suspended',
+                'reference_no',
+                DB::raw("CONCAT(photo_relative_path, '/', photo) AS photo"),
+                DB::raw("CONCAT(sign_relative_path, '/', signature) AS signature")
+            )
+                ->where('users.id', $id)
+                ->orderBy('users.id', 'desc');
+
+            // Apply pipeline filters
+            $filteredQuery = app(Pipeline::class)
+                ->send($query)
+                ->through([
+                    SearchByName::class,
+                    SearchByEmail::class,
+                    SearchByMobile::class,
+                    SearchByRole::class
+                ])
+                ->thenReturn();
+
+            // Paginate results
+            $userList = $filteredQuery->paginate($perPage);
+
+            // Attach document data to each user
+            $docUpload = new DocUpload();
+            $data = $userList->map(function ($user) use ($docUpload) {
+                $docDetails = $docUpload->getSingleDocUrl($user); // Fetch document details
+                $docUrl = $docDetails['doc_path'] ?? null;
+
+                return [
+                    'id'             => $user->id,
+                    'user_name'      => $user->user_name,
+                    'mobile'         => $user->mobile,
+                    'alternateMobile' => $user->alternate_mobile,
+                    'email'          => $user->email,
+                    'name'           => $user->name,
+                    'user_type'      => $user->user_type,
+                    'address'        => $user->address,
+                    'suspended'      => $user->suspended,
+                    'referenceNo'    => $user->reference_no,
+                    'photo'          => $user->photo,
+                    'signature'      => $user->signature,
+                    'documentUrl'    => $docUrl, // Add document URL to response
+                ];
+            });
+
+            // Build response structure
+            $userListResponse = [
+                "current_page" => $userList->currentPage(),
+                "last_page"    => $userList->lastPage(),
+                "data"         => $data,
+                "total"        => $userList->total(),
+            ];
+
+            return responseMsgs(true, "User List", $userListResponse, "", "01", responseTime(), "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
+        }
+    }
 }
