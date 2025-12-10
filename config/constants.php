@@ -71,7 +71,8 @@ return [
         2,   // water
         5,   // market advertisement\
         3,     //trade
-        6  // HRMS
+        6,  // HRMS
+        28  // Municipal Rental
         // Add more module IDs here
     ],
 ];
