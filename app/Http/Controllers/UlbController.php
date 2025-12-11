@@ -6,6 +6,7 @@ use App\MicroServices\DocUpload;
 use App\Models\BlogPost;
 use App\Models\Department;
 use App\Models\DistrictMaster;
+use App\Models\LogNewDepartment;
 use App\Models\MCity;
 use App\Models\ServiceMapping;
 use App\Models\ServiceMaster;
@@ -25,12 +26,14 @@ class UlbController extends Controller
     protected $_UlbServices;
     protected $_ulbMasters;
     protected $_department;
+    protected $_logDepartment;
     public function __construct()
     {
         $this->_UlbModulePermission = new UlbModulePermission();
         $this->_UlbServices = new ServiceMapping();
         $this->_ulbMasters = new UlbMaster();
         $this->_department = new Department();
+        $this->_logDepartment = new LogNewDepartment();
     }
 
     /**
@@ -1098,9 +1101,20 @@ class UlbController extends Controller
                 return validationError($validated);
             }
 
-            $mDepartment = new Department();
-            $dept = $mDepartment->find($req->id);
+            $dept = $this->_department->find($req->id);
+            $oldData = $dept->toArray();
             $dept->update($validated->validated());
+            
+            // Log the update
+            $this->_logDepartment->create([
+                'department_id' => $dept->id,
+                'department_name' => $dept->department_name,
+                'description' => $dept->description,
+                'status' => $dept->status,
+                'action' => 'UPDATE',
+                'old_data' => $oldData,
+                'new_data' => $dept->toArray()
+            ]);
 
             return responseMsgs(true, "Department updated successfully", $dept, "DEPT004", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
@@ -1144,7 +1158,20 @@ class UlbController extends Controller
                 return validationError($validated);
             }
 
-            $this->_department->where('id', $req->id)->delete();
+            $dept = $this->_department->find($req->id);
+            
+            // Log before deletion
+            $this->_logDepartment->create([
+                'department_id' => $dept->id,
+                'department_name' => $dept->department_name,
+                'description' => $dept->description,
+                'status' => $dept->status,
+                'action' => 'DELETE',
+                'old_data' => $dept->toArray(),
+                'new_data' => null
+            ]);
+            
+            $dept->delete();
 
             return responseMsgs(true, "Department deleted successfully", "", "DEPT006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
