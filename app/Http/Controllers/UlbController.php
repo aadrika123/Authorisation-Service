@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\MicroServices\DocUpload;
 use App\Models\BlogPost;
+use App\Models\Department;
 use App\Models\DistrictMaster;
 use App\Models\MCity;
 use App\Models\ServiceMapping;
@@ -23,11 +24,13 @@ class UlbController extends Controller
     protected $_UlbModulePermission;
     protected $_UlbServices;
     protected $_ulbMasters;
+    protected $_department;
     public function __construct()
     {
         $this->_UlbModulePermission = new UlbModulePermission();
         $this->_UlbServices = new ServiceMapping();
         $this->_ulbMasters = new UlbMaster();
+        $this->_department = new Department();
     }
 
     /**
@@ -1019,6 +1022,133 @@ class UlbController extends Controller
             return responseMsgs(true, "Blog Details", $message, "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "BLOG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Department Create
+    public function departmentCreate(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'department_name' => 'required|string|max:255',
+                'description'     => 'nullable|string|max:255'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $dept = $this->_department->create($validated->validated());
+
+            return responseMsgs(true, "Department created successfully", $dept, "DEPT001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DEPT001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // List all departments
+    public function departmentList(Request $req)
+    {
+        try {
+            $dept = $this->_department->where('status', 1)->orderBy('id', 'DESC')->get();
+
+            return responseMsgs(true, "Departments fetched successfully", $dept, "DEPT002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DEPT002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Department details
+    public function departmentDetail(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id' => 'required|exists:departments,id'
+            ]);
+
+            if ($validated->fails()) {
+                 return responseMsgs(false,$validated->errors()->first(), "","DEPT003","01", responseTime(),"","");
+            }
+
+            $dept = $this->_department->where('id', $req->id)->where('status', 1)->first();
+            
+            if (!$dept) {
+                return responseMsgs(false, "Department not found or inactive", "", "DEPT003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            }
+
+            return responseMsgs(true, "Department fetched successfully", $dept, "DEPT003", "01", responseTime(),$req->getMethod(), $req->deviceId);
+
+        } catch (Exception $e) {
+
+            return responseMsgs(false, $e->getMessage(), "","DEPT003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Update Department
+    public function updateDepartment(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id'              => 'required|exists:departments,id',
+                'department_name' => 'required|string|max:255',
+                'description'     => 'nullable|string|max:255'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $mDepartment = new Department();
+            $dept = $mDepartment->find($req->id);
+            $dept->update($validated->validated());
+
+            return responseMsgs(true, "Department updated successfully", $dept, "DEPT004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DEPT004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Toggle Department Status
+    public function toggleDepartmentStatus(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id' => 'required|exists:departments,id'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $dept = $this->_department->find($req->id);
+            $newStatus = $dept->status == 1 ? 0 : 1;
+            $dept->update(['status' => $newStatus]);
+            
+            $message = $newStatus == 1 ? "Department activated successfully" : "Department deactivated successfully";
+
+            return responseMsgs(true, $message, "", "DEPT005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DEPT005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Delete Department
+    public function deleteDepartment(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id' => 'required|exists:departments,id'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $this->_department->where('id', $req->id)->delete();
+
+            return responseMsgs(true, "Department deleted successfully", "", "DEPT006", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DEPT006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
