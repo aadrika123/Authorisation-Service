@@ -60,7 +60,7 @@ class EpramaanController extends Controller
             case 'citizen-page':
                 $serviceId    = '100001634';
                 //
-                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
+                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
                 break;
             case 'citizen':
                 // $serviceId    = '100001033';    #_staging
