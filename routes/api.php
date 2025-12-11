@@ -145,6 +145,13 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('m-update-blog', 'editBlog');
     Route::post('m-delete-blog', 'deleteBlog');
     Route::post('m-get-blog-by-Id', 'blogById');
+
+    Route::post('department-create',  'departmentCreate');
+    Route::post('department-list',    'departmentList');
+    Route::post('department-detail',  'departmentDetail');
+    Route::post('update-department',  'updateDepartment');
+    Route::post('delete-department',  'deleteDepartment');
+    Route::post('toggle-department-status',  'toggleDepartmentStatus');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
@@ -477,6 +484,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('get/services-by-module', 'checkUlbModuleServices');
         Route::post('upload/ulb-logo-by-id', 'uploadUlbLogo');
         Route::post('get-upload/ulb-logo', 'getAllUlbLogos');
+
+        
     });
 
     /**
