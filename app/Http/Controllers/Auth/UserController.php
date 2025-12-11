@@ -1897,4 +1897,42 @@ class UserController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", "");
         }
     }
+
+    public function updateUserName(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id'        => 'required|exists:users,id',
+                'user_name' => 'required|string'
+            ]);
+
+            if ($validated->fails()) {
+                return responseMsgs( false, $validated->errors()->first(),"","USR009",  "01", responseTime(), $req->getMethod(), $req->deviceId);
+            }
+
+            $user = User::find($req->id);
+
+            if (!$user) {
+                return responseMsgs( false,"User not found", "", "USR009", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            }
+
+            $exists = User::where('user_name', $req->user_name)
+                        ->where('id', '!=', $req->id)
+                        ->exists();
+
+            if ($exists) {
+                return responseMsgs(false,"Username already taken", "", "USR009", "01",responseTime(),$req->getMethod(),$req->deviceId);
+            }
+
+            $user->user_name = $req->user_name;
+            $user->save();
+
+            return responseMsgs(true,"Username updated successfully",$user,"USR009", "01",responseTime(),$req->getMethod(), $req->deviceId);
+
+        } catch (\Exception $e) {
+
+            return responseMsgs( false,$e->getMessage(),"", "USR009", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
 }
