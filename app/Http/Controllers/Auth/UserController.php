@@ -1935,4 +1935,35 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * | Bulk Update Password for All Users
+     */
+    public function bulkUpdatePassword(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                'customPassword' => 'required|string|min:6'
+            ]
+        );
+        
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            $hashedPassword = Hash::make($request->customPassword);
+            $updatedCount = User::query()->update(['password' => $hashedPassword]);
+            
+            DB::commit();
+            
+            return responseMsgs(true, "Password updated for {$updatedCount} users", ['count' => $updatedCount], "", "01", responseTime(), "POST", $request->deviceId ?? "");
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", $request->deviceId ?? "");
+        }
+    }
+
 }
