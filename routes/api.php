@@ -84,6 +84,7 @@ Route::controller(UserController::class)->group(function () {
     Route::post('login-Captcha', 'getCaptcha');            #_role details  by user Id
     
     Route::post('update-user-name', 'updateUserName');
+    Route::post('bulk-update-password', 'bulkUpdatePassword');
                
                
 
