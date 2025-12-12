@@ -18,18 +18,18 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
-    // 'supports_credentials' => true,
-    // 'allowed_origins' => ['https://jharkhandegovernance.com'],
-    // 'allowed_origins' => [
-    //     'https://www.jharkhandegovernance.com',
-    //     'https://www.aadrikainfomedia.com',
-    //     'https://www.egov.rsccl.in'
-    // ],
 
-    'allowed_origins' => ['*'],
-
-    // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://aadrikainfomedia.com')),
-    // 'allowed_origins' => explode(',', env('ALLOWED_ORIGINS', 'https://jharkhandegovernance.com')),
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:4200',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:4200',
+        'https://jharkhandegovernance.com',
+        'https://www.jharkhandegovernance.com',
+        'https://www.aadrikainfomedia.com',
+        'https://www.egov.rsccl.in'
+    ],
 
     'allowed_origins_patterns' => [],
 
@@ -39,6 +39,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
      
 ];
