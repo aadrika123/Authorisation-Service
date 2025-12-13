@@ -72,7 +72,8 @@ return [
         5,   // market advertisement\
         3,     //trade
         6,  // HRMS
-        28  // Municipal Rental
+        28,  // Municipal Rental
+        32   // PTMS New
         // Add more module IDs here
     ],
 ];
