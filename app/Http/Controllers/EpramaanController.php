@@ -58,31 +58,23 @@ class EpramaanController extends Controller
 
         switch ($type) {
             case 'citizen-page':
-                $serviceId    = '100001634';
-                //
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                // $serviceId    = '100001634';
+                // $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
                 break;
-            case 'citizen':
-                // $serviceId    = '100001033';    #_staging
-                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
 
+            case 'citizen':
                 #change by prity pandey 
                 $serviceId    = '100001511';    #_production
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
 
-            // $serviceId    = '100001511';    #_production
-            // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-            // break;
-
-            #change by prity pandey  
-            // case 'mobile':
-            //     $serviceId    = '100001360';
-            //     $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
-            //     break;
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                // $serviceId    = '100001513';
+                // $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
 
             case 'property':
@@ -121,10 +113,6 @@ class EpramaanController extends Controller
                 break;
 
             default:
-                // $serviceId    = '100001033';    #_staging
-                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-                #serviceId change by prity pandey
-                //$serviceId    = '100001332';    #_production
                 $serviceId    = '100001511';
                 $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 break;
@@ -170,71 +158,6 @@ class EpramaanController extends Controller
         return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
     }
 
-
-    // public function loginEpramaan(Request $req)
-    // {
-    //     // Reset old cookies
-    //     setcookie("verifier_c", "", time() - 3600, "/");
-    //     setcookie("nonce_c", "", time() - 3600, "/");
-
-    //     $type = $req->type;
-
-    //     $services = config('epramaan.services');
-
-    //     if (!array_key_exists($type, $services)) {
-    //         $type = 'citizen'; // default
-    //     }
-
-    //     $serviceId = $services[$type]['id'];
-    //     $redirect_uri = $services[$type]['redirect'];
-
-    //     $scope                 = config('epramaan.scope');
-    //     $response_type         = config('epramaan.response_type');
-    //     $code_challenge_method = config('epramaan.code_method');
-    //     $aeskey                = config('epramaan.aes_key');
-    //     $url                   = config('epramaan.url');
-    //     $request_uri           = config('epramaan.request_uri');
-
-    //     $state = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4));
-
-    //     // nonce
-    //     $nonce = bin2hex(random_bytes(16));
-    //     setcookie("nonce_c", $nonce, time() + 3600, "/");
-
-    //     // verifier
-    //     $verifier_bytes = random_bytes(64);
-    //     $code_verifier = rtrim(strtr(base64_encode($verifier_bytes), "+/", "-_"), "=");
-    //     setcookie("verifier_c", $code_verifier, time() + 3600, "/");
-
-    //     // challenge
-    //     $challenge_bytes = hash("sha256", $code_verifier, true);
-    //     $code_challenge  = rtrim(strtr(base64_encode($challenge_bytes), "+/", "-_"), "=");
-
-    //     $input   = $serviceId . $aeskey . $state . $nonce . $redirect_uri . $scope . $code_challenge;
-    //     $apiHmac = base64_encode(hash_hmac('sha256', $input, $aeskey, true));
-
-    //     $finalUrl = $url
-    //         . "?&scope={$scope}"
-    //         . "&response_type={$response_type}"
-    //         . "&redirect_uri={$redirect_uri}"
-    //         . "&state={$state}"
-    //         . "&code_challenge_method={$code_challenge_method}"
-    //         . "&nonce={$nonce}"
-    //         . "&client_id={$serviceId}"
-    //         . "&code_challenge={$code_challenge}"
-    //         . "&request_uri={$request_uri}"
-    //         . "&apiHmac={$apiHmac}";
-
-    //     $data = [
-    //         'url'           => $finalUrl,
-    //         'nonce'         => $nonce,
-    //         'code_verifier' => $code_verifier,
-    //     ];
-
-    //     return responseMsgs(true, "Success", $data, "", "01", responseTime(), "POST", "");
-    // }
-
-
     /**
      * | Dashboard
      */
@@ -252,26 +175,22 @@ class EpramaanController extends Controller
         switch ($type) {
 
             case 'citizen-page':
-                $serviceId    = '100001634';
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                // $serviceId    = '100001634';
+                // $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
                 break;
             #change by prity pandey 
             case 'citizen':
-                //     // $serviceId    = '100001033';    #_staging
                 $serviceId    = '100001511';    #_production
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
-                //     break;
-                // $serviceId    = '100001511';    #_production
-                // $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
-            #change by prity pandey 
-            // case 'mobile':
-            //     $serviceId    = '100001360';
-            //     $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
-            //     break;
+
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                // $serviceId    = '100001513';
+                // $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
                 break;
             case 'property':
                 $serviceId    = '100001034';
@@ -309,9 +228,6 @@ class EpramaanController extends Controller
                 break;
 
             default:
-                // $serviceId    = '100001033';    #_staging
-                #serviceId change by prity pandey
-                //$serviceId    = '100001332';    #_production
                 $serviceId    = '100001511';
                 $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
                 break;
@@ -490,58 +406,6 @@ class EpramaanController extends Controller
         }
     }
 
-    // public function dashboardEpramaan(Request $req)
-    // {
-    //     $a             = getcwd() . '/epramaanprod2016.cer';
-    //     $type          = $req->type ?? 'citizen'; // default to citizen
-    //     $code          = $req->code;
-    //     $nonce         = $req->nonce;
-    //     $code_verifier = $req->codeVerifier;
-
-    //     $scope       = config('epramaan.scope');
-    //     $grant_type  = 'authorization_code';
-    //     $tokenUrl    = config('epramaan.token_url');
-    //     $services    = config('epramaan.services');
-
-    //     // validate service
-    //     if (!array_key_exists($type, $services)) {
-    //         return responseMsgs(false, "Invalid service type: $type", [], "", "01", responseTime(), $req->getMethod(), $req->deviceId);
-    //     }
-
-    //     $serviceId    = $services[$type]['id'];
-    //     $redirect_uri = $services[$type]['redirect'];
-
-    //     // 🔹 Call ePramaan Token API
-    //     $curl = curl_init();
-    //     curl_setopt_array($curl, [
-    //         CURLOPT_URL            => $tokenUrl,
-    //         CURLOPT_RETURNTRANSFER => true,
-    //         CURLOPT_SSL_VERIFYHOST => 0,
-    //         CURLOPT_SSL_VERIFYPEER => 0,
-    //         CURLOPT_CUSTOMREQUEST  => 'POST',
-    //         CURLOPT_POSTFIELDS     => json_encode([
-    //             "code"          => [$code],
-    //             "grant_type"    => [$grant_type],
-    //             "scope"         => [$scope],
-    //             "redirect_uri"  => [$redirect_uri],
-    //             "request_uri"   => [$tokenUrl],
-    //             "code_verifier" => [$code_verifier],
-    //             "client_id"     => [$serviceId],
-    //         ]),
-    //         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-    //     ]);
-
-    //     $response = curl_exec($curl);
-    //     curl_close($curl);
-
-    //     // ---------- decrypting logic (same as your code) ----------
-    //     // (keep your existing JWE + JWS verification logic here, unchanged)
-    //     // ----------------------------------------------------------
-
-    //     // final step: return success/failure
-    // }
-
-
     /**
      * | Logout Epramaan
      */
@@ -552,35 +416,24 @@ class EpramaanController extends Controller
         $type  = $req->type;
 
         switch ($type) {
-
-            // case 'citizen':
-
-            //     // $serviceId    = '100001033';    #_staging
-            //     // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-
-            #change by prity pandey 
-            //     $serviceId    = '100001332';    #_production
-            //     $redirect_uri = 'https://egov.rsccl.in/citizen/login/e-pramaan';
-            //     break;
-
             case 'citizen-page':
-                $serviceId    = '100001634';
-                $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                // $serviceId    = '100001634';
+                // $redirect_uri = 'https://jharkhandegovernance.com/citizen-page/login/e-pramaan';
+                $serviceId    = '100001637';
+                $redirect_uri = 'https://egov.rsccl.in/citizen-page/login/e-pramaan';
                 break;
             case 'citizen':
                 $serviceId    = '100001511';    #_production
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
-
-            #change by prity pandey 
-            // case 'mobile':
-            //     $serviceId    = '100001360';
-            //     $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
-            //     break;
+            
             case 'mobile':
-                $serviceId    = '100001513';
-                $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
-            break;
+                // $serviceId    = '100001513';
+                // $redirect_uri = 'https://jharkhandegovernance.com/juidco-app/auth/login-e-praman';
+                $serviceId    = '100001360';
+                $redirect_uri = 'https://egov.rsccl.in/juidco-app/auth/login-e-praman';
+                break;
+
             case 'property':
                 $serviceId    = '100001034';
                 $redirect_uri = 'https://egov.rsccl.in/property/login/e-pramaan';
@@ -617,11 +470,6 @@ class EpramaanController extends Controller
                 break;
 
             default:
-                // $serviceId    = '100001033';    #_staging
-                // $redirect_uri = 'https://aadrikainfomedia.com/citizen/login/e-pramaan';         #_previous url of service id 100001332
-
-                #serviceId change by prity pandey
-                //$serviceId    = '100001332';    #_production
                 $serviceId    = '100001511';
                 $redirect_uri = 'https://jharkhandegovernance.com/citizen/login/e-pramaan';
                 break;
