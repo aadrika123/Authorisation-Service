@@ -507,37 +507,39 @@ class UserController extends Controller
             $nameParts = explode(" ", trim($request->name));
             $firstName = $nameParts[0];
             $user->user_name = $firstName . '.' . substr($request->mobile, 0, 3);
-
+            
             $basePassword = $firstName . '@';
             $baseLength   = strlen($basePassword);
             $minLength    = 8;
 
             if ($baseLength < $minLength) {
+                // Add only required digits to reach minimum length
                 $digitsUsed   = $minLength - $baseLength;
                 $mobileDigits = substr($request->mobile, -$digitsUsed);
             } else {
+                // For long names, always add last 3 digits
                 $digitsUsed   = 3;
                 $mobileDigits = substr($request->mobile, -3);
             }
 
             $finalPassword = $basePassword . $mobileDigits;
 
-            // Hash & set password
+            // Hash password before saving
             $user->password = Hash::make($finalPassword);
 
             // Save user
             $user->save();
 
-            // Assign role
+            // Assign role if ADMIN
             if ($request->role === 'ADMIN') {
                 $this->assignRole($request->role, $user);
             }
 
             DB::commit();
 
-            // Dynamic response message
+            // RESPONSE MESSAGE WITH ACTUAL PASSWORD
             $message = "User Registered Successfully !! Please Continue to Login.
-                        Your Password is FirstName @ Mobile Last {$digitsUsed} Digits";
+                        Your Password is {$finalPassword}";
 
             return responseMsgs(
                 true,
@@ -553,6 +555,7 @@ class UserController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
 
     /**
      * | Role addition of ther user
