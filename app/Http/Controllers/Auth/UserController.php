@@ -451,29 +451,103 @@ class UserController extends Controller
     /**
      * | User Creation
      */
+    // public function createUser(AuthUserRequest $request)
+    // {
+    //     try {
+    //         // Validation---@source-App\Http\Requests\AuthUserRequest
+    //         $user = new User;
+    //         $checkEmail = User::where('email', $request->email)->first();
+    //         if ($checkEmail)
+    //             throw new Exception('The email has already been taken.');
+    //         $this->saving($user, $request);                     #_Storing data using Auth trait
+    //         $firstname = explode(" ", $request->name);
+    //         $user->user_name = $firstname[0] . '.' . substr($request->mobile, 0, 3);
+    //         $user->password = Hash::make($firstname[0] . '@' . substr($request->mobile, 7, 3));
+
+    //         DB::beginTransaction();
+    //         $user->save();
+    //         if ($request->role == 'ADMIN') {
+    //             $this->assignRole($request->role, $user);
+    //         }
+    //         DB::commit();
+    //         $data['id'] = $user->id;
+    //         $data['userName'] = $user->user_name;
+    //         return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
+    //         Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return responseMsgs(false, $e->getMessage(), "");
+    //     }
+    // }
+
+    /*
+        |--------------------------------------------------------------------------
+        | PASSWORD LOGIC (AS DISCUSSED)
+        |--------------------------------------------------------------------------
+        | password = FirstName + '@' + last mobile digits
+        | minimum length = 8
+        | mobile digits added dynamically
+    */
+
     public function createUser(AuthUserRequest $request)
     {
+        DB::beginTransaction();
         try {
-            // Validation---@source-App\Http\Requests\AuthUserRequest
             $user = new User;
-            $checkEmail = User::where('email', $request->email)->first();
-            if ($checkEmail)
-                throw new Exception('The email has already been taken.');
-            $this->saving($user, $request);                     #_Storing data using Auth trait
-            $firstname = explode(" ", $request->name);
-            $user->user_name = $firstname[0] . '.' . substr($request->mobile, 0, 3);
-            $user->password = Hash::make($firstname[0] . '@' . substr($request->mobile, 7, 3));
 
-            DB::beginTransaction();
+            // Check email uniqueness
+            if (User::where('email', $request->email)->exists()) {
+                throw new Exception('The email has already been taken.');
+            }
+
+            // Store common fields (Auth trait)
+            $this->saving($user, $request);
+
+            // Username generation
+            $nameParts = explode(" ", trim($request->name));
+            $firstName = $nameParts[0];
+            $user->user_name = $firstName . '.' . substr($request->mobile, 0, 3);
+
+            $basePassword = $firstName . '@';
+            $baseLength   = strlen($basePassword);
+            $minLength    = 8;
+
+            if ($baseLength < $minLength) {
+                $digitsUsed   = $minLength - $baseLength;
+                $mobileDigits = substr($request->mobile, -$digitsUsed);
+            } else {
+                $digitsUsed   = 3;
+                $mobileDigits = substr($request->mobile, -3);
+            }
+
+            $finalPassword = $basePassword . $mobileDigits;
+
+            // Hash & set password
+            $user->password = Hash::make($finalPassword);
+
+            // Save user
             $user->save();
-            if ($request->role == 'ADMIN') {
+
+            // Assign role
+            if ($request->role === 'ADMIN') {
                 $this->assignRole($request->role, $user);
             }
+
             DB::commit();
-            $data['id'] = $user->id;
-            $data['userName'] = $user->user_name;
-            return responseMsgs(true, "User Registered Successfully !! Please Continue to Login.
-            Your Password is Your first name @ Your last 3 digit of your Mobile No", $data);
+
+            // Dynamic response message
+            $message = "User Registered Successfully !! Please Continue to Login.
+                        Your Password is FirstName @ Mobile Last {$digitsUsed} Digits";
+
+            return responseMsgs(
+                true,
+                $message,
+                [
+                    'id' => $user->id,
+                    'userName' => $user->user_name
+                ]
+            );
+
         } catch (Exception $e) {
             DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "");
