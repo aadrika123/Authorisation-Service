@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\RateLimiter;
@@ -332,140 +333,147 @@ class UserController extends Controller
     // }
 
     public function loginAuth(Request $req)
-    {
-        $validated = Validator::make($req->all(), [
-            'email' => 'required|email',
-            'password' => 'required',
-            'type' => 'nullable|in:mobile',
-            'moduleId' => 'required|int',
-            'captcha_code' => 'nullable|string',
-            'captcha_id' => 'nullable|string',
-            'systemUniqueId' => 'nullable|string',
-        ]);
+{
+    $validated = Validator::make($req->all(), [
+        'email' => 'required|email',
+        'password' => 'required',
+        'type' => 'nullable|in:mobile',
+        'moduleId' => 'nullable|int',
+        'captcha_code' => 'nullable|string',
+        'captcha_id' => 'nullable|string',
+        'systemUniqueId' => 'nullable|string',
+    ]);
 
-        if ($validated->fails()) {
-            return validationError($validated);
-        }
+    if ($validated->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => $validated->errors()->first(),
+            'data' => ''
+        ], 422);
+    }
 
-        try {
-            /* ================= ENCRYPTION SETUP ================= */
-            $secretKey = Config::get('constants.SECRETKEY');
-            $method = 'AES-256-CBC';
-            $key = hash('sha256', $secretKey, true);
-            $iv = substr(hash('sha256', $secretKey), 0, 16);
+    try {
+        /* ================= ENCRYPTION ================= */
+        $secretKey = Config::get('constants.SECRETKEY');
+        $method = 'AES-256-CBC';
+        $key = hash('sha256', $secretKey, true);
+        $iv = substr(hash('sha256', $secretKey), 0, 16);
 
-            /* ================= CAPTCHA (UNCHANGED) ================= */
-            $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
-            if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
+        /* ================= CAPTCHA ================= */
+        $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
+        if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
 
-                $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
-                if (!$storedCode) {
-                    throw new Exception("Captcha expired or not found");
-                }
+            if (!$req->filled('captcha_id') || !$req->filled('captcha_code')) {
+                return response('Captcha is required', 401);
+            }
 
-                $decryptedCaptcha = openssl_decrypt(
-                    base64_decode($req->captcha_code),
-                    $method,
-                    $key,
-                    OPENSSL_RAW_DATA,
-                    $iv
+            $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
+            if (!$storedCode) {
+                return response(
+                    'Captcha expired. Please refresh captcha and try again.',
+                    401
                 );
-
-                if (strtoupper(trim($storedCode)) !== strtoupper(trim($decryptedCaptcha))) {
-                    throw new Exception("Incorrect captcha code");
-                }
-
-                Redis::del("CAPTCHA:{$req->captcha_id}");
             }
 
-            /* ================= RATE LIMIT ================= */
-            $rateKey = 'login:' . ($req->systemUniqueId ?? $req->ip());
-            if (RateLimiter::tooManyAttempts($rateKey, 5)) {
-                $seconds = RateLimiter::availableIn($rateKey);
-                return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429);
-            }
-            RateLimiter::hit($rateKey, 120);
-
-            /* ================= PASSWORD DECRYPT ================= */
-            $password = openssl_decrypt(
-                base64_decode($req->password),
+            $decryptedCaptcha = openssl_decrypt(
+                base64_decode($req->captcha_code),
                 $method,
                 $key,
                 OPENSSL_RAW_DATA,
                 $iv
             );
 
-            if (!$password) {
-                throw new Exception("Invalid Credentials");
+            if (
+                strtoupper(trim($storedCode)) !==
+                strtoupper(trim($decryptedCaptcha))
+            ) {
+                return response('Invalid captcha code', 401);
             }
 
-            /* ================= USER LOOKUP ================= */
-            $user = $this->_mUser->getUserByEmail($req->email);
-            if (!$user) {
-                throw new Exception("Invalid Credentials");
-            }
-
-            if ($user->suspended) {
-                throw new Exception("You are not authorized to log in!");
-            }
-
-            /* ================= ULB CHECK ================= */
-            $mUlbMaster = new UlbMaster();
-            if (!$mUlbMaster->checkUlb($user)) {
-                throw new Exception("This ULB is restricted!");
-            }
-
-            /* ================= MODULE CHECK (🔥 FIX) ================= */
-            if ($req->filled('moduleId')) {
-                $hasModule = $this->_UlbModulePermission->check($user, $req);
-                if (!$hasModule) {
-                    throw new Exception("You are not authorized for this module in your ULB.");
-                }
-            }
-            // 🔥 If moduleId NOT sent → allow login (old flow stays safe)
-
-            /* ================= PASSWORD VERIFY ================= */
-            if (!Hash::check($password, $user->password)) {
-                throw new Exception("Invalid Credentials");
-            }
-
-            RateLimiter::clear($rateKey);
-
-            /* ================= TOKEN ================= */
-            $token = $user->createToken('my-app-token')->plainTextToken;
-
-            /* ================= ROLES ================= */
-            $mWfRoleusermap = new WfRoleusermap();
-            $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
-
-            $data['token'] = $token;
-            $data['userDetails'] = $user;
-            $data['userDetails']['role'] = collect($menuRoleDetails)->pluck('roles');
-            $data['userDetails']['roleId'] = collect($menuRoleDetails)->pluck('roleId');
-            $data['userDetails']['moduleId'] = $req->moduleId ?? null; // 👈 IMPORTANT
-
-            if ($user->asset_type_id) {
-                $data['userDetails']['asset_type_id'] =
-                    array_map('intval', explode(',', trim($user->asset_type_id, '{}')));
-            }
-
-            return responseMsgs(true, "You have logged in successfully", $data)
-                ->cookie(
-                    'auth_token',
-                    $token,
-                    120,
-                    '/',
-                    '.jharkhandegovernance.com',
-                    true,
-                    true,
-                    false,
-                    'Strict'
-                );
-
-        } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), '');
+            Redis::expire("CAPTCHA:{$req->captcha_id}", 1);
         }
+
+        /* ================= RATE LIMIT ================= */
+        $rateKey = 'login:' . ($req->systemUniqueId ?? $req->ip());
+        if (RateLimiter::tooManyAttempts($rateKey, 5)) {
+            return response(
+                'Too many login attempts. Please try again later.',
+                429
+            );
+        }
+        RateLimiter::hit($rateKey, 120);
+
+        /* ================= PASSWORD ================= */
+        $password = openssl_decrypt(
+            base64_decode($req->password),
+            $method,
+            $key,
+            OPENSSL_RAW_DATA,
+            $iv
+        );
+
+        if (!$password) {
+            return response('Invalid credentials', 401);
+        }
+
+        /* ================= USER ================= */
+        $user = $this->_mUser->getUserByEmail($req->email);
+        if (!$user) {
+            return response('Invalid credentials', 401);
+        }
+
+        if ($user->suspended) {
+            return response(
+                'You are not authorized to log in',
+                403
+            );
+        }
+
+        /* ================= ULB ================= */
+        if (!(new UlbMaster())->checkUlb($user)) {
+            return response('ULB is restricted', 403);
+        }
+
+        /* ================= MODULE (🔥 FIXED) ================= */
+        if ($req->filled('moduleId')) {
+            if (!$this->_UlbModulePermission->check($user, $req)) {
+                return response(
+                    'You are not authorized for this module',
+                    403
+                );
+            }
+        }
+
+        /* ================= PASSWORD VERIFY ================= */
+        if (!Hash::check($password, $user->password)) {
+            return response('Invalid credentials', 401);
+        }
+
+        RateLimiter::clear($rateKey);
+
+        /* ================= TOKEN ================= */
+        $token = $user->createToken('my-app-token')->plainTextToken;
+
+        /* ================= RESPONSE ================= */
+        return response()->json([
+            'status' => true,
+            'message' => 'You have logged in successfully',
+            'data' => [
+                'token' => $token,
+                'userDetails' => $user,
+                'moduleId' => $req->moduleId ?? null
+            ]
+        ], 200);
+
+    } catch (\Throwable $e) {
+        Log::error('Login Error', [
+            'error' => $e->getMessage()
+        ]);
+
+        return response('Internal server error', 500);
     }
+}
+
 
 
     public function changePass(ChangePassRequest $request)
