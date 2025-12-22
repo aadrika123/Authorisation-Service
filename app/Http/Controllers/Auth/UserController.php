@@ -337,7 +337,7 @@ class UserController extends Controller
             'email' => 'required|email',
             'password' => 'required',
             'type' => 'nullable|in:mobile',
-            'moduleId' => 'nullable|int',
+            'moduleId' => 'required|int',
             'captcha_code' => 'nullable|string',
             'captcha_id' => 'nullable|string',
             'systemUniqueId' => 'nullable|string',
