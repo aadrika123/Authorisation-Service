@@ -543,10 +543,12 @@ class UserController extends Controller
 
     private function hasModulePermission(int $userId, int $moduleId): bool
     {
-        return DB::table('menu_roles')
-            ->where('user_id', $userId)
-            ->where('module_id', $moduleId)
-            ->where('status', 1)
+        return DB::table('menu_roleusermaps as mur')
+            ->join('menu_roles as mr', 'mr.role_id', '=', 'mur.role_id')
+            ->where('mur.user_id', $userId)
+            ->where('mr.module_id', $moduleId)
+            ->where('mur.status', 1)
+            ->where('mr.status', 1)
             ->exists();
     }
 
