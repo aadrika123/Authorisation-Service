@@ -179,6 +179,160 @@ class UserController extends Controller
     //     }
     // }
 
+    // public function loginAuth(Request $req)
+    // {
+    //     $validated = Validator::make(
+    //         $req->all(),
+    //         [
+    //             'email' => 'required|email',
+    //             'password' => 'required',
+    //             'type' => 'nullable|in:mobile',
+    //             'moduleId' => 'nullable|int',
+    //             'captcha_code' => 'nullable|string',
+    //             'captcha_id' => 'nullable|string',
+    //             'systemUniqueId' => 'nullable|string',
+    //         ]
+    //     );
+
+    //     if ($validated->fails())
+    //         return validationError($validated);
+
+    //     try {
+    //         // ✅ Common encryption setup
+    //         $secretKey = Config::get('constants.SECRETKEY');
+    //         $method = 'AES-256-CBC';
+    //         $key = hash('sha256', $secretKey, true);
+    //         $iv = substr(hash('sha256', $secretKey), 0, 16);
+
+    //         // ✅ Captcha verification (only for modules requiring captcha)
+    //         $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
+    //         if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
+
+    //             $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
+    //             if (!$storedCode) {
+    //                 throw new Exception("Captcha expired or not found");
+    //             }
+
+    //             // Decrypt the frontend-provided captcha
+    //             $decryptedCaptcha = openssl_decrypt(
+    //                 base64_decode($req->captcha_code),
+    //                 $method,
+    //                 $key,
+    //                 OPENSSL_RAW_DATA,
+    //                 $iv
+    //             );
+
+    //             // Compare the decrypted frontend captcha with stored Redis captcha
+    //             if (strtoupper(trim($storedCode)) !== strtoupper(trim($decryptedCaptcha))) {
+    //                 throw new Exception("Incorrect captcha code");
+    //             }
+
+    //             // Delete used captcha
+    //             Redis::del("CAPTCHA:{$req->captcha_id}");
+    //         }
+
+    //         // return responseMsgs(true, "Invalid Credentials", "", 10101, "1.0", responseTime(), "POST", $req->deviceId);
+    //         // ✅ Rate Limiting: max 5 attempts per 120 seconds per IP
+    //         // $rateKey = Str::lower('login|' . $user->ip());
+    //         // $rateKey = 'login:' . $user->id;
+    //         $clientUniqueId = $req->systemUniqueId;
+    //         $rateKey = 'login:' . $clientUniqueId;
+    //         if (RateLimiter::tooManyAttempts($rateKey, 5)) {
+    //             $seconds = RateLimiter::availableIn($rateKey);
+    //             return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
+    //         }
+
+    //         RateLimiter::hit($rateKey, 120); // 2 minutes limit window
+
+    //         // ✅ Decrypt user password
+    //         $encryptedData = base64_decode($req->password);
+    //         $password = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
+    //         if ($password === false) {
+    //             throw new Exception("Invalid Credentials");
+    //         }
+
+    //         // ✅ User lookup and checks
+    //         $mWfRoleusermap = new WfRoleusermap();
+    //         $mUlbMaster = new UlbMaster();
+    //         $user = $this->_mUser->getUserByEmail($req->email);
+
+    //         if (!$user)
+    //             throw new Exception("Invalid Credentials");
+    //         if ($user->suspended == true)
+    //             throw new Exception("You are not authorized to log in!");
+
+    //         $checkUlbStatus = $mUlbMaster->checkUlb($user);
+    //         if (!$checkUlbStatus) {
+    //             throw new Exception('This ULB is restricted for SuperAdmin!');
+    //         }
+
+    //         if ($req->moduleId) {
+    //             $checkModule = $this->_UlbModulePermission->check($user, $req);
+    //             if (!$checkModule) {
+    //                 throw new Exception('Module is restricted for this ULB!');
+    //             }
+    //         }
+
+    //         // ✅ Password validation
+    //         if (Hash::check($password, $user->password)) {
+
+    //             // ✅ Clear rate limiter after successful login
+    //             RateLimiter::clear($rateKey);
+
+    //             $token = $user->createToken('my-app-token')->plainTextToken;
+    //             $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+    //             $role = collect($menuRoleDetails)->pluck('roles');
+    //             $roleId = collect($menuRoleDetails)->pluck('roleId');
+
+    //             if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
+    //                 throw new Exception("Mobile user cannot login as web user");
+    //             }
+
+    //             $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
+    //             if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
+    //                 throw new Exception("Web user cannot login as mobile user");
+    //             }
+
+    //             // ✅ Log login for TC/TL users
+    //             if (in_array($user->user_type, ['TC', 'TL'])) {
+    //                 UserLoginDetail::create([
+    //                     'user_id' => $user->id,
+    //                     'login_date' => now()->format('Y-m-d'),
+    //                     'login_time' => now()->format('h:i:s a'),
+    //                     'ip_address' => $req->ip(),
+    //                 ]);
+    //             }
+
+    //             $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
+    //             $data['token'] = $token;
+    //             $data['userDetails'] = $user;
+    //             $data['userDetails']['role'] = $role;
+    //             $data['userDetails']['roleId'] = $roleId;
+    //             if ($user->asset_type_id) {
+    //                 $data['userDetails']['asset_type_id'] = array_map('intval', explode(',', trim($user->asset_type_id, '{}'))); 
+    //             }
+
+    //             return responseMsgs(true, "You have logged in successfully", $data, 10101, "1.0", responseTime(), "POST", $req->deviceId)
+    //                 ->cookie(
+    //                     'auth_token',
+    //                     $token,
+    //                     120,
+    //                     '/',
+    //                     '.jharkhandegovernance.com',
+    //                     true,
+    //                     true,
+    //                     false,
+    //                     'Strict'
+    //                 );
+    //         }
+
+    //         throw new Exception("Invalid Credentials");
+    //     } catch (Exception $e) {
+    //         return responseMsg(false, $e->getMessage(), '');
+    //     }
+    // }
+
+    
     public function loginAuth(Request $req)
     {
         $validated = Validator::make(
@@ -194,17 +348,22 @@ class UserController extends Controller
             ]
         );
 
-        if ($validated->fails())
+        if ($validated->fails()) {
             return validationError($validated);
+        }
 
         try {
-            // ✅ Common encryption setup
+            /* =========================================================
+            *  Encryption Setup
+            * ========================================================= */
             $secretKey = Config::get('constants.SECRETKEY');
             $method = 'AES-256-CBC';
             $key = hash('sha256', $secretKey, true);
             $iv = substr(hash('sha256', $secretKey), 0, 16);
 
-            // ✅ Captcha verification (only for modules requiring captcha)
+            /* =========================================================
+            *  Captcha Verification (Module Based)
+            * ========================================================= */
             $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
             if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
 
@@ -213,7 +372,6 @@ class UserController extends Controller
                     throw new Exception("Captcha expired or not found");
                 }
 
-                // Decrypt the frontend-provided captcha
                 $decryptedCaptcha = openssl_decrypt(
                     base64_decode($req->captcha_code),
                     $method,
@@ -222,116 +380,177 @@ class UserController extends Controller
                     $iv
                 );
 
-                // Compare the decrypted frontend captcha with stored Redis captcha
                 if (strtoupper(trim($storedCode)) !== strtoupper(trim($decryptedCaptcha))) {
                     throw new Exception("Incorrect captcha code");
                 }
 
-                // Delete used captcha
                 Redis::del("CAPTCHA:{$req->captcha_id}");
             }
 
-            // return responseMsgs(true, "Invalid Credentials", "", 10101, "1.0", responseTime(), "POST", $req->deviceId);
-            // ✅ Rate Limiting: max 5 attempts per 120 seconds per IP
-            // $rateKey = Str::lower('login|' . $user->ip());
-            // $rateKey = 'login:' . $user->id;
-            $clientUniqueId = $req->systemUniqueId;
-            $rateKey = 'login:' . $clientUniqueId;
+            /* =========================================================
+            *  Rate Limiting (System Unique ID)
+            * ========================================================= */
+            $rateKey = 'login:' . $req->systemUniqueId;
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
-                return responseMsgs(false, "Too many login attempts. Try again in $seconds seconds.", '', 429, "1.0", responseTime(), "POST", $req->deviceId);
+                return responseMsgs(
+                    false,
+                    "Too many login attempts. Try again in $seconds seconds.",
+                    '',
+                    429,
+                    "1.0",
+                    responseTime(),
+                    "POST",
+                    $req->deviceId
+                );
             }
 
-            RateLimiter::hit($rateKey, 120); // 2 minutes limit window
+            RateLimiter::hit($rateKey, 120);
 
-            // ✅ Decrypt user password
-            $encryptedData = base64_decode($req->password);
-            $password = openssl_decrypt($encryptedData, $method, $key, OPENSSL_RAW_DATA, $iv);
+            /* =========================================================
+            *  Password Decryption
+            * ========================================================= */
+            $password = openssl_decrypt(
+                base64_decode($req->password),
+                $method,
+                $key,
+                OPENSSL_RAW_DATA,
+                $iv
+            );
+
             if ($password === false) {
                 throw new Exception("Invalid Credentials");
             }
 
-            // ✅ User lookup and checks
-            $mWfRoleusermap = new WfRoleusermap();
-            $mUlbMaster = new UlbMaster();
+            /* =========================================================
+            *  User Lookup
+            * ========================================================= */
             $user = $this->_mUser->getUserByEmail($req->email);
-
-            if (!$user)
+            if (!$user) {
                 throw new Exception("Invalid Credentials");
-            if ($user->suspended == true)
+            }
+
+            if ($user->suspended) {
                 throw new Exception("You are not authorized to log in!");
-
-            $checkUlbStatus = $mUlbMaster->checkUlb($user);
-            if (!$checkUlbStatus) {
-                throw new Exception('This ULB is restricted for SuperAdmin!');
             }
 
-            if ($req->moduleId) {
-                $checkModule = $this->_UlbModulePermission->check($user, $req);
-                if (!$checkModule) {
-                    throw new Exception('Module is restricted for this ULB!');
+            /* =========================================================
+            *  ULB Restriction Check
+            * ========================================================= */
+            $mUlbMaster = new UlbMaster();
+            if (!$mUlbMaster->checkUlb($user)) {
+                throw new Exception("This ULB is restricted for SuperAdmin!");
+            }
+
+            /* =========================================================
+            *  ULB → Module Restriction Check
+            * ========================================================= */
+            if ($req->filled('moduleId')) {
+                if (!$this->_UlbModulePermission->check($user, $req)) {
+                    throw new Exception("Module is restricted for this ULB!");
                 }
             }
 
-            // ✅ Password validation
-            if (Hash::check($password, $user->password)) {
+            /* =========================================================
+            *  🔥 USER → MODULE PERMISSION CHECK (menu_roles)
+            * ========================================================= */
+            if ($req->filled('moduleId')) {
 
-                // ✅ Clear rate limiter after successful login
-                RateLimiter::clear($rateKey);
-
-                $token = $user->createToken('my-app-token')->plainTextToken;
-                $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
-                $role = collect($menuRoleDetails)->pluck('roles');
-                $roleId = collect($menuRoleDetails)->pluck('roleId');
-
-                if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Mobile user cannot login as web user");
+                if (!$this->hasModulePermission($user->id, (int) $req->moduleId)) {
+                    throw new Exception("Permission denied!");
                 }
-
-                $jeRole = collect($menuRoleDetails)->where('roles', 'JUNIOR ENGINEER');
-                if ($jeRole->isEmpty() && $req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
-                    throw new Exception("Web user cannot login as mobile user");
-                }
-
-                // ✅ Log login for TC/TL users
-                if (in_array($user->user_type, ['TC', 'TL'])) {
-                    UserLoginDetail::create([
-                        'user_id' => $user->id,
-                        'login_date' => now()->format('Y-m-d'),
-                        'login_time' => now()->format('h:i:s a'),
-                        'ip_address' => $req->ip(),
-                    ]);
-                }
-
-                $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
-                $data['token'] = $token;
-                $data['userDetails'] = $user;
-                $data['userDetails']['role'] = $role;
-                $data['userDetails']['roleId'] = $roleId;
-                if ($user->asset_type_id) {
-                    $data['userDetails']['asset_type_id'] = array_map('intval', explode(',', trim($user->asset_type_id, '{}'))); 
-                }
-
-                return responseMsgs(true, "You have logged in successfully", $data, 10101, "1.0", responseTime(), "POST", $req->deviceId)
-                    ->cookie(
-                        'auth_token',
-                        $token,
-                        120,
-                        '/',
-                        '.jharkhandegovernance.com',
-                        true,
-                        true,
-                        false,
-                        'Strict'
-                    );
+            }
+            /* =========================================================
+            *  Password Match
+            * ========================================================= */
+            if (!Hash::check($password, $user->password)) {
+                throw new Exception("Invalid Credentials");
             }
 
-            throw new Exception("Invalid Credentials");
+            /* =========================================================
+            *  SUCCESS LOGIN
+            * ========================================================= */
+            RateLimiter::clear($rateKey);
+
+            $token = $user->createToken('my-app-token')->plainTextToken;
+
+            $mWfRoleusermap = new WfRoleusermap();
+            $menuRoleDetails = $mWfRoleusermap->getRoleDetailsByUserId($user->id);
+
+            $role = collect($menuRoleDetails)->pluck('roles');
+            $roleId = collect($menuRoleDetails)->pluck('roleId');
+
+            if (!$req->type && $this->checkMobileUserRole($menuRoleDetails)) {
+                throw new Exception("Mobile user cannot login as web user");
+            }
+
+            if ($req->type && !$this->checkMobileUserRole($menuRoleDetails)) {
+                throw new Exception("Web user cannot login as mobile user");
+            }
+
+            /* =========================================================
+            *  TC / TL Login Log
+            * ========================================================= */
+            if (in_array($user->user_type, ['TC', 'TL'])) {
+                UserLoginDetail::create([
+                    'user_id' => $user->id,
+                    'login_date' => now()->format('Y-m-d'),
+                    'login_time' => now()->format('h:i:s a'),
+                    'ip_address' => $req->ip(),
+                ]);
+            }
+
+            /* =========================================================
+            *  Response Data
+            * ========================================================= */
+            $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
+
+            $data['token'] = $token;
+            $data['userDetails'] = $user;
+            $data['userDetails']['role'] = $role;
+            $data['userDetails']['roleId'] = $roleId;
+
+            if ($user->asset_type_id) {
+                $data['userDetails']['asset_type_id'] =
+                    array_map('intval', explode(',', trim($user->asset_type_id, '{}')));
+            }
+
+            return responseMsgs(
+                true,
+                "You have logged in successfully",
+                $data,
+                10101,
+                "1.0",
+                responseTime(),
+                "POST",
+                $req->deviceId
+            )->cookie(
+                'auth_token',
+                $token,
+                120,
+                '/',
+                '.jharkhandegovernance.com',
+                true,
+                true,
+                false,
+                'Strict'
+            );
+
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), '');
         }
     }
 
+        private function hasModulePermission(int $userId, int $moduleId): bool
+        {
+            return DB::table('menu_roleusermaps as mur')
+                ->join('menu_roles as mr', 'mr.id', '=', 'mur.menu_role_id')
+                ->where('mur.user_id', $userId)
+                ->where('mr.module_id', $moduleId)
+                ->where('mur.is_suspended', false)
+                ->where('mr.is_suspended', false)
+                ->exists();
+        }
 
 
     public function changePass(ChangePassRequest $request)
