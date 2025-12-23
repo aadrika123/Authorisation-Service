@@ -1311,6 +1311,7 @@ class UserController extends Controller
                 'permittedWard'    => $permittedWards,
                 'roleId'           => $lastLogin->wfRoleId,
                 'roleName'         => $lastLogin->role_name,
+                'empId'            => $lastLogin->emp_id,
             ];
 
             return responseMsgsv1(true,  true, "User Details", $response, "", "01", responseTime(), "POST", "");
