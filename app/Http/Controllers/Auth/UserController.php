@@ -2200,37 +2200,70 @@ class UserController extends Controller
         try {
             $validated = Validator::make($req->all(), [
                 'id'        => 'required|exists:users,id',
-                'user_name' => 'required|string'
+                'user_name' => 'nullable|string',
+                'emp_id'    => 'nullable|string',
             ]);
 
             if ($validated->fails()) {
-                return responseMsgs( false, $validated->errors()->first(),"","USR009",  "01", responseTime(), $req->getMethod(), $req->deviceId);
+                return responseMsgs(false,$validated->errors()->first(),"", "USR009","01",responseTime(),$req->getMethod(),$req->deviceId);
             }
 
             $user = User::find($req->id);
 
             if (!$user) {
-                return responseMsgs( false,"User not found", "", "USR009", "01", responseTime(), $req->getMethod(), $req->deviceId);
+                return responseMsgs(false, "User not found", "", "USR009", "01", responseTime(), $req->getMethod(), $req->deviceId);
             }
 
-            $exists = User::where('user_name', $req->user_name)
-                        ->where('id', '!=', $req->id)
-                        ->exists();
-
-            if ($exists) {
-                return responseMsgs(false,"Username already taken", "", "USR009", "01",responseTime(),$req->getMethod(),$req->deviceId);
+            // Update only provided fields
+            if ($req->filled('user_name')) {
+                $user->user_name = $req->user_name;
             }
 
-            $user->user_name = $req->user_name;
+            if ($req->filled('emp_id')) {
+                $user->emp_id = $req->emp_id;
+            }
+
+            if (!$req->filled('user_name') && !$req->filled('emp_id')) {
+                return responseMsgs(
+                    false,
+                    "Nothing to update",
+                    "",
+                    "USR009",
+                    "01",
+                    responseTime(),
+                    $req->getMethod(),
+                    $req->deviceId
+                );
+            }
+
             $user->save();
 
-            return responseMsgs(true,"Username updated successfully",$user,"USR009", "01",responseTime(),$req->getMethod(), $req->deviceId);
+            return responseMsgs(
+                true,
+                "User details updated successfully",
+                $user,
+                "USR009",
+                "01",
+                responseTime(),
+                $req->getMethod(),
+                $req->deviceId
+            );
 
-        } catch (\Exception $e) {
-
-            return responseMsgs( false,$e->getMessage(),"", "USR009", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(
+                false,
+                $e->getMessage(),
+                "",
+                "USR009",
+                "01",
+                responseTime(),
+                $req->getMethod(),
+                $req->deviceId
+            );
+            
         }
     }
+
 
     /**
      * | Bulk Update Password for All Users
