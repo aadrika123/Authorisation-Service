@@ -362,11 +362,18 @@ class UserController extends Controller
             $iv = substr(hash('sha256', $secretKey), 0, 16);
 
             /* =========================================================
-            *  Captcha Verification (Module Based)
+            *  Normalize Module ID
+            * ========================================================= */
+            $moduleId = (int) ($req->moduleId ?? 0);
+
+            /* =========================================================
+            *  Captcha Verification (WORKS EVEN FOR moduleId = 0)
             * ========================================================= */
             $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
-            if ($req->filled('moduleId') && in_array($req->moduleId, $captchaModules)) {
-
+            if (
+                $req->filled('moduleId') &&
+                in_array($moduleId, $captchaModules)
+            ) {
                 $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
                 if (!$storedCode) {
                     throw new Exception("Captcha expired or not found");
@@ -435,7 +442,7 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  ULB Restriction Check
+            *  ULB Restriction Check (ALWAYS REQUIRED)
             * ========================================================= */
             $mUlbMaster = new UlbMaster();
             if (!$mUlbMaster->checkUlb($user)) {
@@ -443,23 +450,23 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  ULB → Module Restriction Check
+            *  ULB → MODULE Restriction (SKIP ONLY IF moduleId = 0)
             * ========================================================= */
-            if ($req->filled('moduleId')) {
+            if ($moduleId > 0) {
                 if (!$this->_UlbModulePermission->check($user, $req)) {
                     throw new Exception("Module is restricted for this ULB!");
                 }
             }
 
             /* =========================================================
-            *  🔥 USER → MODULE PERMISSION CHECK (menu_roles)
+            *  USER → MODULE Permission (menu_roles) (SKIP ONLY IF moduleId = 0)
             * ========================================================= */
-            if ($req->filled('moduleId')) {
-
-                if (!$this->hasModulePermission($user->id, (int) $req->moduleId)) {
+            if ($moduleId > 0) {
+                if (!$this->hasModulePermission($user->id, $moduleId)) {
                     throw new Exception("Permission denied!");
                 }
             }
+
             /* =========================================================
             *  Password Match
             * ========================================================= */
@@ -540,6 +547,7 @@ class UserController extends Controller
             return responseMsg(false, $e->getMessage(), '');
         }
     }
+
 
     private function hasModulePermission(int $userId, int $moduleId): bool
     {
