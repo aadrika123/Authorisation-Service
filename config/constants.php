@@ -57,23 +57,24 @@ return [
 
     // Optional: List of modules that require captcha
     'MODULES_WITH_CAPTCHA' => [
-        25, // LEGAL
-        21, // LAMS
-        14, // Fines
-        15,  // RIG,
-        11, // WATER TANKER
-        18, // PTMS
-        20, //FINANCE COMMISSION
-        30,   //HRMS,
-        16,
-        19,  // Parking
-        17,  // procurement
-        2,   // water
-        5,   // market advertisement\
-        3,     //trade
-        6,  // HRMS
-        28,  // Municipal Rental
-        32   // PTMS New
+        25,     // LEGAL
+        21,     // LAMS
+        14,     // Fines
+        15,     // RIG,
+        11,     // WATER TANKER
+        18,     // PTMS
+        20,     // FINANCE COMMISSION
+        30,     // HRMS,
+        16,     // Septic Tanker
+        19,     // Parking
+        17,     // procurement
+        2,      // water
+        5,      // market advertisement
+        3,      // trade
+        6,      // HRMS
+        28,     // Municipal Rental
+        32,     // PTMS New
+        1,      // property
         // Add more module IDs here
     ],
 ];
