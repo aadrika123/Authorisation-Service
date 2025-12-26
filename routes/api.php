@@ -301,6 +301,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/menu-role/get', 'getMenuRole');
         Route::post('user-managment/v1/crud/menu-role/list', 'listMenuRole');
         Route::post('user-managment/v1/crud/menu-role/menu-list', 'menuByMenuRole');
+        Route::post('user-managment/v1/menu-role/toggle-suspension', 'toggleRoleSuspension');
     });
 
     /**
