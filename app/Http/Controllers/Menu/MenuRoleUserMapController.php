@@ -133,7 +133,7 @@ class MenuRoleUserMapController extends Controller
     /**
      * | Roles by User Id
      */
-    public function roleByUserId(Request $req)
+   /*  public function roleByUserId(Request $req)
     {
         try {
             $validator = Validator::make($req->all(), [
@@ -167,6 +167,39 @@ class MenuRoleUserMapController extends Controller
             // $data = $mMenuRoleusermap->getRoleByUserId()
             // ->where('menu_roleusermaps.user_id', '=', $req->userId)
             // ->get();
+
+            return responseMsgs(true, 'Menu Role Map By User Id', $data, "120907", "1.0", responseTime(), "POST", $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), [], "120907", "1.0", responseTime(), "POST", $req->deviceId);
+        }
+    } */
+
+    public function roleByUserId(Request $req)
+    {
+        try {
+            $validator = Validator::make($req->all(), [
+                'userId' => 'required|integer'
+            ]);
+            if ($validator->fails())
+                return validationError($validator);
+
+            $query = "SELECT
+                            m.id,
+                            m.menu_role_name,
+                            mr.user_id,
+                            m.is_suspended AS issuspended,
+                            CASE
+                                WHEN mr.user_id IS NULL THEN false
+                                ELSE true
+                            END AS permission_status
+                        FROM menu_roles AS m    
+                        LEFT JOIN (
+                            SELECT * FROM menu_roleusermaps
+                            WHERE user_id = ? AND is_suspended = false
+                        ) AS mr ON mr.menu_role_id = m.id
+                        ORDER BY m.id";
+
+            $data = DB::select($query, [$req->userId]);
 
             return responseMsgs(true, 'Menu Role Map By User Id', $data, "120907", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
