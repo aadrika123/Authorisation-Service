@@ -161,4 +161,38 @@ class MenuRoleController extends Controller
             return responseMsg(false, $e->getMessage(), "");
         }
     }
+
+    /**
+     * | Toggle Suspension for Menu Role
+     * | Payload: roleId, isSuspended (active/inactive)
+     */
+    public function toggleRoleSuspension(Request $request)
+    {
+        try {
+            // 1. Validation
+            $request->validate([
+                'roleId'      => 'required|integer',
+                'isSuspended' => 'required|in:active,inactive'
+            ]);
+
+                // 2. Check existence (Exist karti hai ki nahi)
+            $role = MenuRole::find($request->roleId);
+
+            if (!$role) {
+                return responseMsg(false, "Role not found with ID: " . $request->roleId, "");
+            }
+
+            // 3. Logic: active -> false, inactive -> true
+            $status = ($request->isSuspended == 'inactive') ? true : false;
+
+            // 4. Update
+            $role->is_suspended = $status;
+            $role->save();
+
+            return responseMsgs(true, "Role status updated to " . $request->isSuspended, "", "", "02", "733", "POST", "");
+
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    }
 }
