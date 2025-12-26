@@ -47,7 +47,7 @@ class MenuRole extends Model
     {
         return $mMenuRole = MenuRole::select('menu_roles.id', 'menu_role_name', 'is_suspended', 'module_id', 'users.name as created_by')
             ->join('users', 'users.id', 'menu_roles.created_by')
-            ->where('menu_roles.is_suspended', false)
+            // ->where('menu_roles.is_suspended', false)
             ->orderbydesc('id');
     }
 }

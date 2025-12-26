@@ -9,6 +9,7 @@ use App\Models\Menu\MenuRolemap;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class MenuRoleController extends Controller
 {
@@ -162,37 +163,39 @@ class MenuRoleController extends Controller
         }
     } */
 
+
     public function menuByMenuRole(Request $req)
     {
         try {
-            $req->validate([
-                'menuRoleId' => 'required'
+            $validator = Validator::make($req->all(), [
+                'menuRoleId' => 'required|integer'
             ]);
 
-        // 2. Query Logic: Alias 'is_suspended'
-        $query = "SELECT
-                        m.id,
-                        m.menu_string,
-                        mr.menu_role_id,
-                        module_masters.module_name,
-                        CASE
-                            WHEN mr.menu_role_id IS NULL THEN true
-                            ELSE mr.is_suspended
-                        END AS is_suspended
+            if ($validator->fails()) {
+                return validationError($validator);
+            }
 
-                    FROM menu_masters AS m
-                    LEFT JOIN menu_rolemaps AS mr ON mr.menu_id = m.id AND mr.menu_role_id = ?
-                    JOIN module_masters ON module_masters.id = m.module_id
-                    ORDER BY m.menu_string";
+            $query = "SELECT
+                            m.id,
+                            m.menu_string,
+                            mr.menu_role_id,
+                            mm.module_name,
+                            CASE
+                                WHEN mr.menu_role_id IS NULL THEN true
+                                ELSE mr.is_suspended
+                            END AS is_suspended
+                        FROM menu_masters AS m
+                        JOIN module_masters AS mm ON mm.id = m.module_id
+                        LEFT JOIN menu_rolemaps AS mr ON mr.menu_id = m.id AND mr.menu_role_id = ?
+                        ORDER BY mm.module_name, m.menu_string";
 
-        $data = DB::select($query, [$req->menuRoleId]);
+            $data = DB::select($query, [$req->menuRoleId]);
+            $groupedData = collect($data)->groupBy('module_name');
 
-        $groupedData = collect($data)->groupBy('module_name');
-
-        return responseMsg(true, "Menu Role Map List", $groupedData);
+            return responseMsgs(true, "Menu Role Map List", $groupedData, "120906", "1.0", responseTime(), "POST", $req->deviceId);
 
         } catch (Exception $e) {
-            return responseMsg(false, $e->getMessage(), "");
+            return responseMsgs(false, $e->getMessage(), [], "120906", "1.0", responseTime(), "POST", $req->deviceId);
         }
     }
 
