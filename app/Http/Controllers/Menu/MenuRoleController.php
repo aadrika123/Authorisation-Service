@@ -126,7 +126,7 @@ class MenuRoleController extends Controller
     /**
      * | Menu Role Mapping List By Menu Role Id
      */
-    public function menuByMenuRole(Request $req)
+   /*  public function menuByMenuRole(Request $req)
     {
         try {
             $req->validate([
@@ -157,6 +157,40 @@ class MenuRoleController extends Controller
             $data = collect($data)->groupBy('module_name');
 
             return responseMsg(true, "Menu Role Map List", $data);
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), "");
+        }
+    } */
+
+    public function menuByMenuRole(Request $req)
+    {
+        try {
+            $req->validate([
+                'menuRoleId' => 'required'
+            ]);
+
+        // 2. Query Logic: Alias 'is_suspended'
+        $query = "SELECT
+                        m.id,
+                        m.menu_string,
+                        mr.menu_role_id,
+                        module_masters.module_name,
+                        CASE
+                            WHEN mr.menu_role_id IS NULL THEN true
+                            ELSE mr.is_suspended
+                        END AS is_suspended
+
+                    FROM menu_masters AS m
+                    LEFT JOIN menu_rolemaps AS mr ON mr.menu_id = m.id AND mr.menu_role_id = ?
+                    JOIN module_masters ON module_masters.id = m.module_id
+                    ORDER BY m.menu_string";
+
+        $data = DB::select($query, [$req->menuRoleId]);
+
+        $groupedData = collect($data)->groupBy('module_name');
+
+        return responseMsg(true, "Menu Role Map List", $groupedData);
+
         } catch (Exception $e) {
             return responseMsg(false, $e->getMessage(), "");
         }
