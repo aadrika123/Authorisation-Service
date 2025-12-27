@@ -437,6 +437,27 @@ class UserController extends Controller
                 throw new Exception("Invalid Credentials");
             }
 
+            /* =========================================================
+            *  GLOBAL MODULE STATUS CHECK (FIRST RESTRICTION)
+            * ========================================================= */
+            if ($moduleId > 0) {
+
+                // Check module exists
+                $moduleExists = DB::table('menu_roles')
+                    ->where('module_id', $moduleId)
+                    ->exists();
+
+                if (!$moduleExists) {
+                    throw new Exception("Invalid module selected");
+                }
+
+                // Check module is active
+                if (!$this->isModuleActive($moduleId)) {
+                    throw new Exception("This module is temporarily suspended");
+                }
+            }
+
+
             if ($user->suspended) {
                 throw new Exception("You are not authorized to log in!");
             }
@@ -548,6 +569,13 @@ class UserController extends Controller
         }
     }
 
+    private function isModuleActive(int $moduleId): bool
+    {
+        return DB::table('menu_roles')
+            ->where('module_id', $moduleId)
+            ->where('is_suspended', false)
+            ->exists();
+    }
 
     private function hasModulePermission(int $userId, int $moduleId): bool
     {
