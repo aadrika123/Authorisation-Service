@@ -75,6 +75,7 @@ return [
         28,     // Municipal Rental
         32,     // PTMS New
         1,      // property
+        31,     // Asset Tracking
         // Add more module IDs here
     ],
 ];
