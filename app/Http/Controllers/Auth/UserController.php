@@ -440,21 +440,21 @@ class UserController extends Controller
             /* =========================================================
             *  GLOBAL MODULE STATUS CHECK (FIRST RESTRICTION)
             * ========================================================= */
-            if ($moduleId > 0) {
+            // if ($moduleId > 0) {
 
-                $role = DB::table('menu_roleusermaps as mrum')
-                    ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
-                    ->where('mr.module_id', $moduleId)
-                    ->where('mrum.user_id', $user->id)
-                    ->where('mr.is_suspended', false)
-                    ->first();
+            //     $role = DB::table('menu_roleusermaps as mrum')
+            //         ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
+            //         ->where('mr.module_id', $moduleId)
+            //         ->where('mrum.user_id', $user->id)
+            //         ->where('mr.is_suspended', false)
+            //         ->first();
 
-                if (!$role) {
-                    throw new Exception("Invalid role not assigned");
-                }
+            //     if (!$role) {
+            //         throw new Exception("Invalid role not assigned");
+            //     }
 
                 
-            }
+            // }
 
 
             if ($user->suspended) {
@@ -568,13 +568,6 @@ class UserController extends Controller
         }
     }
 
-    private function isModuleActive(int $moduleId): bool
-    {
-        return DB::table('menu_roles')
-            ->where('module_id', $moduleId)
-            ->where('is_suspended', false)
-            ->exists();
-    }
 
     private function hasModulePermission(int $userId, int $moduleId): bool
     {
