@@ -442,23 +442,26 @@ class UserController extends Controller
             * ========================================================= */
             if ($moduleId > 0) {
 
-                $module = DB::table('menu_roles')
-                    ->where('module_id', $moduleId)
+                $role = DB::table('menu_roleusermaps as mrum')
+                    ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
+                    ->where('mr.module_id', $moduleId)
+                    ->select('mr.id', 'mr.is_suspended')
                     ->first();
 
-                if (!$module) {
-                    throw new Exception("Invalid module");
+                if (!$role) {
+                    throw new Exception("Invalid module or role not assigned");
                 }
 
-                if ($module->is_suspended) {
-                    throw new Exception("This module is temporarily suspended");
+                // 🔴 Role suspended check
+                if ($role->is_suspended === true) {
+                    throw new Exception("Role is Suspended");
                 }
 
+                // 🔴 Optional: module-level active check (if you still want it)
                 if (!$this->isModuleActive($moduleId)) {
                     throw new Exception("This module is currently inactive");
                 }
             }
-
 
 
             if ($user->suspended) {
