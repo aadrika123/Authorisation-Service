@@ -450,13 +450,10 @@ class UserController extends Controller
                     ->first();
 
                 if (!$role) {
-                    throw new Exception("Invalid module or role not assigned");
+                    throw new Exception("Invalid role not assigned");
                 }
 
-                // ONLY menu_roles.is_suspended decides login
-                if ($role->is_suspended === true) {
-                    throw new Exception("Role is Suspended");
-                }
+                
             }
 
 
