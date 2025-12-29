@@ -446,7 +446,7 @@ class UserController extends Controller
                     ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
                     ->where('mr.module_id', $moduleId)
                     ->where('mrum.user_id', $user->id)
-                    ->select('mr.is_suspended', true)
+                    ->where('mr.is_suspended', true)
                     ->first();
 
                 if (!$role) {
