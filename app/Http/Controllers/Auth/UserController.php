@@ -446,21 +446,16 @@ class UserController extends Controller
                     ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
                     ->where('mr.module_id', $moduleId)
                     ->where('mrum.user_id', $user->id)
-                    ->select('mr.id', 'mr.is_suspended')
+                    ->select('mr.is_suspended', false)
                     ->first();
 
                 if (!$role) {
                     throw new Exception("Invalid module or role not assigned");
                 }
 
-                // 🔴 ROLE SUSPENSION CHECK
-                if ($role->is_suspended) {
+                // ONLY menu_roles.is_suspended decides login
+                if ($role->is_suspended === true) {
                     throw new Exception("Role is Suspended");
-                }
-
-                // 🔴 MODULE SUSPENSION CHECK
-                if (!$this->isModuleActive($moduleId)) {
-                    throw new Exception("This module is currently inactive");
                 }
             }
 
