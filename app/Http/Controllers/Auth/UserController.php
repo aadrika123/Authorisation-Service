@@ -442,20 +442,23 @@ class UserController extends Controller
             * ========================================================= */
             if ($moduleId > 0) {
 
-                // Check module exists
-                $moduleExists = DB::table('menu_roles')
+                $module = DB::table('menu_roles')
                     ->where('module_id', $moduleId)
-                    ->exists();
+                    ->first();
 
-                if (!$moduleExists) {
-                    throw new Exception("Invalid module selected");
+                if (!$module) {
+                    throw new Exception("Invalid module");
                 }
 
-                // Check module is active
-                if (!$this->isModuleActive($moduleId)) {
+                if ($module->is_suspended) {
                     throw new Exception("This module is temporarily suspended");
                 }
+
+                if (!$this->isModuleActive($moduleId)) {
+                    throw new Exception("This module is currently inactive");
+                }
             }
+
 
 
             if ($user->suspended) {
