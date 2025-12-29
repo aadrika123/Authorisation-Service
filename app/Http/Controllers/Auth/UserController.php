@@ -452,12 +452,12 @@ class UserController extends Controller
                     throw new Exception("Invalid module or role not assigned");
                 }
 
-                // 🔴 Role suspended check
-                if ($role->is_suspended === true) {
+                // Role suspended check
+                if (!$role->is_suspended === false) {
                     throw new Exception("Role is Suspended");
                 }
 
-                // 🔴 Optional: module-level active check (if you still want it)
+                // Optional: module-level active check (if you still want it)
                 if (!$this->isModuleActive($moduleId)) {
                     throw new Exception("This module is currently inactive");
                 }
