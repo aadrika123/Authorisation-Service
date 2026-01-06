@@ -178,6 +178,7 @@ class MenuRoleController extends Controller
             $query = "SELECT
                             m.id,
                             m.menu_string,
+                            m.route,
                             mr.menu_role_id,
                             mm.module_name,
                             CASE
