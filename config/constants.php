@@ -76,6 +76,7 @@ return [
         32,     // PTMS New
         1,      // property
         31,     // Asset Tracking
+        27,     // Market Management
         // Add more module IDs here
     ],
 ];
