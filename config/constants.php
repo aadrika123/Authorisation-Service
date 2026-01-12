@@ -77,6 +77,7 @@ return [
         1,      // property
         31,     // Asset Tracking
         27,     // Market Management
+        34,     // Analytical Dashboard
         // Add more module IDs here
     ],
 ];
