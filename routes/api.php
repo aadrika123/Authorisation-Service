@@ -645,6 +645,8 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("property/live-dashboard-data", "unAuthApis");
         Route::post("property/today-collection-dashboard", "unAuthApis");
         Route::post("property/ulb-wise-count-dashboard", "unAuthApis");
+        Route::post("property/ulb-module-role-count-dashboard", "unAuthApis");
+        Route::post("property/dashboard-summary-cards", "unAuthApis");
         # Property UnAuth Api
         Route::match(['post'], "property/saf/master-saf", "unAuthApis");
         Route::match(["get", 'post'], "property/calculatePropertyTax", "unAuthApis");
