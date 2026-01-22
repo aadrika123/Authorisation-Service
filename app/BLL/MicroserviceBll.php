@@ -22,7 +22,8 @@ class MicroserviceBll
 
         $results = ['services' => []];
 
-        foreach ($services as $name => $url) {
+        foreach ($services as $name => $baseUrl) {
+            $url = rtrim($baseUrl, '/') . '/api/' . $name . '/health-check';
             $results['services'][$name] = $this->checkService($url);
         }
 
@@ -38,9 +39,12 @@ class MicroserviceBll
 
             $timeTaken = round((microtime(true) - $start) * 1000, 2); // ms
 
+            $data = $response->json();
+            $isUp = $response->successful() && isset($data['status']) && $data['status'] === 'ok';
+
             return [
                 'url'           => $url,
-                'status'        => $response->successful() ? 'UP' : 'DOWN',
+                'status'        => $isUp ? 'UP' : 'DOWN',
                 'response_code' => $response->status(),
                 'response_time' => $timeTaken . ' ms',
             ];
