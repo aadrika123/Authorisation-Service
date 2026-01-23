@@ -41,12 +41,9 @@ class MicroserviceBll
 
             $timeTaken = round((microtime(true) - $start) * 1000, 2); // ms
 
-            $data = $response->json();
-            $isUp = $response->successful() && isset($data['status']) && $data['status'] === 'ok';
-
             return [
                 'url'           => $displayUrl,
-                'status'        => $isUp ? 'UP' : 'DOWN',
+                'status'        => $response->status() === 200 ? 'UP' : 'DOWN',
                 'response_code' => $response->status(),
                 'response_time' => $timeTaken . ' ms',
             ];
