@@ -24,7 +24,7 @@ class MicroserviceBll
 
         foreach ($services as $name => $baseUrl) {
             $url = rtrim($baseUrl, '/') . '/api/' . $name . '/health-check';
-            $displayUrl = rtrim(env('APP_URL'), '/') . '/api/' . $name . '/health-check';
+            $displayUrl = rtrim(config('app.url'), '/') . '/api/' . $name . '/health-check';
             $results['services'][$name] = $this->checkService($url, $displayUrl);
         }
 
