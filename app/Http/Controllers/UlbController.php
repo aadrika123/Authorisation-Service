@@ -8,12 +8,14 @@ use App\Models\Department;
 use App\Models\DistrictMaster;
 use App\Models\LogNewDepartment;
 use App\Models\MCity;
+use App\Models\ModuleMaster;
 use App\Models\ServiceMapping;
 use App\Models\ServiceMaster;
 use App\Models\UlbMaster;
 use App\Models\UlbModulePermission;
 use App\Models\UlbNewWardmap;
 use App\Models\UlbService;
+use App\Models\UlbWardMaster;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1177,5 +1179,44 @@ class UlbController extends Controller
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "DEPT006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
+    }
+
+    public function moduleList(Request $request)
+    {
+        try {
+            $mModuleMaster = new ModuleMaster();
+            $data = $mModuleMaster->moduleListv2();
+
+            return responseMsgs(true, "List of Module!", $data, "", "02", "", "POST", "");
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "", "02", "", "POST", "");
+        }
+    }
+
+    public function getWardByUlb(Request $request)
+    {
+        //validating
+        $request->validate([
+            'ulbId' => 'required|integer',
+        ]);
+        $ulbId = $request->ulbId;
+        $wards = collect();
+        $workkFlow = UlbWardMaster::select(
+            'id',
+            'ulb_id',
+            'ward_name',
+            'old_ward_name'
+        )
+            ->where('ulb_id', $ulbId)
+            ->where('status', 1)
+            ->orderby('id')
+            ->get();
+
+        $groupByWards = $workkFlow->groupBy('ward_name');
+        foreach ($groupByWards as $ward) {
+            $wards->push(collect($ward)->first());
+        }
+        $wards->sortBy('ward_name')->values();
+        return responseMsg(true, "Data Retrived", remove_null($wards));
     }
 }

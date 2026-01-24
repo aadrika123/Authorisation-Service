@@ -155,6 +155,8 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('update-department',  'updateDepartment');
     Route::post('delete-department',  'deleteDepartment');
     Route::post('toggle-department-status',  'toggleDepartmentStatus');
+    Route::post('module-list',  'moduleList');
+    Route::post('getWardByUlb', 'getWardByUlb');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
