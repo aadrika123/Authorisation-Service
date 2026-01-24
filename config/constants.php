@@ -47,6 +47,7 @@ return [
         "Water-Agency",
         "UlbUser",
         "Municipal",
+        "Developer",
     ],
 
     "ADMIN_ROLE" => 1,

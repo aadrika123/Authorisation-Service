@@ -22,15 +22,18 @@ class MicroserviceBll
 
         $results = ['services' => []];
 
-        foreach ($services as $name => $url) {
-            $results['services'][$name] = $this->checkService($url);
+        foreach ($services as $name => $baseUrl) {
+            $url = rtrim($baseUrl, '/') . '/api/' . $name . '/health-check';
+            $displayUrl = rtrim(config('app.url'), '/') . '/api/' . $name . '/health-check';
+            $results['services'][$name] = $this->checkService($url, $displayUrl);
         }
 
         return response()->json($results, 200);
     }
 
-    private function checkService($url)
+    private function checkService($url, $displayUrl = null)
     {
+        $displayUrl = $displayUrl ?? $url;
         try {
             $start = microtime(true);
 
@@ -39,14 +42,14 @@ class MicroserviceBll
             $timeTaken = round((microtime(true) - $start) * 1000, 2); // ms
 
             return [
-                'url'           => $url,
-                'status'        => $response->successful() ? 'UP' : 'DOWN',
+                'url'           => $displayUrl,
+                'status'        => $response->status() === 200 ? 'UP' : 'DOWN',
                 'response_code' => $response->status(),
                 'response_time' => $timeTaken . ' ms',
             ];
         } catch (\Exception $e) {
             return [
-                'url'           => $url,
+                'url'           => $displayUrl,
                 'status'        => 'DOWN',
                 'response_code' => 0,
                 'error'         => str_contains($e->getMessage(), 'Timeout')
