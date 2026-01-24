@@ -82,11 +82,11 @@ Route::controller(UserController::class)->group(function () {
     Route::post('user-managment/v1/get-user-roles-dtls', 'getUserRoleId');            #_role details  by user Id
     Route::post('user-managment/v1/encrypted', 'encrypted');            #_role details  by user Id
     Route::post('login-Captcha', 'getCaptcha');            #_role details  by user Id
-    
+
     Route::post('update-user-name', 'updateUserName');
     Route::post('bulk-update-password', 'bulkUpdatePassword');
-               
-               
+
+
 
 
 
@@ -102,7 +102,7 @@ Route::controller(CitizenController::class)->group(function () {
 });
 
 /**
- * | 
+ * |
  */
 Route::controller(UlbController::class)->group(function () {
     Route::get('get-all-ulb', 'getAllUlb');
@@ -149,16 +149,17 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('m-delete-blog', 'deleteBlog');
     Route::post('m-get-blog-by-Id', 'blogById');
 
-    Route::post('department-create',  'departmentCreate');
-    Route::post('department-list',    'departmentList');
-    Route::post('department-detail',  'departmentDetail');
-    Route::post('update-department',  'updateDepartment');
-    Route::post('delete-department',  'deleteDepartment');
-    Route::post('toggle-department-status',  'toggleDepartmentStatus');
+    Route::post('department-create', 'departmentCreate');
+    Route::post('department-list', 'departmentList');
+    Route::post('department-detail', 'departmentDetail');
+    Route::post('update-department', 'updateDepartment');
+    Route::post('delete-department', 'deleteDepartment');
+    Route::post('toggle-department-status', 'toggleDepartmentStatus');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
     Route::post('workflow/v2/crud/ward-by-ulb', 'getWardByUlb');        #_Ward Without Login
+    Route::post('workflow/v2/crud/check-ulb-ward-module', 'checkUlbWardModule'); #Check ULB + Ward validity and optionally verify module permission.
 });
 
 Route::controller(ThirdPartyController::class)->group(function () {
@@ -183,7 +184,7 @@ Route::controller(EpramaanController::class)->group(function () {
 
 /**
  * | Protected Routes
- * | Module Id = 12 
+ * | Module Id = 12
  * | Module Name = User Management
  */
 Route::middleware('auth:sanctum')->group(function () {
@@ -205,7 +206,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(MasterController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-master/save', 'createMaster');    #API_ID=120101  | Save Workflow Master
-        Route::post('user-managment/v1/crud/workflow-master/edit', 'updateMaster');    #API_ID=120102  | Edit Workflow Master 
+        Route::post('user-managment/v1/crud/workflow-master/edit', 'updateMaster');    #API_ID=120102  | Edit Workflow Master
         Route::post('user-managment/v1/crud/workflow-master/get', 'masterbyId');       #API_ID=120103  | Get Workflow Master By Id
         Route::post('user-managment/v1/crud/workflow-master/list', 'getAllMaster');    #API_ID=120104  | Get All Workflow Master
         Route::post('user-managment/v1/crud/workflow-master/delete', 'deleteMaster');  #API_ID=120105  | Delete Workflow Master
@@ -217,7 +218,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(WorkflowController::class)->group(function () {
         Route::post('user-managment/v1/crud/wf-workflow/save', 'createWorkflow');      #API_ID=120201  | Save Workflow
-        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');       #API_ID=120202  | Edit Workflow 
+        Route::post('user-managment/v1/crud/wf-workflow/edit', 'updateWorkflow');       #API_ID=120202  | Edit Workflow
         Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');         #API_ID=120203  | Get Workflow By Id
         Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');      #API_ID=120204  | Get All Workflow
         Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');    #API_ID=120205  | Delete Workflow
@@ -231,7 +232,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/workflow-role/save', 'createRole');        #API_ID=120301  | Save Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/edit', 'editRole');          #API_ID=120302  | edit Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/get', 'getRole');            #API_ID=120303  | Get Workflow Role By Id
-        Route::post('user-managment/v1/crud/workflow-role/list', 'getAllRoles');       #API_ID=120304  | Get All Workflow Role          
+        Route::post('user-managment/v1/crud/workflow-role/list', 'getAllRoles');       #API_ID=120304  | Get All Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/delete', 'deleteRole');      #API_ID=120305  | Delete Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/selected-role', 'selectedRole');      #API_ID=120306  | Selected Workflow Role
         Route::post('user-managment/v1/crud/workflow-role/by-module', 'selectedRoleByModule');      #API_ID=120306  | Selected Workflow Role
@@ -243,7 +244,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(WorkflowRoleMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-role-map/save', 'createRoleMap');             // Save WorkflowRoleMap
-        Route::post('user-managment/v1/crud/workflow-role-map/edit', 'updateRoleMap');             // Edit WorkflowRoleMap 
+        Route::post('user-managment/v1/crud/workflow-role-map/edit', 'updateRoleMap');             // Edit WorkflowRoleMap
         Route::post('user-managment/v1/crud/workflow-role-map/get', 'roleMapbyId');                // Get WorkflowRoleMap By Id
         Route::post('user-managment/v1/crud/workflow-role-map/list', 'getAllRoleMap');             // Get All WorkflowRoleMap
         Route::post('user-managment/v1/crud/workflow-role-map/delete', 'deleteRoleMap');           // Delete WorkflowRoleMap
@@ -257,7 +258,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(WorkflowRoleUserMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/workflow-role-user/save', 'createRoleUser');                #API_ID=120501  |  #_Save WorkflowRoleUserMap
-        Route::post('user-managment/v1/crud/workflow-role-user/edit', 'updateRoleUser');                #API_ID=120502  |  #_Edit WorkflowRoleUserMap 
+        Route::post('user-managment/v1/crud/workflow-role-user/edit', 'updateRoleUser');                #API_ID=120502  |  #_Edit WorkflowRoleUserMap
         Route::post('user-managment/v1/crud/workflow-role-user/get', 'roleUserbyId');                   #API_ID=120503  |  #_Get WorkflowRoleUserMap By Id
         Route::post('user-managment/v1/crud/workflow-role-user/list', 'getAllRoleUser');                #API_ID=120504  |  #_Get All WorkflowRoleUserMap
         Route::post('user-managment/v1/crud/workflow-role-user/delete', 'deleteRoleUser');              #API_ID=120505  |  #_Delete WorkflowRoleUserMap
@@ -310,7 +311,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(MenuRoleMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/menu-role-map/save', 'createRoleMap');                    // Save MenuRole
-        Route::post('user-managment/v1/crud/menu-role-map/edit', 'updateRoleMap');                    // Edit MenuRole 
+        Route::post('user-managment/v1/crud/menu-role-map/edit', 'updateRoleMap');                    // Edit MenuRole
         Route::post('user-managment/v1/crud/menu-role-map/get', 'roleMapbyId');                       // Get MenuRole By Id
         Route::post('user-managment/v1/crud/menu-role-map/list', 'getAllRoleMap');                    // Get All MenuRole
         Route::post('user-managment/v1/crud/menu-role-map/delete', 'deleteRoleMap');                  // Delete MenuRole
@@ -322,7 +323,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(MenuRoleUserMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/menu-role-user/save', 'createRoleUser');              #API_ID=120501 | #_Save MenuRoleUser
-        Route::post('user-managment/v1/crud/menu-role-user/edit', 'updateRoleUser');              #API_ID=120502 | #_Edit MenuRoleUser 
+        Route::post('user-managment/v1/crud/menu-role-user/edit', 'updateRoleUser');              #API_ID=120502 | #_Edit MenuRoleUser
         Route::post('user-managment/v1/crud/menu-role-user/get', 'roleUserbyId');                 #API_ID=120503 | #_Get MenuRoleUser By Id
         Route::post('user-managment/v1/crud/menu-role-user/list', 'getAllRoleUser');              #API_ID=120504 | #_Get All MenuRoleUser
         Route::post('user-managment/v1/crud/menu-role-user/delete', 'deleteRoleUser');            #API_ID=120505 | #_Delete MenuRoleUser
@@ -338,7 +339,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::controller(ApiController::class)->group(function () {
         Route::post('user-managment/v1/crud/api-master/save', 'createApi');                  // Save Api
         Route::post('user-managment/v1/crud/api-master/save', 'store');                  // Save Api
-        Route::post('user-managment/v1/crud/api-master/edit', 'updateApi');                  // Edit Api 
+        Route::post('user-managment/v1/crud/api-master/edit', 'updateApi');                  // Edit Api
         Route::post('user-managment/v1/crud/api-master/get', 'apibyId');                     // Get Api By Id
         Route::post('user-managment/v1/crud/api-master/list', 'getAllApi');                  // Get All Api
         Route::post('user-managment/v1/crud/api-master/delete', 'deleteApi');                // Delete Api
@@ -355,7 +356,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * Api Permission Crud
      * created By Sandeep Bara
      * Date 08/08/2023
-     * 
+     *
      */
     Route::controller(ApiMasterController::class)->group(function () {
         # menu api map api list
@@ -371,7 +372,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-api-exclude', 'userApiExclulde');
         Route::post('edit-user-api-exclude', 'userApiExcluldeUpdate');
 
-        # zone crud operation 
+        # zone crud operation
         Route::post('create-zone', 'createZone');
         Route::post('get-zone', 'getZone');
         Route::post('delete-zone', 'deleteZone');
@@ -407,7 +408,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(ApiRoleMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/api-role-map/save', 'createRoleMap');                    // Save APIRole
-        Route::post('user-managment/v1/crud/api-role-map/edit', 'updateRoleMap');                    // Edit APIRole 
+        Route::post('user-managment/v1/crud/api-role-map/edit', 'updateRoleMap');                    // Edit APIRole
         Route::post('user-managment/v1/crud/api-role-map/get', 'roleMapbyId');                       // Get APIRole By Id
         Route::post('user-managment/v1/crud/api-role-map/list', 'getAllRoleMap');                    // Get All APIRole
         Route::post('user-managment/v1/crud/api-role-map/delete', 'deleteRoleMap');                  // Delete APIRole
@@ -422,7 +423,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(ApiRoleUserMapController::class)->group(function () {
         Route::post('user-managment/v1/crud/api-role-user/save', 'createRoleUser');     #API_ID=121301 | #_Save ApiRoleUser
-        Route::post('user-managment/v1/crud/api-role-user/edit', 'updateRoleUser');     #API_ID=121302 | #_Edit ApiRoleUser 
+        Route::post('user-managment/v1/crud/api-role-user/edit', 'updateRoleUser');     #API_ID=121302 | #_Edit ApiRoleUser
         Route::post('user-managment/v1/crud/api-role-user/get', 'roleUserbyId');        #API_ID=121303 | #_Get ApiRoleUser By Id
         Route::post('user-managment/v1/crud/api-role-user/list', 'getAllRoleUser');     #API_ID=121304 | #_Get All ApiRoleUser
         Route::post('user-managment/v1/crud/api-role-user/delete', 'deleteRoleUser');   #API_ID=121305 | #_Delete ApiRoleUser
@@ -436,7 +437,7 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(WardUserController::class)->group(function () {
         Route::post('user-managment/v1/crud/ward-user/save', 'createWardUser');       // Save WardUser
-        Route::post('user-managment/v1/crud/ward-user/edit', 'updateWardUser');       // Edit WardUser 
+        Route::post('user-managment/v1/crud/ward-user/edit', 'updateWardUser');       // Edit WardUser
         Route::post('user-managment/v1/crud/ward-user/get', 'WardUserbyId');         // Get WardUser By Id
         Route::post('user-managment/v1/crud/ward-user/list', 'getAllWardUser');       // Get All WardUser
         Route::post('user-managment/v1/crud/ward-user/delete', 'deleteWardUser');     // Delete WardUser
@@ -457,7 +458,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/getWorkflowNameByUlb', 'getWorkflowNameByUlb');
         Route::post('workflow/getRoleByUlb', 'getRoleByUlb');
         Route::post('workflow/getUserByRole', 'getUserByRole');     #both r same please use one
-        Route::post('workflow/getUserByRoleId', 'getUserByRoleId'); #both r same please use one    
+        Route::post('workflow/getUserByRoleId', 'getUserByRoleId'); #both r same please use one
         Route::post('workflow/getRoleByWorkflow', 'getRoleByWorkflow');
         Route::post('workflow/getUserByWorkflow', 'getUserByWorkflow');
         Route::post('workflow/getWardsInWorkflow', 'getWardsInWorkflow');
@@ -489,7 +490,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('upload/ulb-logo-by-id', 'uploadUlbLogo');
         Route::post('get-upload/ulb-logo', 'getAllUlbLogos');
 
-        
+
     });
 
     /**
@@ -510,14 +511,14 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     Route::controller(FaqController::class)->group(function () {
         Route::post('user-managment/v1/crud/faq/save', 'createfaq');                  // Save FAQ
-        Route::post('user-managment/v1/crud/faq/edit', 'updatefaq');                  // Edit FAQ 
+        Route::post('user-managment/v1/crud/faq/edit', 'updatefaq');                  // Edit FAQ
         Route::post('user-managment/v1/crud/faq/get', 'faqbyId')->withoutMiddleware('auth:sanctum');   // Get FAQ By Id
         Route::post('user-managment/v1/crud/faq/list', 'faqList')->withoutMiddleware('auth:sanctum');  // Get All FAQ
         Route::post('user-managment/v1/crud/faq/delete', 'deletefaq');                // Delete FAQ
     });
 
     /**
-     * | 
+     * |
      */
     Route::controller(UserController::class)->group(function () {
         Route::post('user-managment/v1/crud/user/create', 'createUser');              #_Authorised User Adding User
@@ -534,7 +535,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         Route::post('change-password', 'changePass');                       // Change password with login
-        Route::post('otp/change-password', 'changePasswordByOtp');           // Change Password With OTP   
+        Route::post('otp/change-password', 'changePasswordByOtp');           // Change Password With OTP
 
         // User Profile APIs
         Route::get('my-profile-details', 'myProfileDetails');   // For get My profile Details
@@ -563,7 +564,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get-citizen-by-id/{id}', 'getCitizenByID');                                                // Get Citizen By ID
         Route::get('get-all-citizens', 'getAllCitizens');                                                      // Get All Citizens
         Route::post('edit-citizen-profile', 'citizenEditProfile');                                             // Approve Or Reject Citizen by Id
-        Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password 
+        Route::post('change-citizen-pass', 'changeCitizenPass');                                               // Change the Password of The Citizen Using its Old Password
         Route::post('otp/change-citizen-pass', 'changeCitizenPassByOtp');                                      // Change Password using OTP for Citizen
         Route::post('citizen-profile-details', 'profileDetails');
         Route::post('detach-citizen-from-undercare', 'detachCitizenFromUndercare');
@@ -721,7 +722,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("swm/getReprintData-v3", "unAuthApis");
         Route::post("swm/getConsumerDetailsByIdv1/{id}", "unAuthApis");
 
-        // water 
+        // water
         Route::post("water/consumer/get-owner-details", "unAuthApis");
         //legal
         Route::post("legal/guest/get-detail-case-citizen", "unAuthApis");

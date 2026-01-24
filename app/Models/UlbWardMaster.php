@@ -24,7 +24,7 @@ class UlbWardMaster extends Model
 
         return $workkFlow;
     }
-    # create ulb ward 
+    # create ulb ward
     public function addUlbWard($req)
     {
         $data = new UlbWardMaster;
@@ -72,7 +72,7 @@ class UlbWardMaster extends Model
         $data->save();
         return $message;
     }
-    # create ulb ward 
+    # create ulb ward
     public function updateZoneById($req)
     {
         $data = UlbWardMaster::find($req->id);
@@ -88,7 +88,7 @@ class UlbWardMaster extends Model
         $data->save();
         return $data->id;
     }
-    #get data by id 
+    #get data by id
     public function getDataByIdDtls($req)
     {
         $data = UlbWardMaster::select(
