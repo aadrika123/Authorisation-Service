@@ -74,6 +74,118 @@ class WorkflowMapController extends Controller
      * - If module_id is provided, it checks whether that module is permitted in that ULB
      *
      */
+    // public function checkUlbWardModule(Request $request)
+    // {
+    //     $request->validate([
+    //         'ulb_id' => 'required|integer',
+    //         'ward_id' => 'nullable|integer',
+    //         'module_id' => 'nullable|integer',
+    //     ]);
+
+    //     try {
+    //         // Get ULB Details
+    //         $ulb = UlbMaster::find($request->ulb_id);
+    //         if (!$ulb) {
+    //             throw new Exception("ULB not found");
+    //         }
+
+    //         $docUrl = Config::get('constants.DOC_URL');
+
+    //         $responseData = [
+    //             'ulb_name' => $ulb->ulb_name,
+    //             'ulb_image' => $docUrl . '/' . $ulb->logo,
+    //         ];
+
+    //         // Get Ward Details
+    //         if ($request->ward_id) {
+    //             // Try to find by ward_name first (User might send Ward Number)
+    //             $ward = UlbWardMaster::where('ulb_id', $request->ulb_id)
+    //                 ->where('ward_name', $request->ward_id)
+    //                 ->where('status', 1)
+    //                 ->first();
+
+    //             // If not found, try by ID
+    //             if (!$ward) {
+    //                 $ward = UlbWardMaster::where('ulb_id', $request->ulb_id)
+    //                     ->where('id', $request->ward_id)
+    //                     ->where('status', 1)
+    //                     ->first();
+    //             }
+
+    //             if (!$ward) {
+    //                 throw new Exception("Ward not found or not active in this ULB");
+    //             }
+
+    //             $responseData['ward_name'] = $ward->ward_name;
+
+    //             // Get TC (Tax Collector) Details using RESOLVED $ward->id
+    //             $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
+    //                 ->where('users.ulb_id', $request->ulb_id)
+    //                 ->where('wf_ward_users.ward_id', $ward->id)
+    //                 ->where('users.user_type', 'TC')
+    //                 ->where('users.suspended', false)
+    //                 ->where('wf_ward_users.is_suspended', false)
+    //                 ->select('users.name', 'users.user_name', 'users.mobile', 'users.photo')
+    //                 ->get();
+
+    //             $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $ward) {
+    //                 return [
+    //                     'tc_name' => $tc->name ?: $tc->user_name,
+    //                     'tc_mobile' => $tc->mobile,
+    //                     'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
+    //                     'ward_name' => $ward->ward_name,
+    //                 ];
+    //             });
+    //         } else {
+    //             // Get All TCs if no ward_id
+    //             $allTcs = User::join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
+    //                 ->join('ulb_ward_masters', 'ulb_ward_masters.id', 'wf_ward_users.ward_id')
+    //                 ->where('users.ulb_id', $request->ulb_id)
+    //                 ->where('users.user_type', 'TC')
+    //                 ->where('users.suspended', false)
+    //                 ->where('wf_ward_users.is_suspended', false)
+    //                 ->select('users.name', 'users.user_name', 'users.mobile', 'users.photo', 'ulb_ward_masters.ward_name')
+    //                 ->get();
+
+    //             $responseData['tc_details'] = $allTcs->map(function ($tc) use ($docUrl) {
+    //                 return [
+    //                     'tc_name' => $tc->name ?: $tc->user_name,
+    //                     'tc_mobile' => $tc->mobile,
+    //                     'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
+    //                     'ward_name' => $tc->ward_name,
+    //                 ];
+    //             });
+    //         }
+
+    //         // If module_id is provided, check permission
+    //         if ($request->module_id) {
+    //             // Check if module exists and is active
+    //             $module = ModuleMaster::where('id', $request->module_id)
+    //                 ->where('is_suspended', false)
+    //                 ->first();
+
+    //             if ($module) {
+    //                 $permission = UlbModulePermission::where('ulb_id', $request->ulb_id)
+    //                     ->where('module_id', $request->module_id)
+    //                     ->where('is_suspended', false)
+    //                     ->first();
+
+    //                 if ($permission) {
+    //                     $responseData['module_permission'] = $module;
+    //                 } else {
+    //                     $responseData['module_permission'] = null;
+    //                 }
+    //             } else {
+    //                 $responseData['module_permission'] = null;
+    //             }
+    //         }
+
+    //         return responseMsg(true, "Data Retrieved Successfully", $responseData);
+
+    //     } catch (Exception $e) {
+    //         return responseMsg(false, $e->getMessage(), null);
+    //     }
+    // }
     public function checkUlbWardModule(Request $request)
     {
         $request->validate([
@@ -96,9 +208,11 @@ class WorkflowMapController extends Controller
                 'ulb_image' => $docUrl . '/' . $ulb->logo,
             ];
 
+            $tcUsers = collect(); // default empty collection
+
             // Get Ward Details
             if ($request->ward_id) {
-                // Try to find by ward_name first (User might send Ward Number)
+                // Try to find by ward_name first
                 $ward = UlbWardMaster::where('ulb_id', $request->ulb_id)
                     ->where('ward_name', $request->ward_id)
                     ->where('status', 1)
@@ -118,63 +232,103 @@ class WorkflowMapController extends Controller
 
                 $responseData['ward_name'] = $ward->ward_name;
 
-                // Get TC (Tax Collector) Details using RESOLVED $ward->id
-                $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
+                // Get TC Users (WARD WISE)
+                $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', '=', 'users.id')
+                    ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
                     ->where('users.ulb_id', $request->ulb_id)
                     ->where('wf_ward_users.ward_id', $ward->id)
                     ->where('users.user_type', 'TC')
                     ->where('users.suspended', false)
-                    ->where('wf_ward_users.is_suspended', 'false')
-                    ->select('users.name', 'users.user_name', 'users.mobile', 'users.photo')
+                    ->where('wf_ward_users.is_suspended', false)
+                    ->select(
+                        'users.id as user_id',
+                        'users.name',
+                        'users.mobile',
+                        'users.email',
+                        'users.photo',
+                        'ulb_ward_masters.ward_name'
+                    )
                     ->get();
-
-                $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $ward) {
-                    return [
-                        'tc_name' => $tc->name ?: $tc->user_name,
-                        'tc_mobile' => $tc->mobile,
-                        'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
-                        'ward_name' => $ward->ward_name,
-                    ];
-                });
             } else {
-                // Get All TCs if no ward_id
-                $allTcs = User::join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
-                    ->join('ulb_ward_masters', 'ulb_ward_masters.id', 'wf_ward_users.ward_id')
+                // Get All TCs (ULB WISE)
+                $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', '=', 'users.id')
+                    ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
                     ->where('users.ulb_id', $request->ulb_id)
                     ->where('users.user_type', 'TC')
                     ->where('users.suspended', false)
-                    ->where('wf_ward_users.is_suspended', 'false')
-                    ->select('users.name', 'users.user_name', 'users.mobile', 'users.photo', 'ulb_ward_masters.ward_name')
+                    ->where('wf_ward_users.is_suspended', false)
+                    ->select(
+                        'users.id as user_id',
+                        'users.name',
+                        'users.mobile',
+                        'users.email',
+                        'users.photo',
+                        'ulb_ward_masters.ward_name'
+                    )
                     ->get();
-
-                $responseData['tc_details'] = $allTcs->map(function ($tc) use ($docUrl) {
-                    return [
-                        'tc_name' => $tc->name ?: $tc->user_name,
-                        'tc_mobile' => $tc->mobile,
-                        'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
-                        'ward_name' => $tc->ward_name,
-                    ];
-                });
             }
 
-            // If module_id is provided, check permission
+            // check permission
+            $ulbPermission = null;
+            $allowedUserIds = [];
+
             if ($request->module_id) {
-                // Check if module exists and is active
+                // Check if module exists and active
                 $module = ModuleMaster::where('id', $request->module_id)
                     ->where('is_suspended', false)
                     ->first();
 
                 if ($module) {
-                    $permission = UlbModulePermission::where('ulb_id', $request->ulb_id)
+                    // Check ULB level permission
+                    $ulbPermission = UlbModulePermission::where('ulb_id', $request->ulb_id)
                         ->where('module_id', $request->module_id)
                         ->where('is_suspended', false)
                         ->first();
 
-                    $responseData['module_permission'] = $permission ? true : false;
+                    $responseData['module_permission'] = $ulbPermission ? $module : null;
+
+                    // ✅ If ULB is permitted, Check Granular User Permissions
+                    if ($ulbPermission) {
+                        $tcIds = $tcUsers->pluck('user_id')->unique()->toArray();
+                        if (!empty($tcIds)) {
+                            // Find users who have roles in workflows linked to this module
+                            $allowedUserIds = DB::table('wf_roleusermaps as rum')
+                                ->join('wf_workflowrolemaps as wrm', 'wrm.wf_role_id', '=', 'rum.wf_role_id')
+                                ->join('wf_workflows as wf', 'wf.id', '=', 'wrm.workflow_id')
+                                ->join('wf_masters as wm', 'wm.id', '=', 'wf.wf_master_id')
+                                ->where('wm.module_id', $request->module_id)
+                                ->whereIn('rum.user_id', $tcIds)
+                                ->where('rum.is_suspended', false)
+                                ->where('wrm.is_suspended', false)
+                                ->where('wf.is_suspended', false)
+                                ->where('wm.is_suspended', false)
+                                ->pluck('rum.user_id')
+                                ->unique()
+                                ->toArray();
+                        }
+                    }
+
                 } else {
-                    $responseData['module_permission'] = false;
+                    $responseData['module_permission'] = null;
                 }
             }
+
+            // FINAL TC OUTPUT
+            $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request) {
+                $tcData = [
+                    'tc_name' => $tc->name ?: $tc->name,
+                    'tc_mobile' => $tc->mobile,
+                    'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
+                    'ward_name' => $tc->ward_name ?? null,
+                    'email' => $tc->email,
+                ];
+
+                if ($request->module_id) {
+                    $tcData['module_permission'] = in_array($tc->user_id, $allowedUserIds);
+                }
+
+                return $tcData;
+            });
 
             return responseMsg(true, "Data Retrieved Successfully", $responseData);
 
