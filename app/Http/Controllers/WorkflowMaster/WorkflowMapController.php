@@ -201,7 +201,7 @@ class WorkflowMapController extends Controller
                 throw new Exception("ULB not found");
             }
 
-            $docUrl = Config::get('constants.DOC_URL');
+            $docUrl = Config::get('constants.DMS_URL');
 
             $responseData = [
                 'ulb_name' => $ulb->ulb_name,
@@ -314,7 +314,7 @@ class WorkflowMapController extends Controller
             }
 
             // FINAL TC OUTPUT
-            $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request) {
+            $tcDetails = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request) {
                 $tcData = [
                     'tc_name' => $tc->name ?: $tc->name,
                     'tc_mobile' => $tc->mobile,
@@ -324,11 +324,29 @@ class WorkflowMapController extends Controller
                 ];
 
                 if ($request->module_id) {
-                    $tcData['module_permission'] = in_array($tc->user_id, $allowedUserIds);
+                    $hasPermission = in_array($tc->user_id, $allowedUserIds);
+                    // Add permission flag internally for filtering
+                    $tcData['has_permission'] = $hasPermission;
+                    // Note: User doesn't want the boolean shown, just the filtered list
+                } else {
+                    $tcData['has_permission'] = true; // Include all if no module specified
                 }
 
                 return $tcData;
             });
+
+            // Filter if module_id is provided
+            if ($request->module_id) {
+                $tcDetails = $tcDetails->filter(function ($item) {
+                    return $item['has_permission'] === true;
+                });
+            }
+
+            // Remove internal flag and re-index
+            $responseData['tc_details'] = $tcDetails->map(function ($item) {
+                unset($item['has_permission']);
+                return $item;
+            })->values();
 
             return responseMsg(true, "Data Retrieved Successfully", $responseData);
 
