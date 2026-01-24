@@ -202,10 +202,12 @@ class WorkflowMapController extends Controller
             }
 
             $docUrl = Config::get('constants.DMS_URL');
+            $ulbUrl = Config::get('constants.DOC_URL');
+
 
             $responseData = [
                 'ulb_name' => $ulb->ulb_name,
-                'ulb_image' => $docUrl . '/' . $ulb->logo,
+                'ulb_image' => $ulbUrl . '/' . $ulb->logo,
             ];
 
             $tcUsers = collect(); // default empty collection
@@ -271,6 +273,7 @@ class WorkflowMapController extends Controller
             // check permission
             $ulbPermission = null;
             $allowedUserIds = [];
+            $moduleName = null;
 
             if ($request->module_id) {
                 // Check if module exists and active
@@ -279,6 +282,7 @@ class WorkflowMapController extends Controller
                     ->first();
 
                 if ($module) {
+                    $moduleName = $module->module_name;
                     // Check ULB level permission
                     $ulbPermission = UlbModulePermission::where('ulb_id', $request->ulb_id)
                         ->where('module_id', $request->module_id)
@@ -314,13 +318,14 @@ class WorkflowMapController extends Controller
             }
 
             // FINAL TC OUTPUT
-            $tcDetails = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request) {
+            $tcDetails = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request, $moduleName) {
                 $tcData = [
                     'tc_name' => $tc->name ?: $tc->name,
                     'tc_mobile' => $tc->mobile,
                     'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
                     'ward_name' => $tc->ward_name ?? null,
                     'email' => $tc->email,
+                    'module' => $moduleName,
                 ];
 
                 if ($request->module_id) {
