@@ -12,6 +12,8 @@ use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
 use App\Models\Workflows\WfWorkflow;
 use App\Models\Workflows\WfWorkflowrolemap;
+use App\Models\Menu\MenuRole;
+use App\Models\Menu\MenuRoleusermap;
 use App\Repository\WorkflowMaster\Interface\iWorkflowMapRepository;
 use Config;
 use Exception;
@@ -204,13 +206,14 @@ class WorkflowMapController extends Controller
             $docUrl = Config::get('constants.DMS_URL');
             $ulbUrl = Config::get('constants.DOC_URL');
 
-
             $responseData = [
                 'ulb_name' => $ulb->ulb_name,
                 'ulb_image' => $ulbUrl . '/' . $ulb->logo,
             ];
 
             $tcUsers = collect(); // default empty collection
+            $ward = null;
+            $moduleName = null;
 
             // Get Ward Details
             if ($request->ward_id) {
@@ -231,50 +234,10 @@ class WorkflowMapController extends Controller
                 if (!$ward) {
                     throw new Exception("Ward not found or not active in this ULB");
                 }
-
                 $responseData['ward_name'] = $ward->ward_name;
-
-                // Get TC Users (WARD WISE)
-                $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', '=', 'users.id')
-                    ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
-                    ->where('users.ulb_id', $request->ulb_id)
-                    ->where('wf_ward_users.ward_id', $ward->id)
-                    ->where('users.user_type', 'TC')
-                    ->where('users.suspended', false)
-                    ->where('wf_ward_users.is_suspended', false)
-                    ->select(
-                        'users.id as user_id',
-                        'users.name',
-                        'users.mobile',
-                        'users.email',
-                        'users.photo',
-                        'ulb_ward_masters.ward_name'
-                    )
-                    ->get();
-            } else {
-                // Get All TCs (ULB WISE)
-                $tcUsers = User::join('wf_ward_users', 'wf_ward_users.user_id', '=', 'users.id')
-                    ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
-                    ->where('users.ulb_id', $request->ulb_id)
-                    ->where('users.user_type', 'TC')
-                    ->where('users.suspended', false)
-                    ->where('wf_ward_users.is_suspended', false)
-                    ->select(
-                        'users.id as user_id',
-                        'users.name',
-                        'users.mobile',
-                        'users.email',
-                        'users.photo',
-                        'ulb_ward_masters.ward_name'
-                    )
-                    ->get();
             }
 
-            // check permission
-            $ulbPermission = null;
-            $allowedUserIds = [];
-            $moduleName = null;
-
+            // Check permission metadata & Fetch TCs ONLY if module_id is present
             if ($request->module_id) {
                 // Check if module exists and active
                 $module = ModuleMaster::where('id', $request->module_id)
@@ -291,26 +254,39 @@ class WorkflowMapController extends Controller
 
                     $responseData['module_permission'] = $ulbPermission ? $module : null;
 
-                    // ✅ If ULB is permitted, Check Granular User Permissions
-                    if ($ulbPermission) {
-                        $tcIds = $tcUsers->pluck('user_id')->unique()->toArray();
-                        if (!empty($tcIds)) {
-                            // Find users who have roles in workflows linked to this module
-                            $allowedUserIds = DB::table('wf_roleusermaps as rum')
-                                ->join('wf_workflowrolemaps as wrm', 'wrm.wf_role_id', '=', 'rum.wf_role_id')
-                                ->join('wf_workflows as wf', 'wf.id', '=', 'wrm.workflow_id')
-                                ->join('wf_masters as wm', 'wm.id', '=', 'wf.wf_master_id')
-                                ->where('wm.module_id', $request->module_id)
-                                ->whereIn('rum.user_id', $tcIds)
-                                ->where('rum.is_suspended', false)
-                                ->where('wrm.is_suspended', false)
-                                ->where('wf.is_suspended', false)
-                                ->where('wm.is_suspended', false)
-                                ->pluck('rum.user_id')
-                                ->unique()
-                                ->toArray();
-                        }
+                    // Build query for TC Users using Menu Roles
+                    $query = User::select(
+                        'users.id as user_id',
+                        'users.name',
+                        'users.user_type',
+                        'users.user_name',
+                        'users.mobile',
+                        'users.email',
+                        'users.photo',
+                        'ulb_ward_masters.ward_name'
+                    )
+                        ->join('menu_roleusermaps', 'menu_roleusermaps.user_id', '=', 'users.id')
+                        ->join('menu_roles', 'menu_roles.id', '=', 'menu_roleusermaps.menu_role_id')
+                        // Use Left Join for Ward specific details to ensure TCs are fetched even if not in a ward
+                        ->leftJoin('wf_ward_users', function ($join) {
+                            $join->on('wf_ward_users.user_id', '=', 'users.id')
+                                ->where('wf_ward_users.is_suspended', false);
+                        })
+                        ->leftJoin('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
+                        ->where('users.ulb_id', $request->ulb_id)
+                        ->where('users.suspended', false)
+                        ->where('menu_roleusermaps.is_suspended', false)
+                        ->where('menu_roles.is_suspended', false)
+                        ->where('menu_roles.menu_role_name', 'ILIKE', '%TC%')
+                        ->where('menu_roles.module_id', $request->module_id);
+
+                    // Apply Ward Filter if present
+                    if ($ward) {
+                        $query->where('wf_ward_users.ward_id', $ward->id);
                     }
+
+                    // Get Distinct TCs
+                    $tcUsers = $query->distinct()->get();
 
                 } else {
                     $responseData['module_permission'] = null;
@@ -318,40 +294,19 @@ class WorkflowMapController extends Controller
             }
 
             // FINAL TC OUTPUT
-            $tcDetails = $tcUsers->map(function ($tc) use ($docUrl, $allowedUserIds, $request, $moduleName) {
-                $tcData = [
-                    'tc_name' => $tc->name ?: $tc->name,
+            // FINAL TC OUTPUT
+            $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $moduleName) {
+                return [
+                    'tc_name' => $tc->user_name,
+                    'tc_name' => $tc->name,  // Fallback to name if user_name is likely empty, or strictly user_name as requested
+                    'tc_type' => $tc->user_type,
                     'tc_mobile' => $tc->mobile,
                     'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
                     'ward_name' => $tc->ward_name ?? null,
                     'email' => $tc->email,
                     'module' => $moduleName,
                 ];
-
-                if ($request->module_id) {
-                    $hasPermission = in_array($tc->user_id, $allowedUserIds);
-                    // Add permission flag internally for filtering
-                    $tcData['has_permission'] = $hasPermission;
-                    // Note: User doesn't want the boolean shown, just the filtered list
-                } else {
-                    $tcData['has_permission'] = true; // Include all if no module specified
-                }
-
-                return $tcData;
             });
-
-            // Filter if module_id is provided
-            if ($request->module_id) {
-                $tcDetails = $tcDetails->filter(function ($item) {
-                    return $item['has_permission'] === true;
-                });
-            }
-
-            // Remove internal flag and re-index
-            $responseData['tc_details'] = $tcDetails->map(function ($item) {
-                unset($item['has_permission']);
-                return $item;
-            })->values();
 
             return responseMsg(true, "Data Retrieved Successfully", $responseData);
 
