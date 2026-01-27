@@ -254,11 +254,11 @@ class WorkflowMapController extends Controller
 
                     $responseData['module_permission'] = $ulbPermission ? $module : null;
 
-                    // Build query for TC Users using Menu Roles
-                    $query = User::select(
+                    // 1. Query via Menu Roles (Existing)
+                    $queryMenu = User::select(
                         'users.id as user_id',
                         'users.name',
-                        'users.user_type',
+                        // 'users.user_type',
                         'users.user_name',
                         'users.mobile',
                         'users.email',
@@ -267,7 +267,6 @@ class WorkflowMapController extends Controller
                     )
                         ->join('menu_roleusermaps', 'menu_roleusermaps.user_id', '=', 'users.id')
                         ->join('menu_roles', 'menu_roles.id', '=', 'menu_roleusermaps.menu_role_id')
-                        // Use Left Join for Ward specific details to ensure TCs are fetched even if not in a ward
                         ->leftJoin('wf_ward_users', function ($join) {
                             $join->on('wf_ward_users.user_id', '=', 'users.id')
                                 ->where('wf_ward_users.is_suspended', false);
@@ -280,13 +279,53 @@ class WorkflowMapController extends Controller
                         ->where('menu_roles.menu_role_name', 'ILIKE', '%TC%')
                         ->where('menu_roles.module_id', $request->module_id);
 
-                    // Apply Ward Filter if present
                     if ($ward) {
-                        $query->where('wf_ward_users.ward_id', $ward->id);
+                        $queryMenu->where('wf_ward_users.ward_id', $ward->id);
                     }
 
-                    // Get Distinct TCs
-                    $tcUsers = $query->distinct()->get();
+                    // 2. Query via Workflow Roles (New)
+                    // Path: user -> wf_roleusermap -> wf_role -> wf_workflowrolemap -> wf_workflow -> wf_master -> module
+                    $queryWf = User::select(
+                        'users.id as user_id',
+                        'users.name',
+                        // 'users.user_type',
+                        'users.user_name',
+                        'users.mobile',
+                        'users.email',
+                        'users.photo',
+                        'ulb_ward_masters.ward_name'
+                    )
+                        ->join('wf_roleusermaps', 'wf_roleusermaps.user_id', '=', 'users.id')
+                        ->join('wf_roles', 'wf_roles.id', '=', 'wf_roleusermaps.wf_role_id')
+                        ->join('wf_workflowrolemaps', 'wf_workflowrolemaps.wf_role_id', '=', 'wf_roles.id')
+                        ->join('wf_workflows', 'wf_workflows.id', '=', 'wf_workflowrolemaps.workflow_id')
+                        ->join('wf_masters', 'wf_masters.id', '=', 'wf_workflows.wf_master_id')
+                        ->leftJoin('wf_ward_users', function ($join) {
+                            $join->on('wf_ward_users.user_id', '=', 'users.id')
+                                ->where('wf_ward_users.is_suspended', false);
+                        })
+                        ->leftJoin('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
+                        ->where('users.ulb_id', $request->ulb_id)
+                        ->where('users.suspended', false)
+                        ->where('wf_roleusermaps.is_suspended', false)
+                        ->where('wf_roles.is_suspended', false)
+                        ->where('wf_workflowrolemaps.is_suspended', false)
+                        ->where('wf_workflows.is_suspended', false)
+                        // Filter by Role Name Pattern AND Module ID
+                        ->where(function ($q) {
+                            $q->where('wf_roles.role_name', 'ILIKE', '%TC%')
+                                ->orWhere('wf_roles.role_name', 'ILIKE', '%Tax Collector%');
+                        })
+                        ->where('wf_masters.module_id', $request->module_id);
+
+                    if ($ward) {
+                        $queryWf->where('wf_ward_users.ward_id', $ward->id);
+                    }
+
+                    // Union and Layout
+                    $tcUsers = $queryMenu->union($queryWf)
+                        ->orderBy('name', 'ASC')
+                        ->get();
 
                 } else {
                     $responseData['module_permission'] = null;
@@ -294,12 +333,10 @@ class WorkflowMapController extends Controller
             }
 
             // FINAL TC OUTPUT
-            // FINAL TC OUTPUT
             $responseData['tc_details'] = $tcUsers->map(function ($tc) use ($docUrl, $moduleName) {
                 return [
-                    'tc_name' => $tc->user_name,
-                    'tc_name' => $tc->name,  // Fallback to name if user_name is likely empty, or strictly user_name as requested
-                    'tc_type' => $tc->user_type,
+                    'tc_name' => $tc->user_name ?: $tc->name, // Fallback to name if user_name is likely empty, or strictly user_name as requested
+                    // 'tc_type' => $tc->user_type,
                     'tc_mobile' => $tc->mobile,
                     'tc_image' => $tc->photo ? $docUrl . '/' . $tc->photo : null,
                     'ward_name' => $tc->ward_name ?? null,
