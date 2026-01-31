@@ -332,7 +332,6 @@ class UserController extends Controller
     //     }
     // }
 
-    
     public function loginAuth(Request $req)
     {
         $validated = Validator::make(
@@ -353,8 +352,9 @@ class UserController extends Controller
         }
 
         try {
+
             /* =========================================================
-            *  Encryption Setup
+            * Encryption Setup
             * ========================================================= */
             $secretKey = Config::get('constants.SECRETKEY');
             $method = 'AES-256-CBC';
@@ -362,18 +362,16 @@ class UserController extends Controller
             $iv = substr(hash('sha256', $secretKey), 0, 16);
 
             /* =========================================================
-            *  Normalize Module ID
+            * Normalize Module ID
             * ========================================================= */
             $moduleId = (int) ($req->moduleId ?? 0);
 
             /* =========================================================
-            *  Captcha Verification (WORKS EVEN FOR moduleId = 0)
+            * Captcha Verification
             * ========================================================= */
             $captchaModules = Config::get('constants.MODULES_WITH_CAPTCHA', []);
-            if (
-                $req->filled('moduleId') &&
-                in_array($moduleId, $captchaModules)
-            ) {
+            if ($req->filled('moduleId') && in_array($moduleId, $captchaModules)) {
+
                 $storedCode = Redis::get("CAPTCHA:{$req->captcha_id}");
                 if (!$storedCode) {
                     throw new Exception("Captcha expired or not found");
@@ -395,9 +393,10 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  Rate Limiting (System Unique ID)
+            * Rate Limiting
             * ========================================================= */
             $rateKey = 'login:' . $req->systemUniqueId;
+
             if (RateLimiter::tooManyAttempts($rateKey, 5)) {
                 $seconds = RateLimiter::availableIn($rateKey);
                 return responseMsgs(
@@ -415,7 +414,7 @@ class UserController extends Controller
             RateLimiter::hit($rateKey, 120);
 
             /* =========================================================
-            *  Password Decryption
+            * Password Decryption
             * ========================================================= */
             $password = openssl_decrypt(
                 base64_decode($req->password),
@@ -430,47 +429,29 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  User Lookup
+            * User Lookup
             * ========================================================= */
             $user = $this->_mUser->getUserByEmail($req->email);
             if (!$user) {
                 throw new Exception("Invalid Credentials");
             }
 
-            /* =========================================================
-            *  GLOBAL MODULE STATUS CHECK (FIRST RESTRICTION)
-            * ========================================================= */
-            // if ($moduleId > 0) {
-
-            //     $role = DB::table('menu_roleusermaps as mrum')
-            //         ->join('menu_roles as mr', 'mr.id', '=', 'mrum.menu_role_id')
-            //         ->where('mr.module_id', $moduleId)
-            //         ->where('mrum.user_id', $user->id)
-            //         ->where('mr.is_suspended', false)
-            //         ->first();
-
-            //     if (!$role) {
-            //         throw new Exception("Invalid role not assigned");
-            //     }
-
-                
-            // }
-
-
             if ($user->suspended) {
                 throw new Exception("You are not authorized to log in!");
             }
 
             /* =========================================================
-            *  ULB Restriction Check (ALWAYS REQUIRED)
+            * ULB Restriction Check (BYPASS ONLY FOR moduleId = 35)
             * ========================================================= */
-            $mUlbMaster = new UlbMaster();
-            if (!$mUlbMaster->checkUlb($user)) {
-                throw new Exception("This ULB is restricted for SuperAdmin!");
+            if ($moduleId != 35) {
+                $mUlbMaster = new UlbMaster();
+                if (!$mUlbMaster->checkUlb($user)) {
+                    throw new Exception("This ULB is restricted for SuperAdmin!");
+                }
             }
 
             /* =========================================================
-            *  ULB → MODULE Restriction (SKIP ONLY IF moduleId = 0)
+            * ULB → MODULE Restriction (SKIP ONLY IF moduleId = 0)
             * ========================================================= */
             if ($moduleId > 0) {
                 if (!$this->_UlbModulePermission->check($user, $req)) {
@@ -479,7 +460,7 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  USER → MODULE Permission (menu_roles) (SKIP ONLY IF moduleId = 0)
+            * USER → MODULE Permission
             * ========================================================= */
             if ($moduleId > 0) {
                 if (!$this->hasModulePermission($user->id, $moduleId)) {
@@ -488,14 +469,14 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  Password Match
+            * Password Match
             * ========================================================= */
             if (!Hash::check($password, $user->password)) {
                 throw new Exception("Invalid Credentials");
             }
 
             /* =========================================================
-            *  SUCCESS LOGIN
+            * SUCCESS LOGIN
             * ========================================================= */
             RateLimiter::clear($rateKey);
 
@@ -516,7 +497,7 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  TC / TL Login Log
+            * TC / TL Login Log
             * ========================================================= */
             if (in_array($user->user_type, ['TC', 'TL'])) {
                 UserLoginDetail::create([
@@ -528,7 +509,7 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            *  Response Data
+            * Response Data
             * ========================================================= */
             $user->ulbName = UlbMaster::find($user->ulb_id)->ulb_name ?? "";
 
