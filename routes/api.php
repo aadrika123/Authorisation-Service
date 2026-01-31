@@ -157,6 +157,9 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('toggle-department-status',  'toggleDepartmentStatus');
     Route::post('module-list',  'moduleList');
     Route::post('getWardByUlb', 'getWardByUlb');
+    Route::post('add-module', 'addModule');
+    Route::post('update-module', 'updateModule');
+    Route::post('delete-module', 'deleteModule');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {

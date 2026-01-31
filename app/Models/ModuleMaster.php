@@ -11,6 +11,16 @@ class ModuleMaster extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'module_name',
+        'title',
+        'url',
+        'image',
+        'dues_api',
+        'can_view',
+        'is_suspended'
+    ];
+
     protected $hidden = [
         'created_at',
         'updated_at'
