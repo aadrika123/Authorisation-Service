@@ -441,19 +441,9 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            * ULB Restriction Check (BYPASS ONLY FOR moduleId = 35)
+            * ULB → MODULE Restriction (SKIP for moduleId = 0 or 35)
             * ========================================================= */
-            if ($moduleId != 35) {
-                $mUlbMaster = new UlbMaster();
-                if (!$mUlbMaster->checkUlb($user)) {
-                    throw new Exception("This ULB is restricted for SuperAdmin!");
-                }
-            }
-
-            /* =========================================================
-            * ULB → MODULE Restriction (SKIP ONLY IF moduleId = 0)
-            * ========================================================= */
-            if ($moduleId > 0) {
+            if ($moduleId > 0 && !in_array($moduleId, [35])) {
                 if (!$this->_UlbModulePermission->check($user, $req)) {
                     throw new Exception("Module is restricted for this ULB!");
                 }
