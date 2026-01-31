@@ -450,9 +450,9 @@ class UserController extends Controller
             }
 
             /* =========================================================
-            * USER → MODULE Permission
+            * USER → MODULE Permission (SKIP for moduleId = 0 or 35)
             * ========================================================= */
-            if ($moduleId > 0) {
+            if ($moduleId > 0 && !in_array($moduleId, [35])) {
                 if (!$this->hasModulePermission($user->id, $moduleId)) {
                     throw new Exception("Permission denied!");
                 }
