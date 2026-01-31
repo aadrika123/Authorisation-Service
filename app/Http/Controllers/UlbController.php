@@ -1219,4 +1219,95 @@ class UlbController extends Controller
         $wards->sortBy('ward_name')->values();
         return responseMsg(true, "Data Retrived", remove_null($wards));
     }
+
+    // Add Module
+    public function addModule(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'moduleName' => 'required|string|max:255',
+                'title' => 'nullable|string|max:255',
+                'url' => 'nullable|string|max:255',
+                'image' => 'nullable|string|max:255',
+                'duesApi' => 'nullable|string|max:255',
+                'canView' => 'nullable|boolean'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $module = ModuleMaster::create([
+                'module_name' => $req->moduleName,
+                'title' => $req->title,
+                'url' => $req->url,
+                'image' => $req->image,
+                'dues_api' => $req->duesApi,
+                'can_view' => $req->canView ?? true,
+                'is_suspended' => false
+            ]);
+
+            return responseMsgs(true, "Module created successfully", $module, "MOD001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Update Module
+    public function updateModule(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id' => 'required|exists:module_masters,id',
+                'moduleName' => 'required|string|max:255',
+                'title' => 'nullable|string|max:255',
+                'url' => 'nullable|string|max:255',
+                'image' => 'nullable|string|max:255',
+                'duesApi' => 'nullable|string|max:255',
+                'canView' => 'nullable|boolean'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $module = ModuleMaster::findOrFail($req->id);
+            $module->update([
+                'module_name' => $req->moduleName,
+                'title' => $req->title,
+                'url' => $req->url,
+                'image' => $req->image,
+                'dues_api' => $req->duesApi,
+                'can_view' => $req->canView ?? $module->can_view
+            ]);
+
+            return responseMsgs(true, "Module updated successfully", $module, "MOD002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Delete Module (Toggle is_suspended)
+    public function deleteModule(Request $req)
+    {
+        try {
+            $validated = Validator::make($req->all(), [
+                'id' => 'required|exists:module_masters,id',
+                'isSuspended' => 'required|boolean'
+            ]);
+
+            if ($validated->fails()) {
+                return validationError($validated);
+            }
+
+            $module = ModuleMaster::findOrFail($req->id);
+            $module->update(['is_suspended' => $req->isSuspended]);
+
+            $message = $req->isSuspended ? "Module disabled successfully" : "Module enabled successfully";
+
+            return responseMsgs(true, $message, "", "MOD003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 }
