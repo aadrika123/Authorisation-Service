@@ -426,11 +426,17 @@ class ApiMasterController extends Controller
     //all master list
     public function getZone(Request $req)
     {
+        $req->validate(['ulbId' => 'nullable|integer']);
         try {
-            // $ulbId = authUser()->ulb_id;
-            $list = new ZoneMaster();
-            $Zone = $list->getZone();
-            return responseMsgs(true, "All Workflow List", $Zone, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            $query = DB::table('zone_masters')
+                ->select('zone_masters.id', 'zone_masters.zone', 'zone_masters.ulb_id', 'zone_masters.status', 'ulb_masters.ulb_name')
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'zone_masters.ulb_id')
+                ->where('zone_masters.status', true);
+            if ($req->ulbId) {
+                $query->where('zone_masters.ulb_id', $req->ulbId);
+            }
+            $Zone = $query->get();
+            return responseMsgs(true, "All Zone List", remove_null($Zone), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
@@ -536,11 +542,17 @@ class ApiMasterController extends Controller
     //all master list
     public function getAllUlbWard(Request $req)
     {
+        $req->validate(['ulbId' => 'nullable|integer']);
         try {
-            // $ulbId = authUser()->ulb_id;
-            $mUlbWard = new UlbWardMaster();
-            $list = $mUlbWard->getALL();
-            return responseMsgs(true, "All  List", $list, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            $query = DB::table('ulb_ward_masters')
+                ->select('ulb_ward_masters.id', 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.old_ward_name', 'ulb_ward_masters.status', 'ulb_masters.ulb_name')
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
+                ->where('ulb_ward_masters.status', 1);
+            if ($req->ulbId) {
+                $query->where('ulb_ward_masters.ulb_id', $req->ulbId);
+            }
+            $list = $query->get();
+            return responseMsgs(true, "All Ward List", remove_null($list), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
