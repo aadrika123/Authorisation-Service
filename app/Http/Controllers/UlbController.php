@@ -272,7 +272,7 @@ class UlbController extends Controller
             'ward_name'
         )
             ->join('ulb_ward_masters', 'ulb_ward_masters.id', 'ulb_new_wardmaps.new_ward_mstr_id')
-            ->where('old_ward_mstr_id', $req->oldWardMstrId)
+                        ->where('old_ward_mstr_id', $req->oldWardMstrId)
             ->orderBy('new_ward_mstr_id')
             ->get();;
 
@@ -1308,6 +1308,38 @@ class UlbController extends Controller
             return responseMsgs(true, $message, "", "MOD003", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "MOD003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function ulbConfigDetails(Request $req)
+    {
+        $req->validate(['ulbId' => 'required|integer']);
+        
+        try {
+            $ulbId = $req->ulbId;
+            
+            $basicInfo = UlbMaster::select('*')->where('id', $ulbId)->first();
+            
+            if (!$basicInfo) {
+                return responseMsgs(false, "ULB not found", "", "404", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            }
+            
+            $wardCount = UlbWardMaster::where('ulb_id', $ulbId)->where('status', 1)->distinct('ward_name')->count('ward_name');
+            $zoneCount = DB::table('zone_masters')->where('ulb_id', $ulbId)->where('status', true)->count();
+            $departmentCount = $basicInfo->department_id ? 1 : 0;
+            
+            $data = [
+                'basic_information' => remove_null($basicInfo),
+                'global_master' => [
+                    'ward_count' => $wardCount,
+                    'zone_count' => $zoneCount,
+                    'department_count' => $departmentCount
+                ]
+            ];
+            
+            return responseMsgs(true, "ULB Configuration Details", $data, "200", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "500", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
