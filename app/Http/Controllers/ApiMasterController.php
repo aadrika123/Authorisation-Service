@@ -429,9 +429,9 @@ class ApiMasterController extends Controller
         $req->validate(['ulbId' => 'nullable|integer']);
         try {
             $query = DB::table('zone_masters')
-                ->select('zone_masters.id', 'zone_masters.zone', 'zone_masters.ulb_id', 'zone_masters.status', 'ulb_masters.ulb_name')
-                ->join('ulb_masters', 'ulb_masters.id', '=', 'zone_masters.ulb_id')
-                ->where('zone_masters.status', true);
+                ->select('zone_masters.id', 'zone_masters.zone', 'zone_masters.ulb_id', 'zone_masters.status', 'ulb_masters.ulb_name', 'zone_masters.created_at', 'zone_masters.updated_at')
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'zone_masters.ulb_id');
+                // ->where('zone_masters.status', true);
             if ($req->ulbId) {
                 $query->where('zone_masters.ulb_id', $req->ulbId);
             }
@@ -546,8 +546,8 @@ class ApiMasterController extends Controller
         try {
             $query = DB::table('ulb_ward_masters')
                 ->select('ulb_ward_masters.id', 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.old_ward_name', 'ulb_ward_masters.status', 'ulb_masters.ulb_name')
-                ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
-                ->where('ulb_ward_masters.status', 1);
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id');
+                // ->where('ulb_ward_masters.status', 1);
             if ($req->ulbId) {
                 $query->where('ulb_ward_masters.ulb_id', $req->ulbId);
             }
