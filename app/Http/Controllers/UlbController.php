@@ -9,6 +9,7 @@ use App\Models\DistrictMaster;
 use App\Models\LogNewDepartment;
 use App\Models\MCity;
 use App\Models\ModuleMaster;
+use App\Models\ModuleRegistry;
 use App\Models\ServiceMapping;
 use App\Models\ServiceMaster;
 use App\Models\UlbMaster;
@@ -446,31 +447,30 @@ class UlbController extends Controller
     {
         $validated = Validator::make(
             $req->all(),
-            ['ulbId'     => 'required|int',]
+            ['ulbId' => 'required|int']
         );
         if ($validated->fails()) {
             return validationError($validated);
         }
         try {
-            $mUlbModulePermission = $this->_UlbModulePermission;
-            $user = authUser();
-
-            $query = "select 
-                            mm.id,
-                            um.ulb_id,
-                            mm.module_name as module_name,
-                            mm.url,
-                            um.created_by,
-                            case 
-                                when um.module_id is null then false
-                                else
-                                    true  
-                            end as permission_status
-                        from module_masters as mm
-                        left join (select * from ulb_module_permissions where ulb_id=$req->ulbId and is_suspended = false) as um on um.module_id=mm.id
-                        order by um.id";
-
-            $data = DB::select($query);
+            $modules = DB::table('ulb_module_permissions as ump')
+                ->select(
+                    'mm.id',
+                    'mm.module_name',
+                )
+                ->join('module_masters as mm', 'mm.id', '=', 'ump.module_id')
+                ->where('ump.ulb_id', $req->ulbId)
+                ->where('ump.is_suspended', false)
+                ->orderBy('mm.id')
+                ->get();
+            
+            $moduleMasters = config('module-masters');
+            
+            $data = $modules->map(function($module) use ($moduleMasters) {
+                $module->master_tables = $moduleMasters[$module->id] ?? [];
+                return $module;
+            });
+            
             return responseMsg(true, "Module List of Ulb", $data);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "");
@@ -1366,6 +1366,169 @@ class UlbController extends Controller
             return responseMsgs(true, "Dashboard Counts", $data, "200", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "500", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Module Registry CRUD
+    public function createModuleRegistry(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'tableName'     => 'required|string|max:255',
+            'databaseName'  => 'required|string|max:255',
+            'moduleId'      => 'required|integer',
+            'ulbId'         => 'required|integer'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $exists = ModuleRegistry::where('table_name', $req->tableName)
+                ->where('module_id', $req->moduleId)
+                ->where('ulb_id', $req->ulbId)
+                ->exists();
+
+            if ($exists) {
+                throw new Exception("Table already registered for this module and ULB");
+            }
+
+            $registry = ModuleRegistry::create([
+                'table_name'    => $req->tableName,
+                'database_name' => $req->databaseName,
+                'module_id'     => $req->moduleId,
+                'ulb_id'        => $req->ulbId,
+                'status'        => true
+            ]);
+
+            return responseMsgs(true, "Module Registry created successfully", $registry, "REG001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    //     public function listModuleRegistry(Request $req)
+    // {
+    //     try {
+    //         $query = ModuleRegistry::select('module_registry.*', 'module_masters.module_name')
+    //             ->leftJoin('module_masters', 'module_masters.id', '=', 'module_registry.module_id')
+    //             ->orderBy('module_registry.id', 'desc');
+
+    //         if ($req->moduleId) {
+    //             $query->where('module_registry.module_id', $req->moduleId);
+    //         }
+
+    //         $data = $query->get();
+    //         return responseMsgs(true, "Module Registry List", remove_null($data), "REG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "REG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     }
+    // }
+
+    public function listModuleRegistry(Request $req)
+    {
+        try {
+            $query = ModuleRegistry::select('module_registry.*', 'module_masters.module_name')
+                ->leftJoin('module_masters', 'module_masters.id', '=', 'module_registry.module_id')
+                ->orderBy('module_registry.id', 'desc');
+
+            if ($req->moduleId) {
+                $query->where('module_registry.module_id', $req->moduleId);
+            }
+
+            $data = $query->get()->map(function($item) {
+                $item->table_name = ucwords(str_replace('_', ' ', $item->table_name));
+                return $item;
+            });
+            return responseMsgs(true, "Module Registry List", remove_null($data), "REG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG002", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function getModuleRegistryById(Request $req)
+    {
+        $validated = Validator::make($req->all(), ['id' => 'required|integer']);
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $data = ModuleRegistry::select('module_registry.*', 'module_masters.module_name')
+                ->leftJoin('module_masters', 'module_masters.id', '=', 'module_registry.module_id')
+                ->where('module_registry.id', $req->id)
+                ->firstOrFail();
+
+            return responseMsgs(true, "Module Registry Details", remove_null($data), "REG003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG003", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function updateModuleRegistry(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'id'            => 'required|integer',
+            'tableName'     => 'required|string|max:255',
+            'databaseName'  => 'required|string|max:255',
+            'moduleId'      => 'required|integer',
+            'ulbId'         => 'required|integer',
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $registry = ModuleRegistry::findOrFail($req->id);
+            $registry->update([
+                'table_name'    => $req->tableName,
+                'database_name' => $req->databaseName,
+                'module_id'     => $req->moduleId,
+                'ulb_id'        => $req->ulbId
+            ]);
+
+            return responseMsgs(true, "Module Registry updated successfully", $registry, "REG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function toggleModuleRegistryStatus(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'id' => 'required|integer',
+            'status' => 'required|boolean'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $registry = ModuleRegistry::findOrFail($req->id);
+            $registry->update(['status' => $req->status]);
+            $message = $req->status ? "Module Registry activated" : "Module Registry deactivated";
+
+            return responseMsgs(true, $message, "", "REG005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function deleteModuleRegistry(Request $req)
+    {
+        $validated = Validator::make($req->all(), ['id' => 'required|integer']);
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $registry = ModuleRegistry::findOrFail($req->id);
+            $registry->delete();
+            return responseMsgs(true, "Module Registry deleted successfully", "", "REG006", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "REG006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }

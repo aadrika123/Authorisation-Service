@@ -31,6 +31,7 @@ use App\Http\Controllers\WcController;
 use App\Http\Controllers\WorkflowMaster\WorkflowMap;
 use App\Http\Controllers\WorkflowMaster\WorkflowMapController;
 use App\Http\Controllers\ZoneMasterController;
+use App\Http\Controllers\DynamicTableController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -496,8 +497,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('get-upload/ulb-logo', 'getAllUlbLogos');
         Route::post('ulb-config-details', 'ulbConfigDetails');
         Route::post('dashboard-counts', 'dashboardCounts');
+        Route::post('module-registry/create', 'createModuleRegistry');
+        Route::post('module-registry/list', 'listModuleRegistry');
+        Route::post('module-registry/get', 'getModuleRegistryById');
+        Route::post('module-registry/update', 'updateModuleRegistry');
+        Route::post('module-registry/toggle-status', 'toggleModuleRegistryStatus');
+        Route::post('module-registry/delete', 'deleteModuleRegistry');
 
 
+    });
+
+    /**
+     * | Dynamic Table CRUD
+     */
+    Route::controller(DynamicTableController::class)->group(function () {
+        Route::post('dynamic-table/structure', 'getTableStructure');
+        Route::post('dynamic-table/list', 'listTableData');
+        Route::post('dynamic-table/get', 'getTableRecord');
+        Route::post('dynamic-table/create', 'createTableRecord');
+        Route::post('dynamic-table/update', 'updateTableRecord');
+        Route::post('dynamic-table/delete', 'deleteTableRecord');
     });
 
     /**
