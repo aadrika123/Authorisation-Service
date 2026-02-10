@@ -1342,4 +1342,26 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "500", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    // Dashboard counts for project configuration home page
+    public function dashboardCounts(Request $req)
+    {
+        try {
+            $ulbCount = UlbMaster::where('active_status', true)->count();
+            $moduleCount = DB::table('module_masters')->where('is_suspended', false)->count();
+            $workflowCount = DB::table('wf_workflows')->where('is_suspended', false)->count();
+            $userCount = DB::table('users')->where('suspended', true)->count();
+            
+            $data = [
+                'total_ulb_count' => $ulbCount,
+                'total_active_modules_count' => $moduleCount,
+                'total_workflow_count' => $workflowCount,
+                'total_active_user_count' => $userCount
+            ];
+            
+            return responseMsgs(true, "Dashboard Counts", $data, "200", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "500", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 }
