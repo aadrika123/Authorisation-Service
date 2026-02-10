@@ -181,4 +181,49 @@ class DynamicTableController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "DYN006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    // Get module data completion percentage
+    public function getModuleDataPercentage(Request $req)
+    {
+        $validated = Validator::make($req->all(), ['moduleId' => 'required|integer']);
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $tables = ModuleRegistry::where('module_id', $req->moduleId)
+                ->where('status', true)
+                ->get();
+
+            $status = !$tables->isEmpty();
+            $message = $status ? "Module Data Completion Percentage" : "No tables registered for this module";
+            $data = "";
+
+            if ($status) {
+                $totalTables = $tables->count();
+                $tablesWithData = 0;
+
+                foreach ($tables as $table) {
+                    $connection = $this->getConnection($table->database_name);
+                    $count = $connection->table($table->table_name)->count();
+                    if ($count > 0) {
+                        $tablesWithData++;
+                    }
+                }
+
+                $percentage = round(($tablesWithData / $totalTables) * 100, 2);
+
+                $data = [
+                    'total_tables' => $totalTables,
+                    'tables_with_data' => $tablesWithData,
+                    'tables_without_data' => $totalTables - $tablesWithData,
+                    'completion_percentage' => $percentage
+                ];
+            }
+
+            return responseMsgs($status, $message, $data, "DYN007", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DYN007", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 }
