@@ -453,23 +453,13 @@ class UlbController extends Controller
             return validationError($validated);
         }
         try {
-            $modules = DB::table('ulb_module_permissions as ump')
-                ->select(
-                    'mm.id',
-                    'mm.module_name',
-                )
+            $data = DB::table('ulb_module_permissions as ump')
+                ->select('mm.id', 'mm.module_name')
                 ->join('module_masters as mm', 'mm.id', '=', 'ump.module_id')
                 ->where('ump.ulb_id', $req->ulbId)
                 ->where('ump.is_suspended', false)
                 ->orderBy('mm.id')
                 ->get();
-            
-            $moduleMasters = config('module-masters');
-            
-            $data = $modules->map(function($module) use ($moduleMasters) {
-                $module->master_tables = $moduleMasters[$module->id] ?? [];
-                return $module;
-            });
             
             return responseMsg(true, "Module List of Ulb", $data);
         } catch (Exception $e) {
