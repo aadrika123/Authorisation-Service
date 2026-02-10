@@ -18,6 +18,7 @@ use App\Models\UlbService;
 use App\Models\UlbWardMaster;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -1317,12 +1318,15 @@ class UlbController extends Controller
         
         try {
             $ulbId = $req->ulbId;
+            $docBaseUrl = Config::get('constants.DOC_URL');
             
             $basicInfo = UlbMaster::select('*')->where('id', $ulbId)->first();
             
             if (!$basicInfo) {
                 return responseMsgs(false, "ULB not found", "", "404", "01", responseTime(), $req->getMethod(), $req->deviceId);
             }
+            
+            $basicInfo->ulb_logo = $basicInfo->logo ? $docBaseUrl . "/" . $basicInfo->logo : null;
             
             $wardCount = UlbWardMaster::where('ulb_id', $ulbId)->where('status', 1)->distinct('ward_name')->count('ward_name');
             $zoneCount = DB::table('zone_masters')->where('ulb_id', $ulbId)->where('status', true)->count();
