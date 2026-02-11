@@ -1427,6 +1427,7 @@ class UlbController extends Controller
             }
 
             $data = $query->get()->map(function($item) {
+                $item->original_name = $item->table_name;
                 $item->table_name = ucwords(str_replace('_', ' ', $item->table_name));
                 return $item;
             });
