@@ -1365,6 +1365,7 @@ class UlbController extends Controller
         $validated = Validator::make($req->all(), [
             'tableName'     => 'required|string|max:255',
             'databaseName'  => 'required|string|max:255',
+            'displayName'   => 'required|string|max:255',
             'moduleId'      => 'required|integer',
             'ulbId'         => 'required|integer'
         ]);
@@ -1386,6 +1387,7 @@ class UlbController extends Controller
             $registry = ModuleRegistry::create([
                 'table_name'    => $req->tableName,
                 'database_name' => $req->databaseName,
+                'display_name'  => $req->displayName,
                 'module_id'     => $req->moduleId,
                 'ulb_id'        => $req->ulbId,
                 'status'        => true
@@ -1462,6 +1464,7 @@ class UlbController extends Controller
             'id'            => 'required|integer',
             'tableName'     => 'required|string|max:255',
             'databaseName'  => 'required|string|max:255',
+            'displayName'   => 'required|string|max:255',
             'moduleId'      => 'required|integer',
             'ulbId'         => 'required|integer',
         ]);
@@ -1475,6 +1478,7 @@ class UlbController extends Controller
             $registry->update([
                 'table_name'    => $req->tableName,
                 'database_name' => $req->databaseName,
+                'display_name'  => $req->displayName,
                 'module_id'     => $req->moduleId,
                 'ulb_id'        => $req->ulbId
             ]);
