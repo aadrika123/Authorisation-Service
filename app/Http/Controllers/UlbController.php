@@ -358,6 +358,28 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
+    
+    #get district by State Id
+    public function getDistrictByStateId(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                "stateId" => 'required'
+            ]
+        );
+        if ($validated->fails())
+            return validationError($validated);
+        try {
+            $data = DistrictMaster::where('state_id', $request->stateId)
+                ->where('status', true)
+                ->orderBy('district_name')
+                ->get();
+            return responseMsgs(true, "Districts fetched successfully", remove_null($data), "120202", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120202", "01", responseTime(), $request->getMethod(), $request->deviceId);
+        }
+    }
     //delete master
     public function deleteDistrict(Request $req)
     {
@@ -382,7 +404,7 @@ class UlbController extends Controller
      */
     public function getAllState(Request $req)
     {
-        $data = DB::table('m_state')
+        $data = DB::table('m_states')
             ->get();
         return responseMsgs(true, "", remove_null($data));
     }

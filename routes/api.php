@@ -161,6 +161,7 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('add-module', 'addModule');
     Route::post('update-module', 'updateModule');
     Route::post('delete-module', 'deleteModule');
+    Route::post('get-district-by-state-id', 'getDistrictByStateId');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
