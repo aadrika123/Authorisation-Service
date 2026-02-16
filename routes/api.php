@@ -505,6 +505,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('module-registry/toggle-status', 'toggleModuleRegistryStatus');
         Route::post('module-registry/delete', 'deleteModuleRegistry');
         Route::post('ulb-action/toggle', 'toggleUlbAction');
+        Route::post('modules/list-with-ulb-status', 'listModulesWithUlbStatus');
+        Route::post('modules/toggle-for-ulb', 'toggleModuleForUlb');
 
 
     });
