@@ -16,7 +16,8 @@ class ModuleRegistry extends Model
         'database_name',
         'module_id',
         'ulb_id',
-        'status'
+        'status',
+        'display_name'
     ];
 
     protected $casts = [
