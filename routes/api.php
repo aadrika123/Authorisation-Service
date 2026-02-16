@@ -503,6 +503,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('module-registry/update', 'updateModuleRegistry');
         Route::post('module-registry/toggle-status', 'toggleModuleRegistryStatus');
         Route::post('module-registry/delete', 'deleteModuleRegistry');
+        Route::post('ulb-action/toggle', 'toggleUlbAction');
 
 
     });
