@@ -1347,6 +1347,14 @@ class UlbController extends Controller
             $ulbModules = DB::table('ulb_module_permissions')->where('ulb_id', $ulbId)->where('is_suspended', false)->count();
             $moduleSetupPercentage = $totalModules > 0 ? round(($ulbModules / $totalModules) * 100) : 0;
             
+            // ULB Actions
+            $ulbActions = [
+                'is_hidden_from_citizen' => $basicInfo->is_hidden_from_citizen ?? 0,
+                'is_hidden_from_admin' => $basicInfo->is_hidden_from_admin ?? 0,
+                'is_disabled_login' => $basicInfo->is_disabled_login ?? 0,
+                'is_deactivated' => $basicInfo->is_deactivated ?? 0
+            ];
+            
             $data = [
                 'basic_information' => remove_null($basicInfo),
                 'global_setup' => [
@@ -1358,12 +1366,39 @@ class UlbController extends Controller
                     'total_modules' => $totalModules,
                     'configured_modules' => $ulbModules,
                     'percentage' => $moduleSetupPercentage
-                ]
+                ],
+                'ulb_action' => $ulbActions
             ];
             
             return responseMsgs(true, "ULB Configuration Details", $data, "200", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "500", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Toggle ULB Action
+    public function toggleUlbAction(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'ulbId' => 'required|integer',
+            'action' => 'required|in:is_hidden_from_citizen,is_hidden_from_admin,is_disabled_login,is_deactivated'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $ulb = UlbMaster::findOrFail($req->ulbId);
+            $action = $req->action;
+            $currentValue = $ulb->$action ?? 0;
+            $newValue = $currentValue == 0 ? 1 : 0;
+            
+            $ulb->update([$action => $newValue]);
+
+            return responseMsgs(true, "ULB action toggled successfully", [$action => $newValue], "ULB001", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "ULB001", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 
