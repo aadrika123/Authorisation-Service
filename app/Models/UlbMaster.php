@@ -9,6 +9,13 @@ class UlbMaster extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'is_hidden_from_citizen',
+        'is_hidden_from_admin',
+        'is_disabled_login',
+        'is_deactivated'
+    ];
+
     /**
      * | Get Ulbs by district code
      */
