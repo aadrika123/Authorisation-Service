@@ -48,6 +48,7 @@ return [
         "UlbUser",
         "Municipal",
         "Developer",
+        "FS"            //  Field Surveyor
     ],
 
     "ADMIN_ROLE" => 1,

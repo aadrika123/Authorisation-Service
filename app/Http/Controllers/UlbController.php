@@ -1424,6 +1424,85 @@ class UlbController extends Controller
         }
     }
 
+    // List all modules with ULB permission status
+    public function listModulesWithUlbStatus(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'ulbId' => 'required|integer'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $data = DB::table('module_masters as mm')
+                ->leftJoin('ulb_module_permissions as ump', function($join) use ($req) {
+                    $join->on('mm.id', '=', 'ump.module_id')
+                         ->where('ump.ulb_id', '=', $req->ulbId);
+                })
+                ->select(
+                    'mm.id',
+                    'mm.module_name',
+                    'mm.is_suspended',
+                    DB::raw('CASE WHEN ump.id IS NOT NULL AND ump.is_suspended = false THEN true ELSE false END as is_enabled')
+                )
+                ->where('mm.is_suspended', false)
+                ->orderBy('mm.module_name')
+                ->get();
+
+            return responseMsgs(true, "Modules list with ULB status", $data, "MOD004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD004", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Toggle module for ULB
+    public function toggleModuleForUlb(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'ulbId' => 'required|integer',
+            'moduleId' => 'required|integer'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $existing = DB::table('ulb_module_permissions')
+                ->where('ulb_id', $req->ulbId)
+                ->where('module_id', $req->moduleId)
+                ->first();
+
+            if ($existing) {
+                // Toggle is_suspended
+                $newStatus = !$existing->is_suspended;
+                DB::table('ulb_module_permissions')
+                    ->where('id', $existing->id)
+                    ->update([
+                        'is_suspended' => $newStatus,
+                        'updated_at' => now()
+                    ]);
+                $message = $newStatus ? "Module disabled for ULB" : "Module enabled for ULB";
+            } else {
+                // Add new entry
+                DB::table('ulb_module_permissions')->insert([
+                    'ulb_id' => $req->ulbId,
+                    'module_id' => $req->moduleId,
+                    'is_suspended' => false,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+                $message = "Module enabled for ULB";
+            }
+
+            return responseMsgs(true, $message, "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
     // Dashboard counts for project configuration home page
     public function dashboardCounts(Request $req)
     {
