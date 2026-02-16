@@ -1337,16 +1337,27 @@ class UlbController extends Controller
             
             $basicInfo->ulb_logo = $basicInfo->logo ? $docBaseUrl . "/" . $basicInfo->logo : null;
             
+            // Global Setup
             $wardCount = UlbWardMaster::where('ulb_id', $ulbId)->where('status', 1)->distinct('ward_name')->count('ward_name');
             $zoneCount = DB::table('zone_masters')->where('ulb_id', $ulbId)->where('status', true)->count();
-            $departmentCount = $basicInfo->department_id ? 1 : 0;
+            $globalSetupPercentage = ($wardCount > 0 && $zoneCount > 0) ? 100 : (($wardCount > 0 || $zoneCount > 0) ? 50 : 0);
+            
+            // Module Setup
+            $totalModules = DB::table('module_masters')->where('is_suspended', false)->count();
+            $ulbModules = DB::table('ulb_module_permissions')->where('ulb_id', $ulbId)->where('is_suspended', false)->count();
+            $moduleSetupPercentage = $totalModules > 0 ? round(($ulbModules / $totalModules) * 100) : 0;
             
             $data = [
                 'basic_information' => remove_null($basicInfo),
-                'global_master' => [
+                'global_setup' => [
                     'ward_count' => $wardCount,
                     'zone_count' => $zoneCount,
-                    'department_count' => $departmentCount
+                    'percentage' => $globalSetupPercentage
+                ],
+                'module_setup' => [
+                    'total_modules' => $totalModules,
+                    'configured_modules' => $ulbModules,
+                    'percentage' => $moduleSetupPercentage
                 ]
             ];
             
