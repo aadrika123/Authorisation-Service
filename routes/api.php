@@ -660,6 +660,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post("pet/get-master-data", "unAuthApis");
         Route::post("pet/application/license", "unAuthApis");
         Route::post("pet/application/payment-receipt", "unAuthApis");
+        Route::post('get-filter-property-details', 'unAuthApis');  
 
         # Water Tanker UnAuth Api
         Route::match(["get", 'post'], "water-tanker/get-water-tanker-reciept/{tranId}", "unAuthApis");
