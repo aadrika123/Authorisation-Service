@@ -116,16 +116,35 @@ class UlbController extends Controller
     public function updateUlbId(Request $req)
     {
         $validator = Validator::make($req->all(), [
-            "id"  => 'required'
+            "id"  => 'required',
+            "document" => 'nullable'
         ]);
         if ($validator->fails()) {
             return ['status' => false, 'message' => $validator->errors()];
         }
         try {
+            DB::beginTransaction();
+            
+            // Handle logo upload to DMS if document is provided
+            if ($req->hasFile('document')) {
+                $docUpload = new DocUpload();
+                $imageName = $docUpload->checkDoc($req);
+                
+                if ($imageName['status']) {
+                    $req->merge([
+                        'uniqueId' => $imageName['data']['uniqueId'] ?? "",
+                        'referenceNo' => $imageName['data']['ReferenceNo'] ?? ""
+                    ]);
+                }
+            }
+            
             $mCity = new UlbMaster();
-            $update = $mCity->updateUlbById($req);
+            $mCity->updateUlbById($req);
+            
+            DB::commit();
             return responseMsgs(true, "Data updated", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
+            DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
@@ -454,7 +473,7 @@ class UlbController extends Controller
         }
         try {
             $data = DB::table('ulb_module_permissions as ump')
-                ->select('mm.id', 'mm.module_name')
+                ->select('mm.id', 'mm.module_name', 'ump.is_suspended')
                 ->join('module_masters as mm', 'mm.id', '=', 'ump.module_id')
                 ->where('ump.ulb_id', $req->ulbId)
                 ->where('ump.is_suspended', false)
