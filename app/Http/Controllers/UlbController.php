@@ -85,10 +85,28 @@ class UlbController extends Controller
     public function createUlbmaster(Request $req)
     {
         try {
+            DB::beginTransaction();
+            
+            $logoPath = null;
+            if ($req->hasFile('document')) {
+                $file = $req->file('document');
+                $fileName = 'ulb_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('Uploads/Icon'), $fileName);
+                $logoPath = 'Uploads/Icon/' . $fileName;
+            }
+            
+            $req->merge(['logo' => $logoPath]);
+            
             $create = new UlbMaster();
             $ulbId = $create->addUlbMaster($req);
-            return responseMsgs(true, "", $ulbId, "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            
+            $ulb = UlbMaster::find($ulbId);
+            $ulb->ulb_logo = $ulb->logo ? url($ulb->logo) : null;
+            
+            DB::commit();
+            return responseMsgs(true, "ULB created successfully", remove_null($ulb), "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
+            DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
