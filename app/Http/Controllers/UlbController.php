@@ -1449,7 +1449,7 @@ class UlbController extends Controller
                     'ump.is_suspended',
                     DB::raw('CASE WHEN ump.id IS NOT NULL AND ump.is_suspended = false THEN true ELSE false END as is_enabled')
                 )
-                ->where('mm.is_suspended', false)
+                ->where('mm.is_module', true)
                 ->orderBy('mm.module_name')
                 ->get();
 
