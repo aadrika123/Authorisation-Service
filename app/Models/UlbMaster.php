@@ -38,7 +38,8 @@ class UlbMaster extends Model
         'is_hidden_from_admin',
         'is_disabled_login',
         'is_deactivated',
-        'pin_code'
+        'pin_code',
+        'logo'
     ];
 
     /**
@@ -115,6 +116,7 @@ class UlbMaster extends Model
         $data->active_status = true;
         $data->pin_code = $req->pincode;
         $data->address = $req->address;
+        $data->logo = $req->logo;
         $data->save();
         return $data->id;
     }
