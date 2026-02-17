@@ -18,6 +18,7 @@ use App\Models\UlbMaster;
 use App\Models\UlbModulePermission;
 use App\Models\UlbWardMaster;
 use App\Models\UserLoginDetail;
+use App\Models\UserType;
 use App\Models\Workflows\WfRole;
 use App\Models\Workflows\WfRoleusermap;
 use App\Pipelines\User\SearchByEmail;
@@ -2293,6 +2294,33 @@ class UserController extends Controller
         } catch (Exception $e) {
             DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "", "01", responseTime(), "POST", $request->deviceId ?? "");
+        }
+    }
+
+    public function getUserType(Request $request)
+    {
+        try {
+
+            $query = UserType::query();
+
+            // Optional filter: only active
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $data = $query->orderBy('id')->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'User types fetched successfully',
+                'data' => $data
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 
