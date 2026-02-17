@@ -1770,7 +1770,8 @@ class UlbController extends Controller
             DB::commit();
             $ulb->refresh();
             
-            $ulb->ulb_logo = $ulb->logo ? url($ulb->logo) : null;
+            $docBaseUrl = Config::get('constants.DOC_URL');
+            $ulb->ulb_logo = $ulb->logo ? $docBaseUrl . "/" . $ulb->logo : null;
             
             return responseMsgs(true, "ULB updated successfully", remove_null($ulb), "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
