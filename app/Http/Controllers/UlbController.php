@@ -1765,6 +1765,7 @@ class UlbController extends Controller
                 'longitude' => $req->longitude ?? $ulb->longitude,
                 'active_status' => $req->activeStatus ?? $ulb->active_status,
                 'remarks' => $req->remarks ?? $ulb->remarks,
+                'pin_code' => $req->pinCode ?? $ulb->pin_code,
                 'logo' => $logoPath
             ]);
             
