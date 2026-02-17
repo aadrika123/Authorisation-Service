@@ -1799,4 +1799,37 @@ class UlbController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+      /**
+     * | Get active modules for ULB
+     */
+    public function getActiveModulesByUlb(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'ulbId' => 'required|integer'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $data = DB::table('module_masters as mm')
+                ->join('ulb_module_permissions as ump', 'mm.id', '=', 'ump.module_id')
+                ->select('mm.id', 'mm.module_name')
+                ->where('ump.ulb_id', $req->ulbId)
+                ->where('ump.is_suspended', false)
+                ->where('mm.is_module', true)
+                ->orderBy('mm.id')
+                ->get();
+
+            return responseMsgs(true, "Active modules for ULB", remove_null($data), "MOD006", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "MOD006", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+
 }
+
+  

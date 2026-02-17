@@ -510,10 +510,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('ulb-action/toggle', 'toggleUlbAction');
         Route::post('modules/list-with-ulb-status', 'listModulesWithUlbStatus');
         Route::post('modules/toggle-for-ulb', 'toggleModuleForUlb');
+        Route::post('permitedModule/get-active-modules-by-ulb', 'getActiveModulesByUlb');
 
 
     });
-
+    
     /**
      * | Dynamic Table CRUD
      */
