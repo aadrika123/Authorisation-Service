@@ -113,7 +113,7 @@ class UlbMaster extends Model
         $data->latitude = $req->latitude;
         $data->longitude = $req->longitude;
         $data->active_status = true;
-        $data->pin_code = $req->pinCode;
+        $data->pin_code = $req->pincode;
         $data->save();
         return $data->id;
     }
