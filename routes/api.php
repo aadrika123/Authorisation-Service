@@ -696,8 +696,7 @@ Route::middleware(['apiPermission'])->group(function () {
         Route::post('property/details/get-owner-details', 'unAuthApis');
         Route::get('property/prop-road-type', 'unAuthApis');
         Route::post('property/m-get-blog-by-Id', 'unAuthApis');
-        Route::post('property/m-get-active-blog', 'unAuthApis');        
-        Route::post("property/get-filter-property-details", "unAuthApis");
+        Route::post('property/m-get-active-blog', 'unAuthApis');
 
 
 
