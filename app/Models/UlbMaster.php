@@ -37,7 +37,8 @@ class UlbMaster extends Model
         'is_hidden_from_citizen',
         'is_hidden_from_admin',
         'is_disabled_login',
-        'is_deactivated'
+        'is_deactivated',
+        'pin_code'
     ];
 
     /**
@@ -112,6 +113,7 @@ class UlbMaster extends Model
         $data->latitude = $req->latitude;
         $data->longitude = $req->longitude;
         $data->active_status = true;
+        $data->pin_code = $req->pinCode;
         $data->save();
         return $data->id;
     }
