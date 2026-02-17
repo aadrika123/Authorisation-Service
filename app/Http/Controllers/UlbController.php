@@ -1695,7 +1695,7 @@ class UlbController extends Controller
     }
 
     /**
-     * | Update ULB Master by ID with logo upload to DMS
+     * | Update ULB Master by ID with logo upload
      */
     public function updateUlbById(Request $req)
     {
@@ -1713,7 +1713,7 @@ class UlbController extends Controller
             
             $ulb = UlbMaster::findOrFail($req->id);
             
-            // Handle logo upload to DMS if document is provided
+            // Handle logo upload if document is provided
             $logoPath = $ulb->logo;
             if ($req->hasFile('document')) {
                 try {
@@ -1768,7 +1768,11 @@ class UlbController extends Controller
             ]);
             
             DB::commit();
-            return responseMsgs(true, "ULB updated successfully", "", "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
+            $ulb->refresh();
+            
+            $ulb->ulb_logo = $ulb->logo ? url($ulb->logo) : null;
+            
+            return responseMsgs(true, "ULB updated successfully", remove_null($ulb), "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
