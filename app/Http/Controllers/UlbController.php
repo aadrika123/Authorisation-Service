@@ -21,6 +21,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
@@ -1690,6 +1691,87 @@ class UlbController extends Controller
             return responseMsgs(true, "Module Registry deleted successfully", "", "REG006", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "REG006", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    /**
+     * | Update ULB Master by ID with logo upload to DMS
+     */
+    public function updateUlbById(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'id' => 'required|integer',
+            'document' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            $ulb = UlbMaster::findOrFail($req->id);
+            
+            // Handle logo upload to DMS if document is provided
+            $logoPath = $ulb->logo;
+            if ($req->hasFile('document')) {
+                try {
+                    $dmsUrl = Config::get('constants.DMS_URL');
+                    $file = $req->document;
+                    $filePath = $file->getPathname();
+                    $hashedFile = hash_file('sha256', $filePath);
+                    $filename = $file->getClientOriginalName();
+                    
+                    $response = Http::timeout(10)->withHeaders([
+                        "x-digest" => $hashedFile,
+                        "token" => "8Ufn6Jio6Obv9V7VXeP7gbzHSyRJcKluQOGorAD58qA1IQKYE0",
+                        "folderPathId" => 1
+                    ])->attach('file', file_get_contents($filePath), $filename)
+                      ->post("$dmsUrl/backend/document/upload", ['tags' => $filename]);
+                    
+                    if ($response->successful()) {
+                        $uploadData = $response->json();
+                        $logoPath = $uploadData['data']['uniqueId'] ?? $ulb->logo;
+                    }
+                } catch (Exception $e) {
+                    // DMS upload failed, continue without logo update
+                }
+            }
+            
+            $ulb->update([
+                'ulb_name' => $req->ulbName ?? $ulb->ulb_name,
+                'ulb_type' => $req->ulbType ?? $ulb->ulb_type,
+                'city_id' => $req->cityId ?? $ulb->city_id,
+                'state_id' => $req->stateId ?? $ulb->state_id,
+                'district_id' => $req->districtId ?? $ulb->district_id,
+                'district_code' => $req->districtCode ?? $ulb->district_code,
+                'category' => $req->category ?? $ulb->category,
+                'code' => $req->code ?? $ulb->code,
+                'short_name' => $req->shortName ?? $ulb->short_name,
+                'hindi_name' => $req->hindiName ?? $ulb->hindi_name,
+                'address' => $req->address ?? $ulb->address,
+                'hindi_address' => $req->hindiAddress ?? $ulb->hindi_address,
+                'email' => $req->email ?? $ulb->email,
+                'mobile_no' => $req->mobileNo ?? $ulb->mobile_no,
+                'toll_free_no' => $req->tollFreeNo ?? $ulb->toll_free_no,
+                'current_website' => $req->currentWebsite ?? $ulb->current_website,
+                'parent_website' => $req->parentWebsite ?? $ulb->parent_website,
+                'incorporation_date' => $req->incorporationDate ?? $ulb->incorporation_date,
+                'department_id' => $req->departmentId ?? $ulb->department_id,
+                'has_zone' => $req->hasZone ?? $ulb->has_zone,
+                'latitude' => $req->latitude ?? $ulb->latitude,
+                'longitude' => $req->longitude ?? $ulb->longitude,
+                'active_status' => $req->activeStatus ?? $ulb->active_status,
+                'remarks' => $req->remarks ?? $ulb->remarks,
+                'logo' => $logoPath
+            ]);
+            
+            DB::commit();
+            return responseMsgs(true, "ULB updated successfully", "", "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return responseMsgs(false, $e->getMessage(), "", "ULB007", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }

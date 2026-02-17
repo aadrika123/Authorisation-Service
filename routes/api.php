@@ -111,7 +111,7 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('create-ulb-master', 'createUlbmaster');
     Route::post('ulb-master-delete', 'deactiveUlbById');                                          //15/2024
     Route::post('get-ulb-by-id', 'getulbById');                                                    //15/2024
-    Route::post('update-ulb-by-id', 'updateUlbId');                                                //15/2024
+    // Route::post('update-ulb-by-id', 'updateUlbId');                                                //15/2024
     Route::post('list-district', 'districtList');
     Route::post('city/state/ulb-id', 'getCityStateByUlb');
     Route::post('get-all-state', 'getAllState');
@@ -162,6 +162,7 @@ Route::controller(UlbController::class)->group(function () {
     Route::post('update-module', 'updateModule');
     Route::post('delete-module', 'deleteModule');
     Route::post('get-district-by-state-id', 'getDistrictByStateId');
+    Route::post('update-ulb-by-id', 'updateUlbById');
 });
 
 Route::controller(WorkflowMapController::class)->group(function () {
