@@ -1485,50 +1485,149 @@ class UlbController extends Controller
     }
 
     // Toggle module for ULB
+    // public function toggleModuleForUlb(Request $req)
+    // {
+    //     $validated = Validator::make($req->all(), [
+    //         'ulbId' => 'required|integer',
+    //         'moduleId' => 'required|integer'
+    //     ]);
+
+    //     if ($validated->fails()) {
+    //         return validationError($validated);
+    //     }
+
+    //     try {
+    //         $existing = DB::table('ulb_module_permissions')
+    //             ->where('ulb_id', $req->ulbId)
+    //             ->where('module_id', $req->moduleId)
+    //             ->first();
+
+    //         if ($existing) {
+    //             // Toggle is_suspended
+    //             $newStatus = !$existing->is_suspended;
+    //             DB::table('ulb_module_permissions')
+    //                 ->where('id', $existing->id)
+    //                 ->update([
+    //                     'is_suspended' => $newStatus,
+    //                     'updated_at' => now()
+    //                 ]);
+    //             $message = $newStatus ? "Module disabled for ULB" : "Module enabled for ULB";
+    //         } else {
+    //             // Add new entry
+    //             DB::table('ulb_module_permissions')->insert([
+    //                 'ulb_id' => $req->ulbId,
+    //                 'module_id' => $req->moduleId,
+    //                 'is_suspended' => false,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now()
+    //             ]);
+    //             $message = "Module enabled for ULB";
+    //         }
+
+    //         return responseMsgs(true, $message, "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     } catch (Exception $e) {
+    //         return responseMsgs(false, $e->getMessage(), "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
+    //     }
+    // }
+
     public function toggleModuleForUlb(Request $req)
     {
         $validated = Validator::make($req->all(), [
-            'ulbId' => 'required|integer',
-            'moduleId' => 'required|integer'
+            'ulbId'   => 'required|integer',
+            'moduleId'=> 'required|integer'
         ]);
 
         if ($validated->fails()) {
             return validationError($validated);
         }
 
+        DB::beginTransaction();
+
         try {
+            $ulbId    = $req->ulbId;
+            $moduleId = $req->moduleId;
+
             $existing = DB::table('ulb_module_permissions')
-                ->where('ulb_id', $req->ulbId)
-                ->where('module_id', $req->moduleId)
+                ->where('ulb_id', $ulbId)
+                ->where('module_id', $moduleId)
                 ->first();
 
             if ($existing) {
-                // Toggle is_suspended
                 $newStatus = !$existing->is_suspended;
+
                 DB::table('ulb_module_permissions')
                     ->where('id', $existing->id)
                     ->update([
                         'is_suspended' => $newStatus,
-                        'updated_at' => now()
+                        'updated_at'   => now()
                     ]);
-                $message = $newStatus ? "Module disabled for ULB" : "Module enabled for ULB";
+
+                if ($newStatus == false) {
+                    $this->copyModuleRegistryFromTemplate($ulbId, $moduleId);
+                    DB::table('module_registry')
+                        ->where('ulb_id', $ulbId)
+                        ->where('module_id', $moduleId)
+                        ->update(['status' => true, 'updated_at' => now()]);
+                    $message = "Module enabled for ULB";
+                } else {
+                    DB::table('module_registry')
+                        ->where('ulb_id', $ulbId)
+                        ->where('module_id', $moduleId)
+                        ->update(['status' => false, 'updated_at' => now()]);
+                    $message = "Module disabled for ULB";
+                }
             } else {
-                // Add new entry
                 DB::table('ulb_module_permissions')->insert([
-                    'ulb_id' => $req->ulbId,
-                    'module_id' => $req->moduleId,
+                    'ulb_id'       => $ulbId,
+                    'module_id'    => $moduleId,
                     'is_suspended' => false,
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'created_at'   => now(),
+                    'updated_at'   => now()
                 ]);
+
+                $this->copyModuleRegistryFromTemplate($ulbId, $moduleId);
                 $message = "Module enabled for ULB";
             }
 
+            DB::commit();
             return responseMsgs(true, $message, "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
+            DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "MOD005", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    private function copyModuleRegistryFromTemplate($ulbId, $moduleId)
+    {
+        $masterUlb = 2;
+
+        $templates = DB::table('module_registry')
+            ->where('module_id', $moduleId)
+            ->where('ulb_id', $masterUlb)
+            ->get();
+
+        foreach ($templates as $row) {
+            $exists = DB::table('module_registry')
+                ->where('ulb_id', $ulbId)
+                ->where('module_id', $moduleId)
+                ->where('table_name', $row->table_name)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('module_registry')->insert([
+                    'table_name'    => $row->table_name,
+                    'database_name' => $row->database_name,
+                    'module_id'     => $moduleId,
+                    'status'        => true,
+                    'ulb_id'        => $ulbId,
+                    'display_name'  => $row->display_name,
+                    'created_at'    => now(),
+                    'updated_at'    => now()
+                ]);
+            }
+        }
+    }
+
 
     // Dashboard counts for project configuration home page
     public function dashboardCounts(Request $req)
