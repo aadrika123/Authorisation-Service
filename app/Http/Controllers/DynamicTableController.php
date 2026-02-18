@@ -63,7 +63,10 @@ class DynamicTableController extends Controller
     // List all records from a table
     public function listTableData(Request $req)
     {
-        $validated = Validator::make($req->all(), ['tableName' => 'required|string']);
+        $validated = Validator::make($req->all(), [
+            'tableName' => 'required|string',
+            'ulbId' => 'required|integer'
+        ]);
         if ($validated->fails()) {
             return validationError($validated);
         }
@@ -72,7 +75,7 @@ class DynamicTableController extends Controller
             $registry = $this->validateTable($req->tableName);
             $connection = $this->getConnection($registry->database_name);
             
-            $data = $connection->table($req->tableName)->get();
+            $data = $connection->table($req->tableName)->where('ulb_id', $req->ulbId)->get();
             
             return responseMsgs(true, "Table Data", remove_null($data), "DYN002", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
