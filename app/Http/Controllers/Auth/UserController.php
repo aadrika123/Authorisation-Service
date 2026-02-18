@@ -1708,6 +1708,7 @@ class UserController extends Controller
             )
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
                 ->where('ulb_masters.id', $ulbId)
+                ->where('users.user_type', 'Admin')
                 ->orderBy('users.name');
             if ($key != null) {
                 switch ($key) {
