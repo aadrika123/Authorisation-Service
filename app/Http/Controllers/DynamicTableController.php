@@ -185,13 +185,17 @@ class DynamicTableController extends Controller
     // Get module data completion percentage
     public function getModuleDataPercentage(Request $req)
     {
-        $validated = Validator::make($req->all(), ['moduleId' => 'required|integer']);
+        $validated = Validator::make($req->all(), [
+            'moduleId' => 'required|integer',
+            'ulbId' => 'required|integer'
+        ]);
         if ($validated->fails()) {
             return validationError($validated);
         }
 
         try {
             $tables = ModuleRegistry::where('module_id', $req->moduleId)
+                ->where('ulb_id', $req->ulbId)
                 ->where('status', true)
                 ->get();
 
