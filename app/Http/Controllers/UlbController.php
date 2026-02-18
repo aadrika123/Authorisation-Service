@@ -1621,6 +1621,10 @@ class UlbController extends Controller
                 $query->where('module_registry.module_id', $req->moduleId);
             }
 
+            if ($req->ulbId) {
+                $query->where('module_registry.ulb_id', $req->ulbId);
+            }
+
             $data = $query->get()->map(function($item) {
                 $item->original_name = $item->table_name;
                 $item->table_name = ucwords(str_replace('_', ' ', $item->table_name));
