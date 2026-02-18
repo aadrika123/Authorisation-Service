@@ -1708,7 +1708,6 @@ class UserController extends Controller
             )
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'users.ulb_id')
                 ->where('ulb_masters.id', $ulbId)
-                ->where('users.user_type', 'Admin')
                 ->orderBy('users.name');
             if ($key != null) {
                 switch ($key) {
@@ -1727,6 +1726,11 @@ class UserController extends Controller
             }
 
             $inboxDetails = $query->paginate($pages);
+            
+            if ($inboxDetails->total() == 0) {
+                return responseMsgs(false, "No users found for the given filters!", []);
+            }
+            
             // Attach document data to each user
             $docUpload = new DocUpload;
             $data = $inboxDetails->map(function ($user) use ($docUpload) {
@@ -1749,10 +1753,6 @@ class UserController extends Controller
                 ];
             });
 
-
-            if ($inboxDetails->isEmpty()) {
-                return responseMsgs(false, "No users found for the given filters!", []);
-            }
             $list = [
                 "current_page" => $inboxDetails->currentPage(),
                 "last_page"    => $inboxDetails->lastPage(),
