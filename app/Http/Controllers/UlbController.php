@@ -56,12 +56,19 @@ class UlbController extends Controller
      */
     public function getAllUlbDtls()
     {
+        $docBaseUrl = Config::get('constants.DOC_URL');
+        
         $ulb = UlbMaster::select(
             'ulb_masters.*',
             'active_status as is_suspended',
         )
-            ->orderBy('ulb_name')
-            ->get();
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->map(function($item) use ($docBaseUrl) {
+                $item->ulb_logo = $item->logo ? $docBaseUrl . "/" . $item->logo : null;
+                return $item;
+            });
+        
         return responseMsgs(true, "", remove_null($ulb));
     }
 
