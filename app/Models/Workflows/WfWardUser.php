@@ -10,6 +10,8 @@ class WfWardUser extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['user_id', 'ward_id', 'created_by'];
+
     /**
      * | Get Wards by user id
      * | @var userId
