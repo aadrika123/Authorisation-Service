@@ -571,19 +571,18 @@ class ApiMasterController extends Controller
     public function ulbWiseWardUserList(Request $req)
     {
         $req->validate([
-            'ulbId' => 'required|integer',
-            'wardId' => 'required|integer'
+            'userId' => 'required|integer',
+            'ulbId' => 'required|integer'
         ]);
         try {
-            $list = DB::table('wf_ward_users')
-                ->select('users.id', 'users.user_name', 'users.email', 'users.mobile', 'ulb_ward_masters.ward_name', 'ulb_masters.ulb_name', 'wf_ward_users.is_admin')
-                ->join('users', 'users.id', '=', 'wf_ward_users.user_id')
-                ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
-                ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
+            $list = DB::table('ulb_ward_masters')
+                ->select('ulb_ward_masters.id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.status', DB::raw('CASE WHEN wf_ward_users.user_id IS NOT NULL THEN wf_ward_users.is_suspended ELSE true END as is_suspended'))
+                ->leftJoin('wf_ward_users', function($join) use ($req) {
+                    $join->on('wf_ward_users.ward_id', '=', 'ulb_ward_masters.id')
+                         ->where('wf_ward_users.user_id', '=', $req->userId);
+                })
                 ->where('ulb_ward_masters.ulb_id', $req->ulbId)
-                ->where('wf_ward_users.ward_id', $req->wardId)
-                ->where('wf_ward_users.is_suspended', false)
-                ->orderBy('users.user_name', 'asc')
+                ->orderBy('ulb_ward_masters.ward_name', 'asc')
                 ->get();
             return responseMsgs(true, "ULB Wise Ward User List", remove_null($list), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {

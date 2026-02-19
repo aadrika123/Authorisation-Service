@@ -397,7 +397,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('delete-ulb_ward_masters', 'deleteUlbWard');
         Route::post('update-ulb_ward_masters', 'updateUlbWard');
         Route::post('get-by-id-ulb_ward_masters', 'getById');
-        Route::post('get-ulb-wise-ward-user-list', 'ulbWiseWardUserList');
+        Route::post('ulb-wise-user-ward-list', 'ulbWiseWardUserList');
     });
 
     /**
