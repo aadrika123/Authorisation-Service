@@ -545,13 +545,18 @@ class ApiMasterController extends Controller
     //all master list
     public function getAllUlbWard(Request $req)
     {
-        $req->validate(['ulbId' => 'nullable|integer']);
+        $req->validate(['ulbId' => 'nullable|integer', 'userId' => 'nullable|integer']);
         try {
             $query = DB::table('ulb_ward_masters')
-                ->select('ulb_ward_masters.id', 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.old_ward_name', 'ulb_ward_masters.status', 'ulb_masters.ulb_name', 'ulb_ward_masters.created_at', 'ulb_ward_masters.updated_at')
+                ->select('ulb_ward_masters.id', 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.old_ward_name', 'ulb_ward_masters.status', 'ulb_masters.ulb_name', 'ulb_ward_masters.created_at', 'ulb_ward_masters.updated_at', DB::raw('CASE WHEN wf_ward_users.user_id IS NOT NULL THEN wf_ward_users.is_suspended ELSE NULL END as is_suspended'))
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
+                ->leftJoin('wf_ward_users', function($join) use ($req) {
+                    $join->on('wf_ward_users.ward_id', '=', 'ulb_ward_masters.id');
+                    if ($req->userId) {
+                        $join->where('wf_ward_users.user_id', '=', $req->userId);
+                    }
+                })
                 ->orderBy('ulb_ward_masters.ward_name', 'asc');
-                // ->where('ulb_ward_masters.status', 1);
             if ($req->ulbId) {
                 $query->where('ulb_ward_masters.ulb_id', $req->ulbId);
             }
