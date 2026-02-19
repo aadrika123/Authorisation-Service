@@ -397,6 +397,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('delete-ulb_ward_masters', 'deleteUlbWard');
         Route::post('update-ulb_ward_masters', 'updateUlbWard');
         Route::post('get-by-id-ulb_ward_masters', 'getById');
+        Route::post('get-ulb-wise-ward-user-list', 'ulbWiseWardUserList');
     });
 
     /**
@@ -454,6 +455,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/ward-user/by-user', 'wardByUserId');     // Ward by user id
         Route::post('workflow/ward-user/list-tc', 'tcList');
         Route::post('workflow/get-all/list-tc', 'getTcTlJSKList');
+        Route::post('toggle-ulb-wise-ward-user', 'toggleULBWaiseWardUser');
+        Route::post('ulb-wise-ward-user-list', 'ulbWiseWardUserList');
     });
 
 

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auth\User;
 use App\Models\IdGenerationParam;
+use App\Models\Workflows\WfWardUser;
 use Illuminate\Http\Request;
 use App\Models\MenuApiMap;
 use App\Models\UlbWardMaster;
@@ -559,6 +561,31 @@ class ApiMasterController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    //get ulb wise ward user list
+    public function ulbWiseWardUserList(Request $req)
+    {
+        $req->validate([
+            'ulbId' => 'required|integer',
+            'wardId' => 'required|integer'
+        ]);
+        try {
+            $list = DB::table('wf_ward_users')
+                ->select('users.id', 'users.user_name', 'users.email', 'users.mobile', 'ulb_ward_masters.ward_name', 'ulb_masters.ulb_name', 'wf_ward_users.is_admin')
+                ->join('users', 'users.id', '=', 'wf_ward_users.user_id')
+                ->join('ulb_ward_masters', 'ulb_ward_masters.id', '=', 'wf_ward_users.ward_id')
+                ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
+                ->where('ulb_ward_masters.ulb_id', $req->ulbId)
+                ->where('wf_ward_users.ward_id', $req->wardId)
+                ->where('wf_ward_users.is_suspended', false)
+                ->orderBy('users.user_name', 'asc')
+                ->get();
+            return responseMsgs(true, "ULB Wise Ward User List", remove_null($list), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
     //enable or disable  master
     public function deleteUlbWard(Request $req)
     {
@@ -606,4 +633,5 @@ class ApiMasterController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
 }

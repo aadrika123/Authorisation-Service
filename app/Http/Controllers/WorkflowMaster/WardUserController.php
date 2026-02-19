@@ -4,6 +4,7 @@ namespace App\Http\Controllers\WorkflowMaster;
 
 use App\Http\Controllers\Controller;
 use App\Models\Auth\User;
+use App\Models\UlbWardMaster;
 use App\Models\Workflows\WfWardUser;
 use Illuminate\Http\Request;
 use Exception;
@@ -236,4 +237,71 @@ class WardUserController extends Controller
             return responseMsgs(false, $e->getMessage(), "");
         }
     }
+
+    public function toggleULBWaiseWardUser(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                'user_id'   => 'required|exists:users,id',
+                'ward_name' => 'required|integer',
+                'ulb_id'    => 'required|integer'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $user = User::where('id', $request->user_id)->where('ulb_id', $request->ulb_id)->first();
+            if (!$user) {
+                throw new Exception('User does not belong to this ULB');
+            }
+
+            $ward = UlbWardMaster::where('ward_name', $request->ward_name)->where('ulb_id', $request->ulb_id)->first();
+            if (!$ward) {
+                throw new Exception('Ward not found for this ULB');
+            }
+
+            $existing = WfWardUser::where('user_id', $user->id)->where('ward_id', $ward->id)->first();
+            $message = $existing ? 'User successfully removed from ward' : 'User successfully mapped to ward';
+            
+            $existing ? $existing->delete() : WfWardUser::create(['user_id' => $user->id, 'ward_id' => $ward->id]);
+            
+            return responseMsg(true, $message, '');
+        } catch (Exception $e) {
+            return responseMsg(false, $e->getMessage(), '');
+        }
+    }
+
+    public function ulbWiseWardUserList(Request $request)
+    {
+        $validated = Validator::make(
+            $request->all(),
+            [
+                'ulbId'    => 'required|integer',
+                'wardName' => 'required|string'
+            ]
+        );
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $data = User::select('users.id', 'users.name', 'users.ulb_id', 'ulb_ward_masters.id as ward_id', 'ulb_ward_masters.ward_name')
+                ->join('wf_ward_users', 'wf_ward_users.user_id', 'users.id')
+                ->join('ulb_ward_masters', 'ulb_ward_masters.id', 'wf_ward_users.ward_id')
+                ->where('users.ulb_id', $request->ulbId)
+                ->where('ulb_ward_masters.ulb_id', $request->ulbId)
+                ->where('ulb_ward_masters.ward_name', $request->wardName)
+                ->orderBy('ulb_ward_masters.id')
+                ->get();
+
+            return responseMsgs(true, 'ULB wise ward user list', $data);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), '');
+        }
+    }
+
+
 }
+
+    
