@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\MenuApiMap;
 use App\Models\UlbWardMaster;
 use App\Models\UserApiExclude;
+use App\Models\UserType;
 use App\Models\ZoneMaster;
 use Exception;
 use Illuminate\Support\Facades\Config;
@@ -631,6 +632,68 @@ class ApiMasterController extends Controller
             return responseMsgs(true, "Data ", $data, "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    #========================================CRUD FOR USER TYPES=========================#
+    public function createUserType(Request $req)
+    {
+        $req->validate(['userType' => 'required|string|max:100']);
+        try {
+            $data = UserType::create(['user_type' => $req->userType]);
+            return responseMsgs(true, "User Type Created", remove_null($data), "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function getAllUserTypes(Request $req)
+    {
+        try {
+            $list = UserType::orderBy('id', 'asc')->get();
+            return responseMsgs(true, "All User Types", remove_null($list), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function getUserTypeById(Request $req)
+    {
+        $req->validate(['id' => 'required|integer']);
+        try {
+            $data = UserType::find($req->id);
+            if (!$data) throw new Exception("User Type Not Found");
+            return responseMsgs(true, "User Type Data", remove_null($data), "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function updateUserType(Request $req)
+    {
+        $req->validate(['id' => 'required|integer', 'userType' => 'required|string|max:100']);
+        try {
+            $data = UserType::find($req->id);
+            if (!$data) throw new Exception("User Type Not Found");
+            $data->user_type = $req->userType;
+            $data->save();
+            return responseMsgs(true, "User Type Updated", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    public function deleteUserType(Request $req)
+    {
+        $req->validate(['id' => 'required|integer', 'status' => 'required|boolean']);
+        try {
+            $data = UserType::find($req->id);
+            if (!$data) throw new Exception("User Type Not Found");
+            $data->status = $req->status;
+            $data->save();
+            return responseMsgs(true, "User Type Status Updated", "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 

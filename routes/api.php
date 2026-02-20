@@ -398,6 +398,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update-ulb_ward_masters', 'updateUlbWard');
         Route::post('get-by-id-ulb_ward_masters', 'getById');
         Route::post('ulb-wise-user-ward-list', 'ulbWiseWardUserList');
+
+        # crud for user_types
+        Route::post('user-type/create-user-type', 'createUserType');
+        Route::post('user-type/get-all-user-types', 'getAllUserTypes');
+        Route::post('user-type/get-user-type-by-id', 'getUserTypeById');
+        Route::post('user-type/update-user-type', 'updateUserType');
+        Route::post('user-type/delete-user-type', 'deleteUserType');
     });
 
     /**
