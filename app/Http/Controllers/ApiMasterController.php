@@ -545,27 +545,23 @@ class ApiMasterController extends Controller
     //all master list
     public function getAllUlbWard(Request $req)
     {
-        $req->validate(['ulbId' => 'nullable|integer', 'userId' => 'nullable|integer']);
+        $req->validate(['ulbId' => 'nullable|integer']);
         try {
             $query = DB::table('ulb_ward_masters')
-                ->select('ulb_ward_masters.id', 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', 'ulb_ward_masters.old_ward_name', 'ulb_ward_masters.status', 'ulb_masters.ulb_name', 'ulb_ward_masters.created_at', 'ulb_ward_masters.updated_at', DB::raw('CASE WHEN wf_ward_users.user_id IS NOT NULL THEN wf_ward_users.is_suspended ELSE NULL END as is_suspended'))
+                ->select(DB::raw('MIN(ulb_ward_masters.id) as id'), 'ulb_ward_masters.ulb_id', 'ulb_ward_masters.ward_name', DB::raw('MIN(ulb_ward_masters.old_ward_name) as old_ward_name'), DB::raw('MIN(ulb_ward_masters.status) as status'), 'ulb_masters.ulb_name', DB::raw('MIN(ulb_ward_masters.created_at) as created_at'), DB::raw('MAX(ulb_ward_masters.updated_at) as updated_at'))
                 ->join('ulb_masters', 'ulb_masters.id', '=', 'ulb_ward_masters.ulb_id')
-                ->leftJoin('wf_ward_users', function($join) use ($req) {
-                    $join->on('wf_ward_users.ward_id', '=', 'ulb_ward_masters.id');
-                    if ($req->userId) {
-                        $join->where('wf_ward_users.user_id', '=', $req->userId);
-                    }
-                })
+                ->groupBy('ulb_ward_masters.ward_name', 'ulb_ward_masters.ulb_id', 'ulb_masters.ulb_name')
                 ->orderBy('ulb_ward_masters.ward_name', 'asc');
             if ($req->ulbId) {
                 $query->where('ulb_ward_masters.ulb_id', $req->ulbId);
             }
-            $list = $query->get();
+            $list = $query->get();  
             return responseMsgs(true, "All Ward List", remove_null($list), "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
 
     //get ulb wise ward user list
     public function ulbWiseWardUserList(Request $req)
