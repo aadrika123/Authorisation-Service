@@ -90,4 +90,20 @@ class WorkflowController extends Controller
             return responseMsgs(false, $e->getMessage(), "", "120205", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
+
+    //get workflow details by alt_name
+    public function getWorkflowByAltName(Request $req)
+    {
+        try {
+            $req->validate([
+                'altName' => 'required'
+            ]);
+            $workflow = new WfWorkflow();
+            $data = $workflow->getByAltName($req->altName);
+
+            return responseMsgs(true, "Workflow Details", $data, "120206", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "120206", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
 }

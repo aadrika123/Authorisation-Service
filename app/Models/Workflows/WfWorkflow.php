@@ -177,4 +177,23 @@ class WfWorkflow extends Model
             ->where('wf_workflows.is_suspended', false)
             ->get();
     }
+
+    /**
+     * Get workflow details by alt_name
+     */
+    public function getByAltName($altName)
+    {
+        return WfWorkflow::select(
+            'wf_workflows.id',
+            'wf_workflows.initiator_role_id',
+            'wf_workflows.finisher_role_id',
+            'ir.role_name as initiator_role_name',
+            'fr.role_name as finisher_role_name'
+        )
+            ->leftJoin('wf_roles as ir', 'ir.id', 'wf_workflows.initiator_role_id')
+            ->leftJoin('wf_roles as fr', 'fr.id', 'wf_workflows.finisher_role_id')
+            ->where('wf_workflows.alt_name', $altName)
+            ->where('wf_workflows.is_suspended', false)
+            ->first();
+    }
 }
