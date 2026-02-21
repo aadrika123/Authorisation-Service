@@ -4,6 +4,7 @@ namespace App\Http;
 
 use App\Http\Middleware\ApiGatewayMiddleware;
 use App\Http\Middleware\ApiPermission;
+use App\Http\Middleware\AttachUserRole;
 use App\Http\Middleware\ExpireBearerToken;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -48,6 +49,7 @@ class Kernel extends HttpKernel
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            AttachUserRole::class,
         ],
     ];
 
@@ -73,6 +75,7 @@ class Kernel extends HttpKernel
         'api.gateway' => ApiGatewayMiddleware::class,
         'log.route' => LogRoute::class,
         'apiPermission' => ApiPermission::class,
-        'roleApiPermission' => RoleApiPermissionMiddleware::class
+        'roleApiPermission' => RoleApiPermissionMiddleware::class,
+        'attach.role' => AttachUserRole::class
     ];
 }
