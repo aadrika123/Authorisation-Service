@@ -66,9 +66,10 @@ class WorkflowController extends Controller
     public function getAllWorkflow(Request $req)
     {
         try {
-            $ulbId = authUser()->ulb_id;
+            // $ulbId = authUser()->ulb_id;
             $list = new WfWorkflow();
-            $workflow = $list->listUlbWorkflow($ulbId);
+            // $workflow = $list->listUlbWorkflow($ulb_id);
+            $workflow = $list->listUlbWorkflow();
 
             return responseMsgs(true, "All Workflow List", $workflow, "120204", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
