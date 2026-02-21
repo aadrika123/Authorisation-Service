@@ -232,6 +232,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('user-managment/v1/crud/wf-workflow/get', 'workflowbyId');         #API_ID=120203  | Get Workflow By Id
         Route::post('user-managment/v1/crud/wf-workflow/list', 'getAllWorkflow');      #API_ID=120204  | Get All Workflow
         Route::post('user-managment/v1/crud/wf-workflow/delete', 'deleteWorkflow');    #API_ID=120205  | Delete Workflow
+        Route::post('user-managment/v1/crud/wf-workflow/by-altname', 'getWorkflowByAltName'); #API_ID=120206  | Get Workflow By Alt Name
     });
 
     /**
