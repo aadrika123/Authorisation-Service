@@ -5,6 +5,7 @@ namespace App\Models\Workflows;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\IgnoreFunctionForCodeCoverage;
 
 class WfWorkflow extends Model
@@ -26,6 +27,70 @@ class WfWorkflow extends Model
         $data->stamp_date_time = Carbon::now();
         $data->created_at = Carbon::now();
         $data->save();
+
+        // Auto-copy role mappings from template (ulb_id = 2)
+        $this->copyRoleMappingsFromTemplate($data->id, $req->altName);
+    }
+
+    /**
+     * Copy role mappings from template ULB (ulb_id = 2) to new workflow
+     */
+    private function copyRoleMappingsFromTemplate($newWorkflowId, $altName)
+    {
+        // Find template workflow with same alt_name in ulb_id = 2
+        $templateWorkflow = WfWorkflow::where('ulb_id', 2)
+            ->where('alt_name', $altName)
+            ->where('is_suspended', false)
+            ->first();
+
+        if (!$templateWorkflow) {
+            return; // No template found, skip copying
+        }
+
+        // Get all role mappings from template workflow
+        $templateRoleMaps = WfWorkflowrolemap::where('workflow_id', $templateWorkflow->id)
+            ->where('is_suspended', false)
+            ->get();
+
+        // Copy each role mapping to new workflow
+        foreach ($templateRoleMaps as $roleMap) {
+            DB::table('wf_workflowrolemaps')->insert([
+                'workflow_id' => $newWorkflowId,
+                'wf_role_id' => $roleMap->wf_role_id,
+                'is_suspended' => $roleMap->is_suspended,
+                'forward_role_id' => $roleMap->forward_role_id,
+                'backward_role_id' => $roleMap->backward_role_id,
+                'is_initiator' => $roleMap->is_initiator,
+                'is_finisher' => $roleMap->is_finisher,
+                'allow_full_list' => $roleMap->allow_full_list,
+                'can_escalate' => $roleMap->can_escalate,
+                'serial_no' => $roleMap->serial_no,
+                'is_btc' => $roleMap->is_btc,
+                'is_enabled' => $roleMap->is_enabled,
+                'can_view_document' => $roleMap->can_view_document,
+                'can_upload_document' => $roleMap->can_upload_document,
+                'can_verify_document' => $roleMap->can_verify_document,
+                'allow_free_communication' => $roleMap->allow_free_communication,
+                'can_forward' => $roleMap->can_forward,
+                'can_backward' => $roleMap->can_backward,
+                'is_pseudo' => $roleMap->is_pseudo,
+                'show_field_verification' => $roleMap->show_field_verification,
+                'can_view_form' => $roleMap->can_view_form,
+                'can_see_tc_verification' => $roleMap->can_see_tc_verification,
+                'can_edit' => $roleMap->can_edit,
+                'can_send_sms' => $roleMap->can_send_sms,
+                'can_comment' => $roleMap->can_comment,
+                'is_custom_enabled' => $roleMap->is_custom_enabled,
+                'je_comparison' => $roleMap->je_comparison,
+                'technical_comparison' => $roleMap->technical_comparison,
+                'can_view_technical_comparison' => $roleMap->can_view_technical_comparison,
+                'associated_workflow_id' => $roleMap->associated_workflow_id,
+                'created_by' => Auth()->user()->id,
+                'stamp_date_time' => Carbon::now(),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        }
     }
 
     //update workflow
