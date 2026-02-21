@@ -51,7 +51,7 @@ class WfWorkflow extends Model
     }
 
     //All workflow list
-    public function listUlbWorkflow($ulbId)
+    public function listUlbWorkflow()
     {
         $data = WfWorkflow::select(
             'wf_workflows.*',
@@ -65,7 +65,7 @@ class WfWorkflow extends Model
             ->leftJoin('wf_roles', 'wf_roles.id', 'wf_workflows.initiator_role_id')
             ->leftJoin('wf_roles as frole', 'frole.id', 'wf_workflows.finisher_role_id')
             ->where('wf_workflows.is_suspended', false)
-            ->where('wf_workflows.ulb_id', $ulbId)
+            // ->where('wf_workflows.ulb_id', $ulbId)
             ->orderByDesc('wf_workflows.id')
             ->get();
         return $data;
