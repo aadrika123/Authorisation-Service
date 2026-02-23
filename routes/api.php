@@ -537,6 +537,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('dynamic-table/update', 'updateTableRecord');
         Route::post('dynamic-table/delete', 'deleteTableRecord');
         Route::post('dynamic-table/module-percentage', 'getModuleDataPercentage');
+        Route::post('dynamic-table/module-completion-toggle', 'toggleCompletion');
     });
 
     /**

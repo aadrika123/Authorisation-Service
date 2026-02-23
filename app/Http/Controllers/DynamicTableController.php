@@ -197,7 +197,8 @@ class DynamicTableController extends Controller
         }
 
         try {
-            $tables = ModuleRegistry::where('module_id', $req->moduleId)
+            $tables = ModuleRegistry::select('table_name', 'database_name', 'is_completed')
+                ->where('module_id', $req->moduleId)
                 ->where('ulb_id', $req->ulbId)
                 ->where('status', true)
                 ->get();
@@ -220,17 +221,53 @@ class DynamicTableController extends Controller
 
                 $percentage = round(($tablesWithData / $totalTables) * 100, 2);
 
+                $isCompleted = $tables->first()->is_completed ?? false;
+
                 $data = [
                     'total_tables' => $totalTables,
-                    'tables_with_data' => $tablesWithData,
-                    'tables_without_data' => $totalTables - $tablesWithData,
-                    'completion_percentage' => $percentage
+                    'completion_percentage' => $percentage,
+                    'is_completed' => $isCompleted
                 ];
             }
 
             return responseMsgs($status, $message, $data, "DYN007", "01", responseTime(), $req->getMethod(), $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), "", "DYN007", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        }
+    }
+
+    // Toggle is_completed status
+    public function toggleCompletion(Request $req)
+    {
+        $validated = Validator::make($req->all(), [
+            'tableName' => 'required|string',
+            'ulbId' => 'required|integer',
+            'moduleId' => 'required|integer'
+        ]);
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+
+        try {
+            $registry = ModuleRegistry::where('table_name', $req->tableName)
+                ->where('ulb_id', $req->ulbId)
+                ->where('module_id', $req->moduleId)
+                ->where('status', true)
+                ->first();
+            
+            $status = (bool)$registry;
+            $message = $status ? "Completion status toggled successfully" : "Table not found";
+            $data = "";
+
+            if ($status) {
+                $registry->is_completed = !$registry->is_completed;
+                $registry->save();
+                $data = ['is_completed' => $registry->is_completed];
+            }
+
+            return responseMsgs($status, $message, $data, "DYN008", "01", responseTime(), $req->getMethod(), $req->deviceId);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), "", "DYN008", "01", responseTime(), $req->getMethod(), $req->deviceId);
         }
     }
 }
