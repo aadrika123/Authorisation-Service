@@ -236,11 +236,10 @@ class DynamicTableController extends Controller
         }
     }
 
-    // Toggle is_completed status
+    // Toggle is_completed status for all tables in a module
     public function toggleCompletion(Request $req)
     {
         $validated = Validator::make($req->all(), [
-            'tableName' => 'required|string',
             'ulbId' => 'required|integer',
             'moduleId' => 'required|integer'
         ]);
@@ -249,20 +248,25 @@ class DynamicTableController extends Controller
         }
 
         try {
-            $registry = ModuleRegistry::where('table_name', $req->tableName)
-                ->where('ulb_id', $req->ulbId)
+            $registries = ModuleRegistry::where('ulb_id', $req->ulbId)
                 ->where('module_id', $req->moduleId)
                 ->where('status', true)
-                ->first();
+                ->get();
             
-            $status = (bool)$registry;
-            $message = $status ? "Completion status toggled successfully" : "Table not found";
+            $status = !$registries->isEmpty();
+            $message = $status ? "Completion status toggled successfully" : "No tables found for this module";
             $data = "";
 
             if ($status) {
-                $registry->is_completed = !$registry->is_completed;
-                $registry->save();
-                $data = ['is_completed' => $registry->is_completed];
+                $currentStatus = $registries->first()->is_completed ?? false;
+                $newStatus = !$currentStatus;
+                
+                ModuleRegistry::where('ulb_id', $req->ulbId)
+                    ->where('module_id', $req->moduleId)
+                    ->where('status', true)
+                    ->update(['is_completed' => $newStatus]);
+                
+                $data = ['is_completed' => $newStatus];
             }
 
             return responseMsgs($status, $message, $data, "DYN008", "01", responseTime(), $req->getMethod(), $req->deviceId);
