@@ -1573,7 +1573,7 @@ class UlbController extends Controller
                     DB::table('module_registry')
                         ->where('ulb_id', $ulbId)
                         ->where('module_id', $moduleId)
-                        ->update(['status' => false, 'updated_at' => now()]);
+                        ->delete();
                     $message = "Module disabled for ULB";
                 }
             } else {
@@ -1624,8 +1624,44 @@ class UlbController extends Controller
                     'created_at'    => now(),
                     'updated_at'    => now()
                 ]);
+                
+                // Copy dummy data from master ULB table to new ULB
+                $this->copyTableData($row->table_name, $row->database_name, $masterUlb, $ulbId);
             }
         }
+    }
+
+    private function copyTableData($tableName, $databaseName, $masterUlbId, $newUlbId)
+    {
+        try {
+            $connection = $this->getConnection($databaseName);
+            
+            $dummyData = $connection->table($tableName)
+                ->where('ulb_id', $masterUlbId)
+                ->get();
+
+            foreach ($dummyData as $record) {
+                $recordArray = (array) $record;
+                unset($recordArray['id']);
+                $recordArray['ulb_id'] = $newUlbId;
+                
+                $connection->table($tableName)->insert($recordArray);
+            }
+        } catch (Exception $e) {
+            // Skip if table doesn't exist or has no ulb_id column
+        }
+    }
+
+    private function getConnection($databaseName)
+    {
+        if ($databaseName && $databaseName !== config('database.connections.pgsql.database')) {
+            $config = config('database.connections.pgsql');
+            $config['database'] = $databaseName;
+            config(['database.connections.dynamic' => $config]);
+            DB::purge('dynamic');
+            return DB::connection('dynamic');
+        }
+        return DB::connection();
     }
 
 
