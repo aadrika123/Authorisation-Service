@@ -536,10 +536,25 @@ class ApiMasterController extends Controller
                 "ulbId" => "required",
                 "wardNumber" => "required"
             ]);
+            DB::beginTransaction();
             $create = new UlbWardMaster();
-            $create->addUlbWard($request);
+            $wardId = $create->addUlbWard($request);
+            
+            $exists = DB::table('ulb_new_wardmaps')
+                ->where('old_ward_mstr_id', $wardId)
+                ->where('new_ward_mstr_id', $wardId)
+                ->where('ulb_id', $request->ulbId)
+                ->exists();
+            
+            if (!$exists) {
+                $maxId = DB::table('ulb_new_wardmaps')->max('id') ?? 0;
+                DB::statement("INSERT INTO ulb_new_wardmaps (id, old_ward_mstr_id, new_ward_mstr_id, ulb_id, status) VALUES (?, ?, ?, ?, ?)", [$maxId + 1, $wardId, $wardId, $request->ulbId, 1]);
+            }
+            DB::commit();
+            
             return responseMsgs(true, "Add  Data ", $create, "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         } catch (Exception $e) {
+            DB::rollBack();
             return responseMsgs(false, $e->getMessage(), "", "120201", "01", responseTime(), $request->getMethod(), $request->deviceId);
         }
     }
