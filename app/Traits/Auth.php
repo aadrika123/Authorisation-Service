@@ -52,34 +52,42 @@ trait Auth
             $user->workflow_participant = $request->workflowParticipant;
         }
         if ($request->photo) {
-            // $filename = explode('.', $request->photo->getClientOriginalName());
-            // $document = $request->photo;
-            // $imageName = $docUpload->upload($filename[0], $document, $imageRelativePath);
-            // $user->photo_relative_path = $imageRelativePath;
-            // $user->photo = $imageName;
             $document = $request->photo;
-            $newRequest = new Request([
-                'document' => $document
-            ]);
+            $newRequest = new Request(['document' => $document]);
 
-            $imageName = $docUpload->checkDoc($newRequest);
-            $user->unique_id = $imageName['data']['uniqueId'];
-            $user->reference_no = $imageName['data']['ReferenceNo'];
+            $response = $docUpload->checkDoc($newRequest);
+            
+            if (is_object($response) && method_exists($response, 'getContent')) {
+                $responseData = json_decode($response->getContent(), true);
+            } elseif (is_array($response)) {
+                $responseData = $response;
+            } else {
+                $responseData = null;
+            }
+            
+            if (isset($responseData['data']['uniqueId'])) {
+                $user->unique_id = $responseData['data']['uniqueId'];
+                $user->reference_no = $responseData['data']['ReferenceNo'];
+            }
         }
         if ($request->signature) {
-            // $filename = explode('.', $request->signature->getClientOriginalName());
-            // $document = $request->signature;
-            // $imageName = $docUpload->upload($filename[0], $document, $signatureRelativePath);
-            // $user->sign_relative_path = $signatureRelativePath;
-            // $user->signature = $imageName;
             $document = $request->signature;
-            $newRequest = new Request([
-                'document' => $document
-            ]);
+            $newRequest = new Request(['document' => $document]);
 
-            $imageName = $docUpload->checkDoc($newRequest);
-            $user->unique_id = $imageName['data']['uniqueId'];
-            $user->reference_no = $imageName['data']['ReferenceNo'];
+            $response = $docUpload->checkDoc($newRequest);
+            
+            if (is_object($response) && method_exists($response, 'getContent')) {
+                $responseData = json_decode($response->getContent(), true);
+            } elseif (is_array($response)) {
+                $responseData = $response;
+            } else {
+                $responseData = null;
+            }
+            
+            if (isset($responseData['data']['uniqueId'])) {
+                $user->unique_id = $responseData['data']['uniqueId'];
+                $user->reference_no = $responseData['data']['ReferenceNo'];
+            }
         }
 
         $token = Str::random(80);                       //Generating Random Token for Initial
