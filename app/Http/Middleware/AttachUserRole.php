@@ -28,7 +28,7 @@ class AttachUserRole
             }
 
             $userWards = DB::table('wf_ward_users')
-                ->select('ward_id', 'admin_ward_id')
+                ->select('ward_id')
                 ->where('user_id', $user->id)
                 ->where('is_suspended', false)
                 ->get();
