@@ -301,6 +301,26 @@ class WardUserController extends Controller
         }
     }
 
+    // user wise ward list
+    public function getUserWardList(Request $request)
+    {
+        $validated = Validator::make($request->all(), [
+            'userId' => 'required|exists:users,id'
+        ]);
+        if ($validated->fails()) {
+            return validationError($validated);
+        }
+        try {
+            $wards = UlbWardMaster::select('ulb_ward_masters.id', 'ulb_ward_masters.ward_name')
+                ->join('wf_ward_users', 'wf_ward_users.ward_id', 'ulb_ward_masters.id')
+                ->where('wf_ward_users.user_id', $request->userId)
+                ->where('wf_ward_users.is_suspended', false)
+                ->get();
+            return responseMsgs(true, 'Ward list of user', $wards);
+        } catch (Exception $e) {
+            return responseMsgs(false, $e->getMessage(), '');
+        }
+    }
 
 }
 

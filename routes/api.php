@@ -465,6 +465,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('workflow/get-all/list-tc', 'getTcTlJSKList');
         Route::post('toggle-ulb-wise-ward-user', 'toggleULBWaiseWardUser');
         Route::post('ulb-wise-ward-user-list', 'ulbWiseWardUserList');
+        Route::post('get-user-ward-list', 'getUserWardList');
     });
 
 
