@@ -186,22 +186,33 @@ class MenuRoleUserMapController extends Controller
             $query = "SELECT
                             m.id,
                             m.menu_role_name,
+                            m.module_id,
+                            mm.module_name,
                             mr.user_id,
                             m.is_suspended AS issuspended,
                             CASE
                                 WHEN mr.user_id IS NULL THEN false
                                 ELSE true
                             END AS permission_status
-                        FROM menu_roles AS m    
+                        FROM menu_roles AS m
+                        LEFT JOIN module_masters AS mm ON mm.id = m.module_id
                         LEFT JOIN (
                             SELECT * FROM menu_roleusermaps
                             WHERE user_id = ? AND is_suspended = false
                         ) AS mr ON mr.menu_role_id = m.id
-                        ORDER BY m.id";
+                        ORDER BY m.module_id, m.id";
 
             $data = DB::select($query, [$req->userId]);
+            
+            $groupedData = collect($data)->groupBy('module_id')->map(function($items, $moduleId) {
+                return [
+                    'module_id' => $moduleId,
+                    'module_name' => $items->first()->module_name,
+                    'roles' => $items->values()
+                ];
+            })->values();
 
-            return responseMsgs(true, 'Menu Role Map By User Id', $data, "120907", "1.0", responseTime(), "POST", $req->deviceId);
+            return responseMsgs(true, 'Menu Role Map By User Id', $groupedData, "120907", "1.0", responseTime(), "POST", $req->deviceId);
         } catch (Exception $e) {
             return responseMsgs(false, $e->getMessage(), [], "120907", "1.0", responseTime(), "POST", $req->deviceId);
         }
