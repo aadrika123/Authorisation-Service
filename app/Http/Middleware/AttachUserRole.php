@@ -12,9 +12,10 @@ class AttachUserRole
     {
         if ($user = auth()->user()) {
             $roleData = DB::table('users')
-                ->select('wf_roles.id as wfRoleId', 'wf_roles.role_name')
+                ->select('wf_roles.id as wfRoleId', 'wf_roles.role_name', 'ulb_masters.ulb_name', 'users.emp_id')
                 ->leftJoin('wf_roleusermaps', 'wf_roleusermaps.user_id', 'users.id')
                 ->leftJoin('wf_roles', 'wf_roles.id', 'wf_roleusermaps.wf_role_id')
+                ->leftJoin('ulb_masters', 'ulb_masters.id', 'users.ulb_id')
                 ->where('users.id', $user->id)
                 ->where('wf_roleusermaps.is_suspended', false)
                 ->first();
@@ -22,7 +23,17 @@ class AttachUserRole
             if ($roleData) {
                 $user->wfRoleId = $roleData->wfRoleId;
                 $user->role_name = $roleData->role_name;
+                $user->ulb_name = $roleData->ulb_name;
+                $user->emp_id = $roleData->emp_id;
             }
+
+            $userWards = DB::table('wf_ward_users')
+                ->select('ward_id')
+                ->where('user_id', $user->id)
+                ->where('is_suspended', false)
+                ->get();
+
+            $user->userWard = $userWards;
         }
 
         return $next($request);
