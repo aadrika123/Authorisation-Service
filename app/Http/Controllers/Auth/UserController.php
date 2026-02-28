@@ -1248,8 +1248,6 @@ class UserController extends Controller
                 return responseMsgs(false, "Unauthorized access", [], "", "01", responseTime(), "POST", "");
             }
 
-            $permittedWards = [];
-            $response       = [];
             $routList       = collect();
 
             // Fetch user details
@@ -1270,6 +1268,13 @@ class UserController extends Controller
             if (!$lastLogin) {
                 return responseMsgs(false, "User not found or suspended", [], "", "01", responseTime(), "POST", "");
             }
+
+            // Fetch permitted wards
+            $permittedWards = DB::table('wf_ward_users')
+                ->select('ward_id')
+                ->where('user_id', $user->id)
+                ->where('is_suspended', false)
+                ->get();
 
             // Fetch document details
             $docUpload  = new DocUpload();
