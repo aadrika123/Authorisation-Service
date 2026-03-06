@@ -102,7 +102,21 @@ class UlbController extends Controller
                 $logoPath = 'Uploads/Icon/' . $fileName;
             }
             
-            $req->merge(['logo' => $logoPath]);
+            // Map ulb_type to category
+            $category = null;
+            if ($req->ulb_type) {
+                $ulbTypeMap = [
+                    'Town Panchayat' => 1,
+                    'Municipal Council' => 2,
+                    'Municipal Corporation' => 3
+                ];
+                $category = $ulbTypeMap[$req->ulb_type] ?? null;
+            }
+            
+            $req->merge([
+                'logo' => $logoPath,
+                'category' => $category
+            ]);
             
             $create = new UlbMaster();
             $ulbId = $create->addUlbMaster($req);
