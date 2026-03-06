@@ -103,19 +103,21 @@ class UlbController extends Controller
             }
             
             // Map ulb_type to category
+            $ulbType = $req->ulb_type ?? $req->ulbType;
             $category = null;
-            if ($req->ulb_type) {
+            if ($ulbType) {
                 $ulbTypeMap = [
                     'Town Panchayat' => 1,
                     'Municipal Council' => 2,
                     'Municipal Corporation' => 3
                 ];
-                $category = $ulbTypeMap[$req->ulb_type] ?? null;
+                $category = $ulbTypeMap[$ulbType] ?? null;
             }
             
             $req->merge([
                 'logo' => $logoPath,
-                'category' => $category
+                'category' => $category,
+                'ulbType' => $ulbType
             ]);
             
             $create = new UlbMaster();
